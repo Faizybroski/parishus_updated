@@ -1,0 +1,177 @@
+@import url('https://fonts.cdnfonts.com/css/sergio-trendy');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Parish Design System - Dark Theme with Peach/Gold & Sage Green Accents */
+
+@layer base {
+  :root {
+    /* Dark theme base colors */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 95%;
+
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 95%;
+
+    /* Primary - Peach/Gold accent */
+    --primary: 32 58% 75%;
+    --primary-foreground: 0 0% 10%;
+
+    /* Secondary - Sage Green accent */
+    --secondary: 142 22% 67%;
+    --secondary-foreground: 0 0% 10%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 142 22% 67%;
+    --accent-foreground: 0 0% 10%;
+
+    --destructive: 0 62.8% 60%;
+    --destructive-foreground: 0 0% 95%;
+
+    --border: 0 0% 20%;
+    --input: 0 0% 15%;
+    --ring: 32 58% 75%;
+
+    --radius: 0.75rem;
+
+    /* Sidebar colors */
+    --sidebar-background: 0 0% 5%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 32 58% 75%;
+    --sidebar-primary-foreground: 0 0% 10%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 32 58% 75%;
+
+    /* Parish specific colors */
+    --peach-gold: 32 58% 75%;
+    --sage-green: 142 22% 67%;
+    --dark-surface: 0 0% 8%;
+    --dark-surface-alt: 0 0% 12%;
+    --mystery-purple: 270 50% 60%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--peach-gold)), hsl(var(--sage-green)));
+    --gradient-mystery: linear-gradient(135deg, hsl(var(--mystery-purple)), hsl(var(--peach-gold)));
+    --gradient-dark: linear-gradient(135deg, hsl(var(--dark-surface)), hsl(var(--dark-surface-alt)));
+    
+    /* Shadows */
+    --shadow-elegant: 0 10px 30px -10px hsl(158 23% 68% / 0.3);
+    --shadow-glow: 0 0 40px hsl(158 23% 68% / 0.3);
+    --shadow-card: 0 4px 20px -4px hsl(158 23% 68% / 0.4);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--primary) / 0.5);
+    border-radius: 9999px;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--primary));
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary) / 0.6) hsl(var(--background));
+  }
+
+  .dark {
+    /* Same as root since we're dark-first */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 95%;
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 32 58% 75%;
+    --primary-foreground: 0 0% 10%;
+    --secondary: 142 22% 67%;
+    --secondary-foreground: 0 0% 10%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 142 22% 67%;
+    --accent-foreground: 0 0% 10%;
+    --destructive: 0 62.8% 60%;
+    --destructive-foreground: 0 0% 95%;
+    --border: 0 0% 20%;
+    --input: 0 0% 15%;
+    --ring: 32 58% 75%;
+    --sidebar-background: 0 0% 5%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 32 58% 75%;
+    --sidebar-primary-foreground: 0 0% 10%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 32 58% 75%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Line clamp utilities */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+
+#profileWrapper{
+
+    @media (max-width: 445px) {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+#notificationSheet{
+
+    @media (min-width: 320px) and (max-width: 640px) {
+    width: 330px;
+  }
+}

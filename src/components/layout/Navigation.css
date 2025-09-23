@@ -1,0 +1,17 @@
+@media (min-width: 1100px) {
+  .nav-items {
+    display: flex !important;
+  }
+  .hamburger-toggle {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1099px) {
+  .nav-items {
+    display: none !important;
+  }
+  .hamburger-toggle {
+    display: block !important;
+  }
+}
