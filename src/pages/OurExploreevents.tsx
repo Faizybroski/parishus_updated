@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { ChevronDown, Calendar } from "lucide-react";
+import PriceFilter from "@/components/filter/PriceFilter";
 
 const OurExploreEvents = () => {
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -9,6 +10,10 @@ const OurExploreEvents = () => {
   const [timeframe, setTimeframe] = useState("This Week");
   const [city, setCity] = useState("Los Angeles");
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [showFeatured, setShowFeatured] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [priceRange, setPriceRange] = useState([0, 200]); // min and max
+  const maxPrice = 1000; // or whatever ceiling you want
 
   const trendingOptions = ["Trending", "Newest", "Largest"];
   const timeframeOptions = ["Today", "This Month", "Right Now"];
@@ -209,10 +214,11 @@ const OurExploreEvents = () => {
             showStatus={false}
             interval={4000}
             showArrows={false}
-            onChange={(index) => setCurrentSlide(index)} // Track active slide
+            onChange={(index) => setCurrentSlide(index)}
+            swipeScrollTolerance={50}
           >
             {sliderData.map((item, index) => (
-              <div key={index} className="relative">
+              <div key={index} className="relative" style={{ touchAction: "pan-y" }}>
                 {/* Matte background for each slide */}
                 <div
                   className="absolute inset-0 z-0"
@@ -248,6 +254,35 @@ const OurExploreEvents = () => {
         </div>
       </div>
 
+      <div className=" w-full z-50 bg-black/80 backdrop-blur-md flex sm:hidden">
+        <button
+          className={`flex-1 py-3 text-center font-semibold ${
+            showFeatured ? "bg-white text-black" : "text-white"
+          }`}
+          onClick={() => setShowFeatured(!showFeatured)}
+        >
+          Featured Events
+        </button>
+        <button
+          className="flex-1 py-3 text-center font-semibold text-white"
+          onClick={() => setFilterOpen(true)}
+        >
+          Filter
+        </button>
+      </div>
+
+      {filterOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
+          <PriceFilter
+            onApply={(selectedRange) => {
+              setPriceRange(selectedRange);
+              setFilterOpen(false);
+            }}
+            onClose={() => setFilterOpen(false)} // 👈 pass this too
+          />
+        </div>
+      )}
+
       <div className="flex flex-wrap m-5 justify-center gap-3">
         {Array.from({ length: 42 }).map((_, index) => {
           const img = cardImages[index % cardImages.length];
@@ -265,7 +300,8 @@ const OurExploreEvents = () => {
                   alt={`Event ${index + 1}`}
                 />
                 <span className="flex items-center justify-center absolute top-2 bg-white right-4 border border-white/20 text-black text-sm px-4 py-1 rounded-full shadow-md">
-                  <Calendar className="w-3 h-3 mr-2"/>More Dates
+                  <Calendar className="w-3 h-3 mr-2" />
+                  More Dates
                 </span>
 
                 {/* Title container with black bg + gradient top */}
