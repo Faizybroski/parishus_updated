@@ -47,7 +47,6 @@ const Navigation = () => {
       { icon: Heart, label: "RSVPs", path: "/rsvps" },
       { icon: MessageSquare, label: "Feedback", path: "/feedback" },
       { icon: Star, label: "Crossed Paths", path: "/crossed-paths" },
-      { icon: Receipt, label: "Subscriptions", path: "/subscription" },
     ];
 
     if (profile?.role === "admin") {
@@ -135,6 +134,10 @@ const Navigation = () => {
                     <DropdownMenuItem onClick={() => navigate("/profile")}>
                       <User className="mr-2 h-4 w-4" />
                       Profile
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/subscription")}>
+                      <Receipt  className="mr-2 h-4 w-4" />
+                      Subscription
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate("/user/dashboard")}>
                       <LayoutDashboard  className="mr-2 h-4 w-4" />

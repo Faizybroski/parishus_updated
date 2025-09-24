@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { ChevronDown, Calendar } from "lucide-react";
 import PriceFilter from "@/components/filter/PriceFilter";
+import ParishLogo from "@/components/ui/logo";
 
 const OurExploreEvents = () => {
+  const [loading, setLoading] = useState(true);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [trending, setTrending] = useState("Trending");
   const [timeframe, setTimeframe] = useState("This Week");
@@ -14,6 +16,33 @@ const OurExploreEvents = () => {
   const [filterOpen, setFilterOpen] = useState(false);
   const [priceRange, setPriceRange] = useState([0, 200]); // min and max
   const maxPrice = 1000; // or whatever ceiling you want
+  const [width, setWidth] = useState(400); // default width
+
+  const updateWidth = () => {
+    setLoading(true);
+    const zoom = window.devicePixelRatio; // 1 = 100%, 1.5 = 150%, etc.
+    let newWidth = 400;
+
+    if (zoom >= 1.5) newWidth = 375;
+    else if (zoom >= 1.25) newWidth = 315;
+    else if (zoom >= 1.1) newWidth = 350;
+    else if (zoom >= 1.0) newWidth = 400;
+    else if (zoom >= 0.9) newWidth = 325;
+    else if (zoom >= 0.8) newWidth = 375;
+    else if (zoom >= 0.75) newWidth = 390;
+    else if (zoom >= 0.67) newWidth = 350;
+    else if (zoom >= 0.5) newWidth = 390;
+    else if (zoom >= 0.33) newWidth = 580;
+
+    setWidth(newWidth);
+    setTimeout(() => setLoading(false), 300);
+  };
+
+  useEffect(() => {
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
 
   const trendingOptions = ["Trending", "Newest", "Largest"];
   const timeframeOptions = ["Today", "This Month", "Right Now"];
@@ -119,6 +148,14 @@ const OurExploreEvents = () => {
     "https://posh.vip/cdn-cgi/image/quality=85,fit=scale-down,format=webp,width=1920/https://posh-images-originals-production.s3.amazonaws.com/68a3b441145a5d2c323b60f0",
   ];
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <h1 className="parish-loader text-7xl font-extrabold">Parish</h1>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#010101] text-white">
       <div className="w-full relative -mt-[2px]">
@@ -206,7 +243,7 @@ const OurExploreEvents = () => {
         </nav>
 
         {/* Carousel BELOW nav */}
-        <div className="pt-[80px]">
+        <div className="pt-[80px] touch-pan-y">
           <Carousel
             showThumbs={false}
             autoPlay
@@ -215,10 +252,17 @@ const OurExploreEvents = () => {
             interval={4000}
             showArrows={false}
             onChange={(index) => setCurrentSlide(index)}
+            swipeable={true}
+            preventMovementUntilSwipeScrollTolerance={true}
             swipeScrollTolerance={50}
+            emulateTouch={true}
           >
             {sliderData.map((item, index) => (
-              <div key={index} className="relative" style={{ touchAction: "pan-y" }}>
+              <div
+                key={index}
+                className="relative"
+                style={{ touchAction: "pan-y" }}
+              >
                 {/* Matte background for each slide */}
                 <div
                   className="absolute inset-0 z-0"
@@ -289,13 +333,14 @@ const OurExploreEvents = () => {
           return (
             <div
               key={index}
-              className="rounded-lg overflow-hidden shadow-lg border border-[0.1px] hover:border-white hover:bg-white/10 hover:cursor-pointer transition-all duration-300 w-[325px]"
+              className="rounded-lg overflow-hidden shadow-lg border border-[0.1px] hover:border-white hover:bg-white/10 hover:cursor-pointer transition-all duration-300 w-[375px]"
+              style={{ width: `${width}px` }}
             >
               <div className="relative">
                 {/* Image */}
                 <img
                   className="w-full object-cover"
-                  style={{ height: "30rem" }}
+                  style={{ height: "35rem" }}
                   src={img}
                   alt={`Event ${index + 1}`}
                 />
