@@ -153,6 +153,54 @@
   animation: fillText 3s ease-in-out infinite alternate;
 }
 
+/* In your CSS file */
+.event-container {
+  container-type: inline-size;
+}
+
+.event-card {
+  width: 400px;
+  transition: width 0.3s ease;
+}
+
+/* Container queries for responsive behavior */
+@container (max-width: 400px) {
+  .event-card {
+    width: 350px;
+  }
+}
+
+@container (max-width: 350px) {
+  .event-card {
+    width: 300px;
+  }
+}
+
+/* Or use standard media queries */
+@media (max-width: 1920px) {
+  .event-card {
+    width: 400px;
+  }
+}
+
+@media (max-width: 1536px) {
+  .event-card {
+    width: 375px;
+  }
+}
+
+@media (max-width: 1366px) {
+  .event-card {
+    width: 350px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .event-card {
+    width: 315px;
+  }
+}
+
 @keyframes fillText {
   0% {
     clip-path: inset(0 100% 0 0); /* hidden */

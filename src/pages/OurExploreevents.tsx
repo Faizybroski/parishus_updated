@@ -4,9 +4,10 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { ChevronDown, Calendar } from "lucide-react";
 import PriceFilter from "@/components/filter/PriceFilter";
 import ParishLogo from "@/components/ui/logo";
+import {useZoomWidth} from "@/hooks/use-width"
 
 const OurExploreEvents = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [trending, setTrending] = useState("Trending");
   const [timeframe, setTimeframe] = useState("This Week");
@@ -16,33 +17,54 @@ const OurExploreEvents = () => {
   const [filterOpen, setFilterOpen] = useState(false);
   const [priceRange, setPriceRange] = useState([0, 200]); // min and max
   const maxPrice = 1000; // or whatever ceiling you want
-  const [width, setWidth] = useState(400); // default width
+  const width = useZoomWidth();
+  // const [width, setWidth] = useState(400); // default width
 
-  const updateWidth = () => {
-    setLoading(true);
-    const zoom = window.devicePixelRatio; // 1 = 100%, 1.5 = 150%, etc.
-    let newWidth = 400;
+  // const getZoom = () => {
+  //   const div = document.createElement("div");
+  //   div.style.width = "1in";
+  //   div.style.height = "1px";
+  //   div.style.position = "absolute";
+  //   div.style.top = "-100%"; // hide offscreen
+  //   document.body.appendChild(div);
 
-    if (zoom >= 1.5) newWidth = 375;
-    else if (zoom >= 1.25) newWidth = 315;
-    else if (zoom >= 1.1) newWidth = 350;
-    else if (zoom >= 1.0) newWidth = 400;
-    else if (zoom >= 0.9) newWidth = 325;
-    else if (zoom >= 0.8) newWidth = 375;
-    else if (zoom >= 0.75) newWidth = 390;
-    else if (zoom >= 0.67) newWidth = 350;
-    else if (zoom >= 0.5) newWidth = 390;
-    else if (zoom >= 0.33) newWidth = 580;
+  //   const pxPerInch = div.offsetWidth;
+  //   document.body.removeChild(div);
 
-    setWidth(newWidth);
-    setTimeout(() => setLoading(false), 300);
-  };
+  //   return pxPerInch / 96; // 96px = 100% zoom
+  // };
 
-  useEffect(() => {
-    updateWidth();
-    window.addEventListener("resize", updateWidth);
-    return () => window.removeEventListener("resize", updateWidth);
-  }, []);
+  // const updateWidth = () => {
+  //   // setLoading(true);
+  //   const zoom = getZoom(); // 1 = 100%, 1.5 = 150%, etc.
+  //   let newWidth;
+
+  //   if (zoom == 1.5) newWidth = 375;
+  //   else if (zoom == 1.25) newWidth = 315;
+  //   else if (zoom == 1.1) newWidth = 350;
+  //   else if (zoom == 1.0) newWidth = 400;
+  //   else if (zoom == 0.9) newWidth = 100;
+  //   else if (zoom == 0.8) newWidth = 375;
+  //   else if (zoom == 0.75) newWidth = 390;
+  //   else if (zoom == 0.67) newWidth = 350;
+  //   else if (zoom == 0.5) newWidth = 390;
+  //   else if (zoom == 0.33) newWidth = 580;
+
+  //   setWidth(newWidth);
+  //   setTimeout(() => setLoading(false), 300);
+  // };
+
+  // useEffect(() => {
+  //   updateWidth();
+  //   window.addEventListener("resize", updateWidth);
+
+  //   const interval = setInterval(updateWidth, 400);
+
+  //   return () => {
+  //     window.removeEventListener("resize", updateWidth);
+  //     clearInterval(interval);
+  //   };
+  // }, []);
 
   const trendingOptions = ["Trending", "Newest", "Largest"];
   const timeframeOptions = ["Today", "This Month", "Right Now"];
@@ -148,6 +170,72 @@ const OurExploreEvents = () => {
     "https://posh.vip/cdn-cgi/image/quality=85,fit=scale-down,format=webp,width=1920/https://posh-images-originals-production.s3.amazonaws.com/68a3b441145a5d2c323b60f0",
   ];
 
+  const NavControls = ({
+    trending,
+    setTrending,
+    timeframe,
+    setTimeframe,
+    city,
+    setCity,
+    trendingOptions,
+    timeframeOptions,
+    cityOptions,
+    openDropdown,
+    setOpenDropdown,
+  }) => {
+    return (
+      <div className="flex items-center gap-5 bg-white/20 rounded-full px-4 py-2 backdrop-blur-md">
+        {[
+          { label: trending, options: trendingOptions, setter: setTrending },
+          { label: timeframe, options: timeframeOptions, setter: setTimeframe },
+          { label: city, options: cityOptions, setter: setCity, city: true },
+        ].map((menu, idx) => (
+          <div key={idx} className="relative">
+            <button
+              className="px-3 py-1 flex items-center gap-1 text-sm font-semibold text-white hover:text-gray-200"
+              onClick={() => setOpenDropdown(openDropdown === idx ? null : idx)}
+            >
+              {idx === 2 && <span className="opacity-70">in</span>}
+              {menu.label}
+              <ChevronDown className="w-4 h-4" />
+            </button>
+
+            {openDropdown === idx && (
+              <div className="absolute left-0 mt-2 bg-white text-black rounded-lg shadow-md z-40 min-w-[160px]">
+                {menu.options.map((opt) => (
+                  <div
+                    key={opt}
+                    onClick={() => {
+                      menu.setter(opt);
+                      setOpenDropdown(null);
+                    }}
+                    className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+                  >
+                    {opt}
+                  </div>
+                ))}
+                {menu.city && (
+                  <input
+                    type="text"
+                    placeholder="Enter a City"
+                    className="w-full px-4 py-2 border-t border-gray-300 outline-none text-sm"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && e.target.value) {
+                        menu.setter(e.target.value);
+                        e.target.value = "";
+                        setOpenDropdown(null);
+                      }
+                    }}
+                  />
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
@@ -160,7 +248,7 @@ const OurExploreEvents = () => {
     <div className="min-h-screen bg-[#010101] text-white">
       <div className="w-full relative -mt-[2px]">
         {/* Nav ABOVE carousel */}
-        <nav className="absolute top-0 left-0 w-full z-30 h-[80px]">
+        <nav className="absolute top-0 left-0 w-full z-30 h-[80px] hidden sm:block">
           {/* Matte background synced with current slide */}
           <div
             className="absolute inset-0 z-0"
@@ -175,75 +263,25 @@ const OurExploreEvents = () => {
           {/* Overlay content (nav controls) */}
           <div className="relative z-10 backdrop-blur-md bg-black/40">
             <div className="flex items-center justify-center px-6 py-5">
-              <div className="flex items-center gap-5 bg-white/20 rounded-full px-4 py-2 backdrop-blur-md">
-                {[
-                  {
-                    label: trending,
-                    options: trendingOptions,
-                    setter: setTrending,
-                  },
-                  {
-                    label: timeframe,
-                    options: timeframeOptions,
-                    setter: setTimeframe,
-                  },
-                  {
-                    label: city,
-                    options: cityOptions,
-                    setter: setCity,
-                    city: true,
-                  },
-                ].map((menu, idx) => (
-                  <div key={idx} className="relative">
-                    <button
-                      className="px-3 py-1 flex items-center gap-1 text-sm font-semibold text-white hover:text-gray-200"
-                      onClick={() =>
-                        setOpenDropdown(openDropdown === idx ? null : idx)
-                      }
-                    >
-                      {idx === 2 && <span className="opacity-70">in</span>}
-                      {menu.label}
-                      <ChevronDown className="w-4 h-4" />
-                    </button>
-                    {openDropdown === idx && (
-                      <div className="absolute left-0 mt-2 bg-white text-black rounded-lg shadow-md z-40 min-w-[160px]">
-                        {menu.options.map((opt) => (
-                          <div
-                            key={opt}
-                            onClick={() => {
-                              menu.setter(opt);
-                              setOpenDropdown(null);
-                            }}
-                            className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
-                          >
-                            {opt}
-                          </div>
-                        ))}
-                        {menu.city && (
-                          <input
-                            type="text"
-                            placeholder="Enter a City"
-                            className="w-full px-4 py-2 border-t border-gray-300 outline-none text-sm"
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" && e.target.value) {
-                                menu.setter(e.target.value);
-                                e.target.value = "";
-                                setOpenDropdown(null);
-                              }
-                            }}
-                          />
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+              <NavControls
+                trending={trending}
+                setTrending={setTrending}
+                timeframe={timeframe}
+                setTimeframe={setTimeframe}
+                city={city}
+                setCity={setCity}
+                trendingOptions={trendingOptions}
+                timeframeOptions={timeframeOptions}
+                cityOptions={cityOptions}
+                openDropdown={openDropdown}
+                setOpenDropdown={setOpenDropdown}
+              />
             </div>
           </div>
         </nav>
 
         {/* Carousel BELOW nav */}
-        <div className="pt-[80px] touch-pan-y">
+        <div className="sm:pt-[80px] touch-pan-y">
           <Carousel
             showThumbs={false}
             autoPlay
@@ -317,23 +355,73 @@ const OurExploreEvents = () => {
 
       {filterOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
-          <PriceFilter
-            onApply={(selectedRange) => {
-              setPriceRange(selectedRange);
-              setFilterOpen(false);
-            }}
-            onClose={() => setFilterOpen(false)} // 👈 pass this too
-          />
+          <div className="bg-[#111] rounded-lg p-6 w-[90%] max-w-md">
+            {/* ✅ Mobile-friendly filter controls */}
+            <div className="flex flex-col gap-4 text-white text-sm">
+              {/* Trending */}
+              <div>
+                <label className="block mb-1 text-gray-400">Trending</label>
+                <select
+                  value={trending}
+                  onChange={(e) => setTrending(e.target.value)}
+                  className="w-full bg-black/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-white"
+                >
+                  {trendingOptions.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Timeframe */}
+              <div>
+                <label className="block mb-1 text-gray-400">Timeframe</label>
+                <select
+                  value={timeframe}
+                  onChange={(e) => setTimeframe(e.target.value)}
+                  className="w-full bg-black/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-white"
+                >
+                  {timeframeOptions.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* City */}
+              <div>
+                <label className="block mb-1 text-gray-400">City</label>
+                <input
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Enter a City"
+                  className="w-full bg-black/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-white"
+                />
+              </div>
+            </div>
+            <div className="mt-6">
+              <PriceFilter
+                onApply={(selectedRange) => {
+                  setPriceRange(selectedRange);
+                  setFilterOpen(false);
+                }}
+                onClose={() => setFilterOpen(false)} // 👈 pass this too
+              />
+            </div>
+          </div>
         </div>
       )}
 
-      <div className="flex flex-wrap m-5 justify-center gap-3">
+      <div className="flex flex-wrap my-5 justify-center gap-3">
         {Array.from({ length: 42 }).map((_, index) => {
           const img = cardImages[index % cardImages.length];
           return (
             <div
               key={index}
-              className="rounded-lg overflow-hidden shadow-lg border border-[0.1px] hover:border-white hover:bg-white/10 hover:cursor-pointer transition-all duration-300 w-[375px]"
+              className=" rounded-lg overflow-hidden shadow-lg border border-[0.1px] hover:border-white hover:bg-white/10 hover:cursor-pointer transition-all duration-300"
               style={{ width: `${width}px` }}
             >
               <div className="relative">
