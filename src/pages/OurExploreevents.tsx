@@ -4,7 +4,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { ChevronDown, Calendar } from "lucide-react";
 import PriceFilter from "@/components/filter/PriceFilter";
 import ParishLogo from "@/components/ui/logo";
-import {useZoomWidth} from "@/hooks/use-width"
+import { useZoomWidth } from "@/hooks/use-width";
 
 const OurExploreEvents = () => {
   const [loading, setLoading] = useState(false);
@@ -163,10 +163,32 @@ const OurExploreEvents = () => {
     },
   ];
 
+  const events = [
+    {
+      image:
+        "https://posh.vip/cdn-cgi/image/width=1080,quality=75,fit=scale-down,format=auto/https://posh-images-originals-production.s3.amazonaws.com/68cd95ca14a830801c692394",
+      date: "WED . OCT 01 . 6:00 PM",
+      name: "Industry Link XV: Game Time",
+      city: "Slate",
+    },
+    {
+      image:
+        "https://posh.vip/cdn-cgi/image/width=1080,quality=75,fit=scale-down,format=auto/https://posh-images-originals-production.s3.amazonaws.com/68d16a2a37fbb1803ecf52ee",
+      date: "FRI . 10:00 PM",
+      name: "A Caribbean Party In Brooklyn",
+      city: "Lot45",
+    },
+    {
+      image:
+        "https://posh.vip/cdn-cgi/image/width=1080,quality=75,fit=scale-down,format=auto/https://posh-images-originals-production.s3.amazonaws.com/68c873c86195ca0793114c4b",
+      date: "THU . 10:00 PM",
+      name: "Montclair State University Homecoming Weekend 2025",
+      city: "Locations In Description 📍",
+    },
+  ];
   const cardImages = [
-    "https://posh.vip/cdn-cgi/image/quality=85,fit=scale-down,format=webp,width=1920/https://posh-images-originals-production.s3.amazonaws.com/68c1cc6c01a7df1c857f9cee",
-    "https://posh.vip/cdn-cgi/image/quality=85,fit=scale-down,format=webp,width=1920/https://posh-images-originals-production.s3.amazonaws.com/68c1cc6c01a7df1c857f9cee",
-    "https://posh.vip/cdn-cgi/image/quality=85,fit=scale-down,format=webp,width=1920/https://posh-images-alts-production.s3.amazonaws.com/68bf6213ee6cfb687a56c36a/1400x1750.webp",
+    "https://posh.vip/cdn-cgi/image/width=1080,quality=75,fit=scale-down,format=auto/https://posh-images-originals-production.s3.amazonaws.com/68d16a2a37fbb1803ecf52ee",
+    "https://posh.vip/cdn-cgi/image/width=1080,quality=75,fit=scale-down,format=auto/https://posh-images-originals-production.s3.amazonaws.com/68c873c86195ca0793114c4b",
     "https://posh.vip/cdn-cgi/image/quality=85,fit=scale-down,format=webp,width=1920/https://posh-images-originals-production.s3.amazonaws.com/68a3b441145a5d2c323b60f0",
   ];
 
@@ -416,49 +438,48 @@ const OurExploreEvents = () => {
       )}
 
       <div className="flex flex-wrap my-5 justify-center gap-3">
-        {Array.from({ length: 42 }).map((_, index) => {
-          const img = cardImages[index % cardImages.length];
-          return (
-            <div
-              key={index}
-              className=" rounded-lg overflow-hidden shadow-lg border border-[0.1px] hover:border-white hover:bg-white/10 hover:cursor-pointer transition-all duration-300"
-              style={{ width: `${width}px` }}
-            >
-              <div className="relative">
-                {/* Image */}
-                <img
-                  className="w-full object-cover"
-                  style={{ height: "35rem" }}
-                  src={img}
-                  alt={`Event ${index + 1}`}
-                />
-                <span className="flex items-center justify-center absolute top-2 bg-white right-4 border border-white/20 text-black text-sm px-4 py-1 rounded-full shadow-md">
-                  <Calendar className="w-3 h-3 mr-2" />
-                  More Dates
-                </span>
+        {events.map((event, index) => (
+          <div
+            key={index}
+            className=" rounded-lg overflow-hidden shadow-lg border border-[0.1px] hover:border-white hover:bg-white/10 hover:cursor-pointer transition-all duration-300 sm:w-[90%]"
+            style={{ width: window.innerWidth <= 768 ? '88%' : `${width}px` }}
+          >
+            <div className="relative">
+              {/* Image */}
+              <img
+                className="w-full object-cover"
+                style={{ height: "35rem" }}
+                src={event.image}
+                alt={event.name}
+              />
+              <span className="flex items-center justify-center absolute top-2 bg-white right-4 border border-white/20 text-black text-sm px-4 py-1 rounded-full shadow-md">
+                <Calendar className="w-3 h-3 mr-2" />
+                More Dates
+              </span>
 
-                {/* Title container with black bg + gradient top */}
-                <div className="absolute inset-x-0 bottom-0">
-                  <div className="relative bg-black">
-                    {/* Day/Time badge (anchored ABOVE this block) */}
-                    <span className="absolute -top-12 left-4 border border-white/20 text-white text-sm font-bold px-4 py-1 rounded shadow-md backdrop-blur-sm">
-                      SAT - 8:00 PM
-                    </span>
+              {/* Title container with black bg + gradient top */}
+              <div className="absolute inset-x-0 bottom-0">
+                <div className="relative bg-black">
+                  <div className="absolute -top-[17.5rem] left-0 right-0 h-[17.5rem] bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10"></div>
+                  {/* Day/Time badge (anchored ABOVE this block) */}
+                  <span className="absolute -top-12 left-5 border border-white/20 text-white text-sm text-2x1 px-3 py-2 rounded shadow-md z-20">
+                    {event.date}
+                  </span>
 
-                    {/* Gradient only for text block */}
-                    <div className="absolute -top-10 left-0 right-0 h-10 bg-gradient-to-t from-black to-transparent"></div>
+                  {/* Gradient only for text block */}
+                  <div className="absolute -top-32 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent"></div>
 
-                    <div className="p-5 relative z-10">
-                      <h3 className="text-2xl font-bold text-white">
-                        Dionysus: Casino Royale
-                      </h3>
-                    </div>
+                  <div className="pl-5 pt-1 flex flex-col gap-2 relative z-10">
+                    <h3 className="text-2xl text-white">
+                      {event.name}
+                    </h3>
+                    <p className="text-white pb-7 text-sm">{event.city}</p>
                   </div>
                 </div>
               </div>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
     </div>
   );
