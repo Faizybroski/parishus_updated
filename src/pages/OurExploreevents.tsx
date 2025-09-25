@@ -18,53 +18,7 @@ const OurExploreEvents = () => {
   const [priceRange, setPriceRange] = useState([0, 200]); // min and max
   const maxPrice = 1000; // or whatever ceiling you want
   const width = useZoomWidth();
-  // const [width, setWidth] = useState(400); // default width
 
-  // const getZoom = () => {
-  //   const div = document.createElement("div");
-  //   div.style.width = "1in";
-  //   div.style.height = "1px";
-  //   div.style.position = "absolute";
-  //   div.style.top = "-100%"; // hide offscreen
-  //   document.body.appendChild(div);
-
-  //   const pxPerInch = div.offsetWidth;
-  //   document.body.removeChild(div);
-
-  //   return pxPerInch / 96; // 96px = 100% zoom
-  // };
-
-  // const updateWidth = () => {
-  //   // setLoading(true);
-  //   const zoom = getZoom(); // 1 = 100%, 1.5 = 150%, etc.
-  //   let newWidth;
-
-  //   if (zoom == 1.5) newWidth = 375;
-  //   else if (zoom == 1.25) newWidth = 315;
-  //   else if (zoom == 1.1) newWidth = 350;
-  //   else if (zoom == 1.0) newWidth = 400;
-  //   else if (zoom == 0.9) newWidth = 100;
-  //   else if (zoom == 0.8) newWidth = 375;
-  //   else if (zoom == 0.75) newWidth = 390;
-  //   else if (zoom == 0.67) newWidth = 350;
-  //   else if (zoom == 0.5) newWidth = 390;
-  //   else if (zoom == 0.33) newWidth = 580;
-
-  //   setWidth(newWidth);
-  //   setTimeout(() => setLoading(false), 300);
-  // };
-
-  // useEffect(() => {
-  //   updateWidth();
-  //   window.addEventListener("resize", updateWidth);
-
-  //   const interval = setInterval(updateWidth, 400);
-
-  //   return () => {
-  //     window.removeEventListener("resize", updateWidth);
-  //     clearInterval(interval);
-  //   };
-  // }, []);
 
   const trendingOptions = ["Trending", "Newest", "Largest"];
   const timeframeOptions = ["Today", "This Month", "Right Now"];
@@ -186,6 +140,9 @@ const OurExploreEvents = () => {
       city: "Locations In Description 📍",
     },
   ];
+
+  const repeatedEvents = Array.from({ length: 42 }, (_, i) => events[i % events.length]);
+
   const cardImages = [
     "https://posh.vip/cdn-cgi/image/width=1080,quality=75,fit=scale-down,format=auto/https://posh-images-originals-production.s3.amazonaws.com/68d16a2a37fbb1803ecf52ee",
     "https://posh.vip/cdn-cgi/image/width=1080,quality=75,fit=scale-down,format=auto/https://posh-images-originals-production.s3.amazonaws.com/68c873c86195ca0793114c4b",
@@ -438,7 +395,7 @@ const OurExploreEvents = () => {
       )}
 
       <div className="flex flex-wrap my-5 justify-center gap-3">
-        {events.map((event, index) => (
+        {repeatedEvents.map((event, index) => (
           <div
             key={index}
             className=" rounded-lg overflow-hidden shadow-lg border border-[0.1px] hover:border-white hover:bg-white/10 hover:cursor-pointer transition-all duration-300 sm:w-[90%]"
