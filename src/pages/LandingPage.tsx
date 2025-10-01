@@ -117,7 +117,7 @@ export const ParishUsLanding: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-dark-surface border-b border-border">
+      <header className="sticky top-0 z-50 backdrop-blur-md bg-surface border-b border-primary">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center">
             <div className="cursor-pointer flex items-center space-x-1 shrink-0">
@@ -139,19 +139,19 @@ export const ParishUsLanding: React.FC = () => {
             </div>
           </div>
 
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-            <a href="#how" className="text-white transition-colors">
+          <nav className="hidden md:flex items-center gap-8 text-sm font-medium ">
+            <a href="#how">
               How it works
             </a>
-            <a href="#events" className="text-white  transition-colors">
+            <a href="#events">
               Events
             </a>
-            <a href="#faq" className="text-white  transition-colors">
+            <a href="#faq">
               FAQ
             </a>
             <a
               onClick={() => navigate("contact-us")}
-              className="text-white cursor-pointer transition-colors"
+              className="cursor-pointer"
             >
               Contact Us
             </a>
@@ -161,7 +161,7 @@ export const ParishUsLanding: React.FC = () => {
             <Button
               variant="default"
               size="default"
-              className="bg-[#9dc0b3]"
+              className="bg-background border border-primary"
               onClick={() => setShowAuth(true)}
             >
               Sign Up
@@ -171,7 +171,7 @@ export const ParishUsLanding: React.FC = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-[linear-gradient(to_top_left,_#4b1603_0%,_transparent_25%)] bg-black">
+      <section className="relative overflow-hidden bg-[linear-gradient(to_top_left,_primary_0%,_transparent_25%)]">
         <div className="max-w-7xl mx-auto px-4 py-20 lg:py-32 relative">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="animate-fade-in">
@@ -235,7 +235,7 @@ export const ParishUsLanding: React.FC = () => {
               </div>
 
               <div className="flex flex-wrap gap-3">
-                <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-accent/10 text-accent border border-accent/20">
+                <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-primary text-background border border-primary/20">
                   Weekly dinners • coffees • teas
                 </div>
               </div>
@@ -281,14 +281,14 @@ export const ParishUsLanding: React.FC = () => {
                 title: "Get matched to a table",
                 description:
                   "We place you in a small group of 5–6 people with shared interests and fresh perspectives for balanced, lively conversations.",
-                color: "bg-secondary",
+                color: "bg-primary",
               },
               {
                 icon: <Calendar className="w-8 h-8" />,
                 title: "RSVP & show up",
                 description:
                   "If it's a paid event, you'll check out securely. If it's free, just RSVP and attend. Everyone pays their own bill at the venue.",
-                color: "bg-accent",
+                color: "bg-primary",
               },
             ].map((step, index) => (
               <div key={index} className="group">
@@ -310,8 +310,8 @@ export const ParishUsLanding: React.FC = () => {
           </div>
 
           <div className="max-w-2xl mx-auto mt-12">
-            <div className="p-4 rounded-xl bg-secondary/10 border border-secondary/20 text-center">
-              <p className="text-sm text-secondary font-medium">
+            <div className="p-4 rounded-xl bg-muted border border-secondary/20 text-center">
+              <p className="text-sm text-muted-foreground font-medium">
                 💡 We match groups by interests and conversation style to create
                 engaging, pressure-free dinners and coffee meetups.
               </p>
@@ -365,10 +365,10 @@ export const ParishUsLanding: React.FC = () => {
               events.map((event) => (
                 <Card
                   key={event.id}
-                  className="relative flex flex-col bg-[#0A0A0A] w-full sm:w-[20rem] lg:w-[25rem] h-[420px] border border-secondary overflow-hidden group hover:shadow-xl transition"
+                  className="relative flex flex-col bg-[#0A0A0A] w-full sm:w-[20rem] lg:w-[25rem] h-[420px] border border-primary overflow-hidden group hover:shadow-xl transition"
                 >
                   {/* Background */}
-                  <div className="relative w-full flex items-center justify-center bg-black flex-shrink-0 h-48">
+                  <div className="relative w-full flex items-center justify-center bg-primary flex-shrink-0 h-48">
                     <img
                       src={event.cover_photo_url}
                       alt={event.name}
@@ -377,21 +377,21 @@ export const ParishUsLanding: React.FC = () => {
                   </div>
 
                   {/* Card Content */}
-                  <CardContent className="flex flex-col flex-grow p-4 text-white">
+                  <CardContent className="flex flex-col flex-grow p-4 text-muted-foreground bg-[#fcfaf8]">
                     {/* Top Section */}
                     <div className="mb-4">
-                      <h3 className="text-2xl text-secondary/90 font-bold truncate">
+                      <h3 className="text-2xl text-black font-bold truncate">
                         {event.name}
                       </h3>
                       {event.description && (
-                        <p className="text-secondary/90 text-sm mt-1 line-clamp-1 truncate">
+                        <p className=" text-sm mt-1 line-clamp-1 truncate">
                           {event.description}
                         </p>
                       )}
                     </div>
 
                     <div className="flex items-center mb-2">
-                      <Calendar className="h-5 w-5 text-secondary/90 mr-3" />
+                      <Calendar className="h-5 w-5 mr-3" />
                       <span>
                         {new Date(event.date_time).toLocaleDateString("en-US", {
                           month: "short",
@@ -406,7 +406,7 @@ export const ParishUsLanding: React.FC = () => {
                     </div>
 
                     <div className="flex items-center">
-                      <MapPin className="w-5 h-5 text-secondary/90" />
+                      <MapPin className="w-5 h-5 " />
                       {/* Location */}
                       <div className="text-sm flex flex-col ml-2">
                         <span className="truncate">
@@ -414,7 +414,7 @@ export const ParishUsLanding: React.FC = () => {
                         </span>
                         {/* Address */}
                         {event.location_address && (
-                          <span className="text-sm text-gray-500 line-clamp-1 truncate">
+                          <span className="text-sm text-muted-foreground line-clamp-1 truncate">
                             {event.location_address}
                           </span>
                         )}
@@ -502,8 +502,8 @@ export const ParishUsLanding: React.FC = () => {
                   </div>
                 ))}
               </div>
-              <div className="p-4 rounded-xl bg-secondary/10 border border-secondary/20">
-                <p className="text-sm text-secondary font-medium">
+              <div className="p-4 rounded-xl bg-muted border border-secondary/20">
+                <p className="text-sm text-muted-foreground font-medium">
                   💡 Tip: We match groups by interests and conversation style
                   for balanced, lively tables.
                 </p>
@@ -526,7 +526,7 @@ export const ParishUsLanding: React.FC = () => {
                   {
                     icon: <Coffee className="w-6 h-6" />,
                     text: "Update your routine with meaningful social time",
-                    color: "bg-secondary",
+                    color: "bg-primary",
                   },
                   {
                     icon: <Users className="w-6 h-6" />,
@@ -536,7 +536,7 @@ export const ParishUsLanding: React.FC = () => {
                   {
                     icon: <Globe className="w-6 h-6" />,
                     text: "Discover great restaurants and cafés near you",
-                    color: "bg-accent",
+                    color: "bg-primary",
                   },
                 ].map((benefit, index) => (
                   <div key={index} className="flex items-center gap-4">
@@ -562,7 +562,7 @@ export const ParishUsLanding: React.FC = () => {
               <div className="rounded-3xl overflow-hidden shadow-xl">
                 <div className="aspect-[4/3] bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center border border-border">
                   <div className="text-center p-8">
-                    <Coffee className="w-16 h-16 text-secondary mx-auto mb-4" />
+                    <Coffee className="w-16 h-16 text-primary mx-auto mb-4" />
                     <p className="text-lg text-foreground/80">
                       Beautiful moments start with simple connections
                     </p>
@@ -618,7 +618,7 @@ export const ParishUsLanding: React.FC = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-dark-surface border-b border-border py-10">
+      <footer className="bg-primary border-b border-border py-10">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             {/* Logo */}

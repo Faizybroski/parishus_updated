@@ -95,6 +95,7 @@ export function RestaurantSearchDropdown({
                 <CommandItem
                   key={restaurant.id}
                   value={restaurant.id}
+                  className="bg-background"
                   onSelect={() => {
                     onSelect(restaurant);
                     setOpen(false);

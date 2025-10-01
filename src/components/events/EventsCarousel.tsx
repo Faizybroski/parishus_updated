@@ -345,7 +345,7 @@ const EventsCarousel = () => {
                 <div className="flex flex-wrap gap-4 px-2">
                   <Card className="relative flex bg-[#0A0A0A] flex-col w-full sm:w-[20rem] lg:w-[25rem] h-[420px] border border-secondary overflow-hidden group hover:shadow-xl transition">
                     {/* Background */}
-                    <div className="relative w-full flex items-center justify-center bg-black flex-shrink-0 h-48">
+                    <div className="relative w-full flex items-center justify-center bg-primary flex-shrink-0 h-48">
                       <img
                         src={event.cover_photo_url}
                         alt={event.name}
@@ -354,20 +354,20 @@ const EventsCarousel = () => {
                     </div>
 
                     {/* Card Content */}
-                    <CardContent className="flex flex-col flex-grow p-4 text-white">
+                    <CardContent className="flex flex-col flex-grow p-4 text-muted-foreground bg-[#fcfaf8]">
                       {/* Title */}
                       <div className="mb-4">
-                        <h3 className="text-2xl text-secondary/90 font-bold truncate">
+                        <h3 className="text-2xl text-black font-bold truncate">
                           {event.name}
                         </h3>
                         {event.description && (
-                          <p className="text-secondary/90 text-sm mt-1 line-clamp-1 truncate">
+                          <p className=" text-sm mt-1 line-clamp-1 truncate">
                             {event.description}
                           </p>
                         )}
                       </div>
                       <div className="flex items-center mb-2">
-                        <Calendar className="h-5 w-5 text-secondary/90 mr-3" />
+                        <Calendar className="h-5 w-5 mr-3" />
                         <span>
                           {new Date(event.date_time).toLocaleDateString(
                             "en-US",
@@ -396,7 +396,7 @@ const EventsCarousel = () => {
                           </p>
                         </div>  */}
                       <div className="flex items-center">
-                        <MapPin className="w-5 h-5 text-secondary/90" />
+                        <MapPin className="w-5 h-5 " />
                         {/* Location */}
                         <div className="text-sm flex flex-col ml-2">
                           <span className="truncate">
@@ -417,7 +417,7 @@ const EventsCarousel = () => {
                           <Button 
                           onClick={() => navigate(`/event/${event.id}/details`)}
                           className="w-12 px-4 py-3 border border-secondary font-medium bg-transparent text-white hover:bg-secondary/20">
-                            <Share2 className="h-4 w-4" />
+                            <Share2 className="h-4 w-4 text-muted-foreground" />
                           </Button>
                         )}
                         <Button 

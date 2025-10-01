@@ -5,7 +5,8 @@ import { Input } from "@/components/OnboardingCarousel/ui/input";
 import { Label } from "@/components/OnboardingCarousel/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
-import { ChevronLeft, ChevronRight, Eye, EyeOff, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Eye, EyeOff, Loader2, } from "lucide-react";
+import { SiGoogle, SiApple } from "react-icons/si";
 import { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -491,11 +492,7 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
                 }}
                 className="flex-1 py-3 border hover:bg-secondary/40 text-foreground bg-transparent"
               >
-                <img
-                  src="/svg/google-logo.svg"
-                  alt="Google"
-                  className="w-4 h-4 mr-2"
-                />{" "}
+                <SiGoogle size={22} color="black" />{" "}
                 Google
               </Button>
               <Button
@@ -529,13 +526,9 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
                     console.error("Apple login error:", error.message);
                   }
                 }}
-                className="flex-1 py-3 text-white hover:bg-secondary/40 bg-transparent border"
+                className="flex-1 py-3 text-foreground hover:bg-secondary/40 bg-transparent border"
               >
-                <img
-                  src="/svg/apple-logo.svg"
-                  alt="Apple"
-                  className="w-4 h-4 mr-2"
-                />{" "}
+                <SiApple size={22} color="black" />{" "}
                 Apple
               </Button>
             </div>
@@ -637,7 +630,7 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
             <ChevronLeft className="w-4 h-4" /> Back
           </Button>
           <Button
-            className="bg-secondary hover:bg-secondary/70"
+            variant="onboardingSecondary"
             onClick={handleNext}
           >
             {currentStep === onboardingCards.length - 1

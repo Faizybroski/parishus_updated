@@ -279,7 +279,7 @@ const AdminEventDetails = () => {
 
         {/* Event Cover Image */}
         {event.cover_photo_url && (
-          <div className="relative w-full flex items-center justify-center bg-black h-64 mb-8 rounded-lg overflow-hidden">
+          <div className="relative w-full flex items-center justify-center bg-primary h-64 mb-8 rounded-lg overflow-hidden">
             <img
               src={event.cover_photo_url}
               alt={event.name}

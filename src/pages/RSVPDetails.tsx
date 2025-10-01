@@ -490,8 +490,8 @@ const RSVPDetails = () => {
   const isPastEvent = eventDate < now;
   
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-[#1c1c1e] p-6 rounded-3xl shadow-lg space-y-6 relative">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+      <div className="w-full max-w-md bg-secondary p-6 rounded-3xl shadow-lg space-y-6 relative">
         <button
           onClick={() => navigate("/")}
           className="absolute top-4 left-4 text-yellow-200 hover:text-yellow-300"
@@ -501,7 +501,7 @@ const RSVPDetails = () => {
         <div className="text-center mt-6">
           {isPastEvent && (
             <>
-              <h3 className="text-xl font-semibold">This event is ended</h3>
+              <h3 className="text-xl font-semibold text-muted-foreground">This event is ended</h3>
               <h2 className="text-xl font-semibold text-primary">
                 {event.name}
               </h2>
@@ -525,22 +525,22 @@ const RSVPDetails = () => {
         <div className="flex justify-center gap-4 text-center text-yellow-200 font-bold text-3xl">
           <div>
             <div className="text-primary">{timeLeft.days}</div>
-            <span className="text-sm font-normal text-white">days</span>
+            <span className="text-sm font-normal text-muted-foreground">days</span>
           </div>
           <div>:</div>
           <div>
             <div className="text-primary">{timeLeft.hours}</div>
-            <span className="text-sm font-normal text-white">hours</span>
+            <span className="text-sm font-normal text-muted-foreground">hours</span>
           </div>
           <div>:</div>
           <div>
             <div className="text-primary">{timeLeft.minutes}</div>
-            <span className="text-sm font-normal text-white">minutes</span>
+            <span className="text-sm font-normal text-muted-foreground">minutes</span>
           </div>
           <div>:</div>
           <div>
             <div className="text-primary">{timeLeft.seconds}</div>
-            <span className="text-sm font-normal text-white">seconds</span>
+            <span className="text-sm font-normal text-muted-foreground">seconds</span>
           </div>
         </div>
         {!isPastEvent && (
@@ -548,7 +548,7 @@ const RSVPDetails = () => {
             RSVP Deadline: {format(rsvpDeadline, "eeee hh:mm a")}
           </p>
         )}
-        <div className="bg-[#2a2a2c] p-4 rounded-xl border border-gray-700">
+        <div className="bg-primary p-4 rounded-xl">
           {isPastEvent && (
             <p className="text-center text-sm font-semibold mb-3">
               <span className="text-yellow-200">
@@ -626,8 +626,8 @@ const RSVPDetails = () => {
                   onClick={handleRSVP}
                   className={`w-full ${
                     hasRSVP
-                      ? "bg-sage-green hover:bg-sage-green/90"
-                      : "bg-peach-gold hover:bg-peach-gold/90"
+                      ? "bg-primary hover:bg-secondary"
+                      : "bg-seconday hover:bg-primary/90"
                   }`}
                 >
                   <UserCheck className="h-4 w-4 mr-2" />
@@ -651,7 +651,7 @@ const RSVPDetails = () => {
                     handlePaidRSVP();
                   }}
                   disabled={isPaying}
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center"
+                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-muted-foreground flex items-center justify-center"
                 >
                   {isPaying ? (
                     <>
@@ -669,7 +669,7 @@ const RSVPDetails = () => {
             ) : (
               <Button
                 disabled
-                className="w-full bg-gray-400 text-white cursor-not-allowed"
+                className="w-full bg-gray-400 text-muted-foreground cursor-not-allowed"
               >
                 <Clock className="h-4 w-4 mr-2" />
                 RSVP Closed

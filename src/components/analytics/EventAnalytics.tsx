@@ -75,7 +75,7 @@ export default function EventAnalyticsDashboard({ eventId, subscriptionStatus }:
 
   if (isFreeTier) {
     return (
-      <Card className="bg-dark-surface shadow-lg rounded-lg max-w-3xl mx-auto p-6">
+      <Card className="bg-surface shadow-lg rounded-lg max-w-3xl mx-auto p-6">
         <CardHeader>
           <CardTitle className="text-xl font-bold">Upgrade to Premium</CardTitle>
         </CardHeader>
@@ -85,7 +85,7 @@ export default function EventAnalyticsDashboard({ eventId, subscriptionStatus }:
           </p>
           <button
             onClick={() => navigate("/subscription")}
-            className="bg-peach-gold text-dark-surface px-6 py-2 rounded-md font-semibold hover:bg-peach-gold/90 transition"
+            className="bg-peach-gold text-surface px-6 py-2 rounded-md font-semibold hover:bg-peach-gold/90 transition"
           >
             Go to Subscription
           </button>

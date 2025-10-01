@@ -258,7 +258,7 @@ const Dashboard = () => {
             </div>
             <div className="justify-end">
               <Button
-                className="bg-peach-gold hover:bg-peach-gold/90 mt-4 sm:mt-0 me-2"
+                className=" mt-4 sm:mt-0 me-2"
                 onClick={() => navigate("/explore")}
               >
                 {" "}
@@ -267,7 +267,7 @@ const Dashboard = () => {
               </Button>
               <Button
                 onClick={() => navigate("/create-event")}
-                className="bg-peach-gold hover:bg-peach-gold/90 mt-4 sm:mt-0"
+                className=" mt-4 sm:mt-0"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Create Event

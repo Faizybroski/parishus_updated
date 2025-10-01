@@ -453,7 +453,7 @@ const ExploreEvents = () => {
               className="flex flex-col h-full bg-[#0A0A0A] border border-secondary rounded-sm overflow-hidden shadow-sm"
             >
               {/* Image with Overlay */}
-              <div className="relative w-full flex items-center justify-center bg-black flex-shrink-0 h-48">
+              <div className="relative w-full flex items-center justify-center bg-primary flex-shrink-0 h-48">
                 {/* Image or Fallback */}
                 <img
                   src={event.cover_photo_url}
