@@ -1,19 +1,34 @@
-import React, { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useProfile } from '@/hooks/useProfile';
-import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Camera, Edit, Save, X, CreditCard, Shield, Building, MapPin } from 'lucide-react';
-import { Switch } from '@/components/ui/switch';
-import { toast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
-import '@/index.css';
+import React, { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useProfile } from "@/hooks/useProfile";
+import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Camera,
+  Edit,
+  Save,
+  X,
+  CreditCard,
+  Shield,
+  Building,
+  MapPin,
+} from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
+import "@/index.css";
 
 const Profile = () => {
   const [editing, setEditing] = useState(false);
@@ -22,47 +37,70 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
-    first_name: '',
-    last_name: '',
-    job_title: '',
-    location_city: ''
+    first_name: "",
+    last_name: "",
+    job_title: "",
+    location_city: "",
   });
   const [socialLinks, setSocialLinks] = useState({
-    instagram_username: '',
-    linkedin_username: ''
+    instagram_username: "",
+    linkedin_username: "",
   });
   const [preferenceData, setPreferenceData] = useState({
-    dining_style: '' as 'adventurous' | 'foodie_enthusiast' | 'local_lover' | 'comfort_food' | 'health_conscious' | 'social_butterfly' | '',
-    dietary_preferences: [] as ('vegetarian' | 'vegan' | 'gluten_free' | 'dairy_free' | 'keto' | 'paleo' | 'halal' | 'kosher' | 'no_restrictions')[],
-    gender_identity: '' as 'male' | 'female' | 'non_binary' | 'prefer_not_to_say' | ''
+    dining_style: "" as
+      | "adventurous"
+      | "foodie_enthusiast"
+      | "local_lover"
+      | "comfort_food"
+      | "health_conscious"
+      | "social_butterfly"
+      | "",
+    dietary_preferences: [] as (
+      | "vegetarian"
+      | "vegan"
+      | "gluten_free"
+      | "dairy_free"
+      | "keto"
+      | "paleo"
+      | "halal"
+      | "kosher"
+      | "no_restrictions"
+    )[],
+    gender_identity: "" as
+      | "male"
+      | "female"
+      | "non_binary"
+      | "prefer_not_to_say"
+      | "",
   });
   const [privacySettings, setPrivacySettings] = useState({
-    allow_crossed_paths_tracking: true
+    allow_crossed_paths_tracking: true,
   });
   const { user, signOut } = useAuth();
   const { profile, refetch } = useProfile();
   const navigate = useNavigate();
-   const [paymentStatus, setPaymentStatus] = useState("free");
+  const [paymentStatus, setPaymentStatus] = useState("free");
 
   React.useEffect(() => {
     if (profile) {
       setFormData({
-        first_name: profile.first_name.trim() || '',
-        last_name: profile.last_name.trim() || '',
-        job_title: profile.job_title?.trim() || '',
-        location_city: profile.location_city?.trim() || ''
+        first_name: profile.first_name.trim() || "",
+        last_name: profile.last_name.trim() || "",
+        job_title: profile.job_title?.trim() || "",
+        location_city: profile.location_city?.trim() || "",
       });
       setSocialLinks({
-        instagram_username: profile.instagram_username?.trim() || '',
-        linkedin_username: profile.linkedin_username?.trim() || ''
+        instagram_username: profile.instagram_username?.trim() || "",
+        linkedin_username: profile.linkedin_username?.trim() || "",
       });
       setPreferenceData({
-        dining_style: profile.dining_style || '',
+        dining_style: profile.dining_style || "",
         dietary_preferences: profile.dietary_preferences || [],
-        gender_identity: profile.gender_identity || ''
+        gender_identity: profile.gender_identity || "",
       });
       setPrivacySettings({
-        allow_crossed_paths_tracking: profile.allow_crossed_paths_tracking ?? true
+        allow_crossed_paths_tracking:
+          profile.allow_crossed_paths_tracking ?? true,
       });
     }
   }, [profile]);
@@ -70,7 +108,7 @@ const Profile = () => {
   React.useEffect(() => {
     const fetchPaymentStatus = async () => {
       if (!user) return;
-        const { data : profileId, error: ProfileError } = await supabase
+      const { data: profileId, error: ProfileError } = await supabase
         .from("profiles")
         .select("id")
         .eq("user_id", user.id)
@@ -97,36 +135,38 @@ const Profile = () => {
     fetchPaymentStatus();
   }, [user]);
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (!file || !user || !profile) return;
 
     setUploading(true);
-    
+
     try {
-      const fileExt = file.name.split('.').pop();
+      const fileExt = file.name.split(".").pop();
       const fileName = `${user.id}-${Date.now()}.${fileExt}`;
       const filePath = `profile-photos/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('profile-photos')
+        .from("profile-photos")
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('profile-photos')
-        .getPublicUrl(filePath);
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("profile-photos").getPublicUrl(filePath);
 
       const { error: updateError } = await supabase
-        .from('profiles')
+        .from("profiles")
         .update({ profile_photo_url: publicUrl })
-        .eq('id', profile.id);
+        .eq("id", profile.id);
 
       if (updateError) throw updateError;
 
       await refetch();
-      
+
       toast({
         title: "Photo updated!",
         description: "Your profile photo has been updated.",
@@ -135,7 +175,7 @@ const Profile = () => {
       toast({
         title: "Upload failed",
         description: error.message || "Failed to upload photo",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setUploading(false);
@@ -149,7 +189,7 @@ const Profile = () => {
       toast({
         title: "Validation Error",
         description: "First name and last name cannot be empty.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -157,7 +197,7 @@ const Profile = () => {
       toast({
         title: "Validation Error",
         description: "Job title cannot be empty.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -165,24 +205,24 @@ const Profile = () => {
       toast({
         title: "Validation Error",
         description: "Location cannot be empty.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
 
     setLoading(true);
-    
+
     try {
       const { error } = await supabase
-        .from('profiles')
+        .from("profiles")
         .update(formData)
-        .eq('id', profile.id);
+        .eq("id", profile.id);
 
       if (error) throw error;
 
       await refetch();
       setEditing(false);
-      
+
       toast({
         title: "Profile updated!",
         description: "Your profile has been updated successfully.",
@@ -191,7 +231,7 @@ const Profile = () => {
       toast({
         title: "Error",
         description: error.message || "Failed to update profile",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -201,10 +241,10 @@ const Profile = () => {
   const handleCancel = () => {
     if (profile) {
       setFormData({
-        first_name: profile.first_name.trim() || '',
-        last_name: profile.last_name.trim() || '',
-        job_title: profile.job_title.trim() || '',
-        location_city: profile.location_city.trim() || ''
+        first_name: profile.first_name.trim() || "",
+        last_name: profile.last_name.trim() || "",
+        job_title: profile.job_title.trim() || "",
+        location_city: profile.location_city.trim() || "",
       });
     }
     setEditing(false);
@@ -217,36 +257,42 @@ const Profile = () => {
       toast({
         title: "Validation Error",
         description: "Please select at least one dietary preference.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
 
     setLoading(true);
-    
+
     try {
       const updateData: any = {
-        dietary_preferences: preferenceData.dietary_preferences
+        dietary_preferences: preferenceData.dietary_preferences,
       };
-      
-      if (preferenceData.dining_style && preferenceData.dining_style.length > 0) {
+
+      if (
+        preferenceData.dining_style &&
+        preferenceData.dining_style.length > 0
+      ) {
         updateData.dining_style = preferenceData.dining_style;
       }
-      
-      if (preferenceData.gender_identity && preferenceData.gender_identity.length > 0) {
+
+      if (
+        preferenceData.gender_identity &&
+        preferenceData.gender_identity.length > 0
+      ) {
         updateData.gender_identity = preferenceData.gender_identity;
       }
 
       const { error } = await supabase
-        .from('profiles')
+        .from("profiles")
         .update(updateData)
-        .eq('id', profile.id);
+        .eq("id", profile.id);
 
       if (error) throw error;
 
       await refetch();
       setEditingPreferences(false);
-      
+
       toast({
         title: "Preferences updated!",
         description: "Your preferences have been updated successfully.",
@@ -255,7 +301,7 @@ const Profile = () => {
       toast({
         title: "Error",
         description: error.message || "Failed to update preferences",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -265,28 +311,31 @@ const Profile = () => {
   const handleSaveSocials = async () => {
     if (!profile) return;
 
-    if (!socialLinks.instagram_username.trim() && !socialLinks.linkedin_username.trim()) {
+    if (
+      !socialLinks.instagram_username.trim() &&
+      !socialLinks.linkedin_username.trim()
+    ) {
       toast({
         title: "Validation Error",
         description: "Please provide at least one social link.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
 
     setLoading(true);
-    
+
     try {
       const { error } = await supabase
-        .from('profiles')
+        .from("profiles")
         .update(socialLinks)
-        .eq('id', profile.id);
+        .eq("id", profile.id);
 
       if (error) throw error;
 
       await refetch();
       setEditingSocials(false);
-      
+
       toast({
         title: "Social Links updated!",
         description: "Your social links has been updated successfully.",
@@ -295,19 +344,19 @@ const Profile = () => {
       toast({
         title: "Error",
         description: error.message || "Failed to update social links",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const handleCancelPreferences = () => {
     if (profile) {
       setPreferenceData({
-        dining_style: profile.dining_style || '',
+        dining_style: profile.dining_style || "",
         dietary_preferences: profile.dietary_preferences || [],
-        gender_identity: profile.gender_identity || ''
+        gender_identity: profile.gender_identity || "",
       });
     }
     setEditingPreferences(false);
@@ -316,12 +365,12 @@ const Profile = () => {
   const handleCancelSocials = () => {
     if (profile) {
       setSocialLinks({
-        instagram_username: profile.instagram_username || '',
-        linkedin_username: profile.linkedin_username || ''
+        instagram_username: profile.instagram_username || "",
+        linkedin_username: profile.linkedin_username || "",
       });
     }
     setEditingSocials(false);
-  }
+  };
 
   if (!profile) {
     return (
@@ -352,15 +401,24 @@ const Profile = () => {
               <CardTitle className="flex items-center justify-between">
                 Personal Information
                 {!editing ? (
-                  <Button onClick={() => setEditing(true)} variant="outline" size="sm">
+                  <Button
+                    onClick={() => setEditing(true)}
+                    variant="outline"
+                    size="sm"
+                  >
                     <Edit className="h-4 w-4 mr-2" />
                     Edit
                   </Button>
                 ) : (
                   <div className="flex space-x-2">
-                    <Button onClick={handleSave} disabled={loading} size="sm" className="bg-peach-gold hover:bg-peach-gold/90 text-background">
+                    <Button
+                      onClick={handleSave}
+                      disabled={loading}
+                      variant="default"
+                      size="sm"
+                    >
                       <Save className="h-4 w-4 mr-2" />
-                      {loading ? 'Saving...' : 'Save'}
+                      {loading ? "Saving..." : "Save"}
                     </Button>
                     <Button onClick={handleCancel} variant="outline" size="sm">
                       <X className="h-4 w-4 mr-2" />
@@ -371,12 +429,13 @@ const Profile = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex items-center space-x-6" id='profileWrapper'>
+              <div className="flex items-center space-x-6" id="profileWrapper">
                 <div className="relative">
                   <Avatar className="h-24 w-24">
-                    <AvatarImage src={profile.profile_photo_url || ''} />
+                    <AvatarImage src={profile.profile_photo_url || ""} />
                     <AvatarFallback className="bg-peach-gold text-background text-xl">
-                      {profile.first_name?.[0]}{profile.last_name?.[0]}
+                      {profile.first_name?.[0]}
+                      {profile.last_name?.[0]}
                     </AvatarFallback>
                   </Avatar>
                   <input
@@ -410,22 +469,22 @@ const Profile = () => {
                   )}
                 </div>
                 <p>
-                      {profile.role === "user" &&
-                      (paymentStatus === "completed" ? (
-                        <span className="px-3 py-1 text-xs font-semibold text-black bg-yellow-400 rounded-full">
-                          🌟 Premium
-                        </span>
-                      ) : (
-                        <span className="px-3 py-1 text-xs font-semibold text-white bg-[rgb(0,30,83)] rounded-full">
-                          🆓 Freemium
-                        </span>
-                      ))}
-                      {profile.role === "admin" && (
-                      <span className="px-3 py-1 text-primary font-semibold bg-[#9dc0b3] rounded-full">
-                        🌟 Admin
+                  {profile.role === "user" &&
+                    (paymentStatus === "completed" ? (
+                      <span className="px-3 py-1 text-xs font-semibold text-black bg-yellow-400 rounded-full">
+                        🌟 Premium
                       </span>
-                    )}
-                    </p>
+                    ) : (
+                      <span className="px-3 py-1 text-xs font-semibold text-white bg-[rgb(0,30,83)] rounded-full">
+                        🆓 Freemium
+                      </span>
+                    ))}
+                  {profile.role === "admin" && (
+                    <span className="px-3 py-1 text-primary font-semibold bg-[#9dc0b3] rounded-full">
+                      🌟 Admin
+                    </span>
+                  )}
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -435,10 +494,17 @@ const Profile = () => {
                     <Input
                       id="first_name"
                       value={formData.first_name}
-                      onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value}))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          first_name: e.target.value,
+                        }))
+                      }
                     />
                   ) : (
-                    <p className="text-foreground p-2 bg-muted rounded-md">{profile.first_name || 'Not set'}</p>
+                    <p className="text-foreground p-2 bg-muted rounded-md">
+                      {profile.first_name || "Not set"}
+                    </p>
                   )}
                 </div>
 
@@ -448,10 +514,17 @@ const Profile = () => {
                     <Input
                       id="last_name"
                       value={formData.last_name}
-                      onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value}))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          last_name: e.target.value,
+                        }))
+                      }
                     />
                   ) : (
-                    <p className="text-foreground p-2 bg-muted rounded-md">{profile.last_name || 'Not set'}</p>
+                    <p className="text-foreground p-2 bg-muted rounded-md">
+                      {profile.last_name || "Not set"}
+                    </p>
                   )}
                 </div>
 
@@ -461,10 +534,17 @@ const Profile = () => {
                     <Input
                       id="job_title"
                       value={formData.job_title}
-                      onChange={(e) => setFormData(prev => ({ ...prev, job_title: e.target.value}))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          job_title: e.target.value,
+                        }))
+                      }
                     />
                   ) : (
-                    <p className="text-foreground p-2 bg-muted rounded-md">{profile.job_title || 'Not set'}</p>
+                    <p className="text-foreground p-2 bg-muted rounded-md">
+                      {profile.job_title || "Not set"}
+                    </p>
                   )}
                 </div>
 
@@ -474,10 +554,17 @@ const Profile = () => {
                     <Input
                       id="location_city"
                       value={formData.location_city}
-                      onChange={(e) => setFormData(prev => ({ ...prev, location_city: e.target.value}))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          location_city: e.target.value,
+                        }))
+                      }
                     />
                   ) : (
-                    <p className="text-foreground p-2 bg-muted rounded-md">{profile.location_city || 'Not set'}</p>
+                    <p className="text-foreground p-2 bg-muted rounded-md">
+                      {profile.location_city || "Not set"}
+                    </p>
                   )}
                 </div>
               </div>
@@ -490,17 +577,30 @@ const Profile = () => {
               <CardTitle className="flex items-center justify-between">
                 Social Links
                 {!editingSocials ? (
-                  <Button onClick={() => setEditingSocials(true)} variant="outline" size="sm">
+                  <Button
+                    onClick={() => setEditingSocials(true)}
+                    variant="outline"
+                    size="sm"
+                  >
                     <Edit className="h-4 w-4 mr-2" />
                     Edit
                   </Button>
                 ) : (
                   <div className="flex space-x-2">
-                    <Button onClick={handleSaveSocials} disabled={loading} size="sm" className="bg-peach-gold hover:bg-peach-gold/90 text-background">
+                    <Button
+                      onClick={handleSaveSocials}
+                      disabled={loading}
+                      size="sm"
+                      variant="default"
+                    >
                       <Save className="h-4 w-4 mr-2" />
-                      {loading ? 'Saving...' : 'Save'}
+                      {loading ? "Saving..." : "Save"}
                     </Button>
-                    <Button onClick={handleCancelSocials} variant="outline" size="sm">
+                    <Button
+                      onClick={handleCancelSocials}
+                      variant="outline"
+                      size="sm"
+                    >
                       <X className="h-4 w-4 mr-2" />
                       Cancel
                     </Button>
@@ -512,29 +612,42 @@ const Profile = () => {
               <div>
                 <Label htmlFor="linkedin">LinkedIn</Label>
                 {editingSocials ? (
-                    <Input
-                      id="linkedin"
-                      value={socialLinks.linkedin_username}
-                      onChange={(e) => setSocialLinks(prev => ({ ...prev, linkedin_username: e.target.value}))}
-                    />
-                  ) : (
-                    <p className="text-foreground p-2 bg-muted rounded-md">{profile.linkedin_username || 'Not set'}</p>
-                  )}
+                  <Input
+                    id="linkedin"
+                    value={socialLinks.linkedin_username}
+                    onChange={(e) =>
+                      setSocialLinks((prev) => ({
+                        ...prev,
+                        linkedin_username: e.target.value,
+                      }))
+                    }
+                  />
+                ) : (
+                  <p className="text-foreground p-2 bg-muted rounded-md">
+                    {profile.linkedin_username || "Not set"}
+                  </p>
+                )}
               </div>
-              
+
               <div>
                 <Label htmlFor="instagram">Instagram</Label>
                 {editingSocials ? (
-                    <Input
-                      id="instagram"
-                      value={socialLinks.instagram_username}
-                      onChange={(e) => setSocialLinks(prev => ({ ...prev, instagram_username: e.target.value}))}
-                    />
-                  ) : (
-                    <p className="text-foreground p-2 bg-muted rounded-md">{profile.instagram_username || 'Not set'}</p>
-                  )}
+                  <Input
+                    id="instagram"
+                    value={socialLinks.instagram_username}
+                    onChange={(e) =>
+                      setSocialLinks((prev) => ({
+                        ...prev,
+                        instagram_username: e.target.value,
+                      }))
+                    }
+                  />
+                ) : (
+                  <p className="text-foreground p-2 bg-muted rounded-md">
+                    {profile.instagram_username || "Not set"}
+                  </p>
+                )}
               </div>
-
             </CardContent>
           </Card>
 
@@ -543,17 +656,30 @@ const Profile = () => {
               <CardTitle className="flex items-center justify-between">
                 Preferences
                 {!editingPreferences ? (
-                  <Button onClick={() => setEditingPreferences(true)} variant="outline" size="sm">
+                  <Button
+                    onClick={() => setEditingPreferences(true)}
+                    variant="outline"
+                    size="sm"
+                  >
                     <Edit className="h-4 w-4 mr-2" />
                     Edit
                   </Button>
                 ) : (
                   <div className="flex space-x-2">
-                    <Button onClick={handleSavePreferences} disabled={loading} size="sm" className="bg-peach-gold hover:bg-peach-gold/90 text-background">
+                    <Button
+                      onClick={handleSavePreferences}
+                      disabled={loading}
+                      size="sm"
+                      variant="default"
+                    >
                       <Save className="h-4 w-4 mr-2" />
-                      {loading ? 'Saving...' : 'Save'}
+                      {loading ? "Saving..." : "Save"}
                     </Button>
-                    <Button onClick={handleCancelPreferences} variant="outline" size="sm">
+                    <Button
+                      onClick={handleCancelPreferences}
+                      variant="outline"
+                      size="sm"
+                    >
                       <X className="h-4 w-4 mr-2" />
                       Cancel
                     </Button>
@@ -565,61 +691,107 @@ const Profile = () => {
               <div>
                 <Label>Dining Style</Label>
                 {editingPreferences ? (
-                  <Select value={preferenceData.dining_style} onValueChange={(value: any) => setPreferenceData(prev => ({ ...prev, dining_style: value }))}>
+                  <Select
+                    value={preferenceData.dining_style}
+                    onValueChange={(value: any) =>
+                      setPreferenceData((prev) => ({
+                        ...prev,
+                        dining_style: value,
+                      }))
+                    }
+                  >
                     <SelectTrigger className="mt-1">
                       <SelectValue placeholder="Select dining style" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="adventurous">Adventurous</SelectItem>
-                      <SelectItem value="foodie_enthusiast">Foodie Enthusiast</SelectItem>
+                      <SelectItem value="foodie_enthusiast">
+                        Foodie Enthusiast
+                      </SelectItem>
                       <SelectItem value="local_lover">Local Lover</SelectItem>
                       <SelectItem value="comfort_food">Comfort Food</SelectItem>
-                      <SelectItem value="health_conscious">Health Conscious</SelectItem>
-                      <SelectItem value="social_butterfly">Social Butterfly</SelectItem>
+                      <SelectItem value="health_conscious">
+                        Health Conscious
+                      </SelectItem>
+                      <SelectItem value="social_butterfly">
+                        Social Butterfly
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 ) : (
                   <p className="text-foreground p-2 bg-muted rounded-md mt-1">
-                    {profile.dining_style ? profile.dining_style.replace('_', ' ') : 'Not set'}
+                    {profile.dining_style
+                      ? profile.dining_style.replace("_", " ")
+                      : "Not set"}
                   </p>
                 )}
               </div>
-              
+
               <div>
                 <Label>Dietary Preferences</Label>
                 {editingPreferences ? (
                   <div className="grid grid-cols-2 gap-2 mt-1">
-                    {['vegetarian', 'vegan', 'gluten_free', 'dairy_free', 'keto', 'paleo', 'halal', 'kosher', 'no_restrictions'].map((pref) => (
+                    {[
+                      "vegetarian",
+                      "vegan",
+                      "gluten_free",
+                      "dairy_free",
+                      "keto",
+                      "paleo",
+                      "halal",
+                      "kosher",
+                      "no_restrictions",
+                    ].map((pref) => (
                       <label key={pref} className="flex items-center space-x-2">
                         <input
                           type="checkbox"
-                          checked={preferenceData.dietary_preferences.includes(pref as any)}
-                           onChange={(e) => {
-                            const typedPref = pref as 'vegetarian' | 'vegan' | 'gluten_free' | 'dairy_free' | 'keto' | 'paleo' | 'halal' | 'kosher' | 'no_restrictions';
+                          checked={preferenceData.dietary_preferences.includes(
+                            pref as any
+                          )}
+                          onChange={(e) => {
+                            const typedPref = pref as
+                              | "vegetarian"
+                              | "vegan"
+                              | "gluten_free"
+                              | "dairy_free"
+                              | "keto"
+                              | "paleo"
+                              | "halal"
+                              | "kosher"
+                              | "no_restrictions";
                             if (e.target.checked) {
-                              setPreferenceData(prev => ({
+                              setPreferenceData((prev) => ({
                                 ...prev,
-                                dietary_preferences: [...prev.dietary_preferences, typedPref]
+                                dietary_preferences: [
+                                  ...prev.dietary_preferences,
+                                  typedPref,
+                                ],
                               }));
                             } else {
-                              setPreferenceData(prev => ({
+                              setPreferenceData((prev) => ({
                                 ...prev,
-                                dietary_preferences: prev.dietary_preferences.filter(p => p !== typedPref)
+                                dietary_preferences:
+                                  prev.dietary_preferences.filter(
+                                    (p) => p !== typedPref
+                                  ),
                               }));
                             }
                           }}
                           className="rounded"
                         />
-                        <span className="text-sm">{pref.replace('_', ' ')}</span>
+                        <span className="text-sm">
+                          {pref.replace("_", " ")}
+                        </span>
                       </label>
                     ))}
                   </div>
                 ) : (
                   <div className="flex flex-wrap gap-2 mt-1">
-                    {profile.dietary_preferences && profile.dietary_preferences.length > 0 ? (
+                    {profile.dietary_preferences &&
+                    profile.dietary_preferences.length > 0 ? (
                       profile.dietary_preferences.map((pref) => (
                         <Badge key={pref} variant="secondary">
-                          {pref.replace('_', ' ')}
+                          {pref.replace("_", " ")}
                         </Badge>
                       ))
                     ) : (
@@ -632,7 +804,15 @@ const Profile = () => {
               <div>
                 <Label>Gender Identity</Label>
                 {editingPreferences ? (
-                  <Select value={preferenceData.gender_identity} onValueChange={(value: any) => setPreferenceData(prev => ({ ...prev, gender_identity: value }))}>
+                  <Select
+                    value={preferenceData.gender_identity}
+                    onValueChange={(value: any) =>
+                      setPreferenceData((prev) => ({
+                        ...prev,
+                        gender_identity: value,
+                      }))
+                    }
+                  >
                     <SelectTrigger className="mt-1">
                       <SelectValue placeholder="Select gender identity" />
                     </SelectTrigger>
@@ -640,12 +820,16 @@ const Profile = () => {
                       <SelectItem value="male">Male</SelectItem>
                       <SelectItem value="female">Female</SelectItem>
                       <SelectItem value="non_binary">Non-binary</SelectItem>
-                      <SelectItem value="prefer_not_to_say">Prefer not to say</SelectItem>
+                      <SelectItem value="prefer_not_to_say">
+                        Prefer not to say
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 ) : (
                   <p className="text-foreground p-2 bg-muted rounded-md mt-1">
-                    {profile.gender_identity ? profile.gender_identity.replace('_', ' ') : 'Not set'}
+                    {profile.gender_identity
+                      ? profile.gender_identity.replace("_", " ")
+                      : "Not set"}
                   </p>
                 )}
               </div>
@@ -662,11 +846,15 @@ const Profile = () => {
             <CardContent>
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground">My Restaurant Visits</h3>
-                  <p className="text-muted-foreground">Track your dining history and discover crossed paths</p>
+                  <h3 className="text-lg font-semibold text-foreground">
+                    My Restaurant Visits
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Track your dining history and discover crossed paths
+                  </p>
                 </div>
                 <Button
-                  onClick={() => navigate('/my-visits')}
+                  onClick={() => navigate("/my-visits")}
                   variant="outline"
                   className="flex items-center space-x-2"
                 >
@@ -687,36 +875,48 @@ const Profile = () => {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground">Crossed Paths Tracking</h3>
+                  <h3 className="text-lg font-semibold text-foreground">
+                    Crossed Paths Tracking
+                  </h3>
                   <p className="text-muted-foreground">
-                    Allow Lovable to track your restaurant visits to enable Crossed Paths suggestions.
+                    Allow Lovable to track your restaurant visits to enable
+                    Crossed Paths suggestions.
                     <span className="block mt-1 text-xs">
-                      Visit restaurants, track your visits, and discover people you've crossed paths with within 14 days.
+                      Visit restaurants, track your visits, and discover people
+                      you've crossed paths with within 14 days.
                     </span>
                   </p>
                 </div>
                 <Switch
                   checked={privacySettings.allow_crossed_paths_tracking}
                   onCheckedChange={async (checked) => {
-                    setPrivacySettings(prev => ({ ...prev, allow_crossed_paths_tracking: checked }));
+                    setPrivacySettings((prev) => ({
+                      ...prev,
+                      allow_crossed_paths_tracking: checked,
+                    }));
                     try {
                       const { error } = await supabase
-                        .from('profiles')
+                        .from("profiles")
                         .update({ allow_crossed_paths_tracking: checked })
-                        .eq('id', profile.id);
-                      
+                        .eq("id", profile.id);
+
                       if (error) throw error;
-                      
+
                       toast({
                         title: "Privacy settings updated",
-                        description: `Crossed paths tracking ${checked ? 'enabled' : 'disabled'}`,
+                        description: `Crossed paths tracking ${
+                          checked ? "enabled" : "disabled"
+                        }`,
                       });
                     } catch (error: any) {
-                      setPrivacySettings(prev => ({ ...prev, allow_crossed_paths_tracking: !checked }));
+                      setPrivacySettings((prev) => ({
+                        ...prev,
+                        allow_crossed_paths_tracking: !checked,
+                      }));
                       toast({
                         title: "Error",
                         description: "Failed to update privacy settings",
-                        variant: "destructive"
+                        variant: "destructive",
                       });
                     }
                   }}
@@ -726,53 +926,56 @@ const Profile = () => {
           </Card>
 
           {profile.role === "user" && (
-<Card className="shadow-card border-border">
-            <CardHeader>
-              <CardTitle>Subscription</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground">Manage Subscription</h3>
-                  <p className="text-muted-foreground">View and manage your subscription plan</p>
+            <Card className="shadow-card border-border">
+              <CardHeader>
+                <CardTitle>Subscription</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground">
+                      Manage Subscription
+                    </h3>
+                    <p className="text-muted-foreground">
+                      View and manage your subscription plan
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => navigate("/subscription")}
+                    variant="outline"
+                    className="flex items-center space-x-2"
+                  >
+                    <CreditCard className="h-4 w-4" />
+                    <span>Manage</span>
+                  </Button>
                 </div>
-                <Button
-                  onClick={() => navigate('/subscription')}
-                  variant="outline"
-                  className="flex items-center space-x-2"
-                >
-                  <CreditCard className="h-4 w-4" />
-                  <span>Manage</span>
-                </Button>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
-                {/* <Button 
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+                  {/* <Button 
                   onClick={() => navigate('/rsvps')}
                   variant="outline"
                   className="flex-1"
                 >
                   View RSVPs
                 </Button> */}
-                {/* <Button 
+                  {/* <Button 
                   onClick={() => navigate('/my-visits')}
                   variant="outline"
                   className="flex-1"
                 >
                   My Visits
                 </Button> */}
-                {/* <Button 
+                  {/* <Button 
                   onClick={() => navigate('/crossed-paths')}
                   variant="outline"
                   className="flex-1"
                 >
                   Crossed Paths
                 </Button> */}
-              </div>
-            </CardContent>
-          </Card>
+                </div>
+              </CardContent>
+            </Card>
           )}
-          
         </div>
       </div>
     </div>

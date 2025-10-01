@@ -21,11 +21,14 @@ interface AnalyticsData {
 }
 
 interface EventAnalyticsDashboardProps {
-    eventId: string;
-    subscriptionStatus: 'loading' | 'free' | 'premium';   
+  eventId: string;
+  subscriptionStatus: "loading" | "free" | "premium";
 }
 
-export default function EventAnalyticsDashboard({ eventId, subscriptionStatus }: EventAnalyticsDashboardProps) {
+export default function EventAnalyticsDashboard({
+  eventId,
+  subscriptionStatus,
+}: EventAnalyticsDashboardProps) {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData[]>([]);
   const [loading, setLoading] = useState(true);
   const { profile } = useProfile();
@@ -72,12 +75,13 @@ export default function EventAnalyticsDashboard({ eventId, subscriptionStatus }:
     );
   }
 
-
   if (isFreeTier) {
     return (
       <Card className="bg-surface shadow-lg rounded-lg max-w-3xl mx-auto p-6">
         <CardHeader>
-          <CardTitle className="text-xl font-bold">Upgrade to Premium</CardTitle>
+          <CardTitle className="text-xl font-bold">
+            Upgrade to Premium
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground text-base leading-relaxed max-w-md mx-auto mb-6">
@@ -104,10 +108,12 @@ export default function EventAnalyticsDashboard({ eventId, subscriptionStatus }:
   return (
     <Card className="bg-dark-surface shadow-lg rounded-lg max-w-3xl mx-auto p-6">
       <CardHeader>
-        <CardTitle className="text-2xl font-semibold mb-4">Event Analytics</CardTitle>
+        <CardTitle className="text-2xl font-semibold mb-4">
+          Event Analytics
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
+        {/* <ResponsiveContainer width="100%" height={300}>
           <BarChart
             data={analyticsData}
             margin={{ top: 10, right: 30, left: 0, bottom: 5 }}
@@ -150,6 +156,89 @@ export default function EventAnalyticsDashboard({ eventId, subscriptionStatus }:
               animationDuration={800}
             >
               <LabelList dataKey="count" position="top" fill="#ffbf69" fontWeight="700" />
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer> */}
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart
+            data={analyticsData}
+            margin={{ top: 10, right: 30, left: 0, bottom: 5 }}
+          >
+            <defs>
+              {/* Primary (uses your --primary var) */}
+              <linearGradient id="colorPrimary" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="hsl(var(--primary))"
+                  stopOpacity={0.9}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="hsl(var(--secondary))"
+                  stopOpacity={0.9}
+                />
+              </linearGradient>
+
+              {/* Accent (uses your --accent var) */}
+              <linearGradient id="colorAccent" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="hsl(var(--accent))"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="hsl(var(--foreground))"
+                  stopOpacity={0.9}
+                />
+              </linearGradient>
+            </defs>
+
+            <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="3 3" />
+
+            <XAxis
+              dataKey="metric"
+              stroke="hsl(var(--muted-foreground))"
+              tick={{
+                fontSize: 14,
+                fontWeight: 600,
+                fill: "hsl(var(--muted-foreground))",
+              }}
+            />
+
+            <YAxis
+              stroke="hsl(var(--muted-foreground))"
+              tick={{
+                fontSize: 14,
+                fontWeight: 600,
+                fill: "hsl(var(--muted-foreground))",
+              }}
+              allowDecimals={false}
+            />
+
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "hsl(var(--card))",
+                border: "1px solid hsl(var(--border))",
+                color: "hsl(var(--foreground))",
+                fontWeight: "600",
+              }}
+              labelStyle={{ color: "hsl(var(--accent))" }}
+              cursor={false}
+            />
+
+            <Bar
+              dataKey="count"
+              fill="url(#colorPrimary)"
+              radius={[8, 8, 0, 0]}
+              animationDuration={800}
+            >
+              <LabelList
+                dataKey="count"
+                position="top"
+                fill="hsl(var(--foreground))"
+                fontWeight="700"
+              />
             </Bar>
           </BarChart>
         </ResponsiveContainer>

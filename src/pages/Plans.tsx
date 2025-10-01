@@ -122,7 +122,7 @@ const Plans = () => {
                 </ul>
 
                 <div className="flex justify-between items-center">
-                  <Button variant="default"
+                  <Button variant="destructive"
                     onClick={() => handleDelete(plan.id, plan.name)} className="w-full">
                     <Trash2 className="h-4 w-4" /> Delete Plan
                   </Button>

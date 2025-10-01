@@ -253,20 +253,20 @@ const AdminEvents = () => {
                     {/* <div className="absolute inset-0 bg-black/70 z-10" /> */}
                   </div>
 
-                  <CardContent className="flex flex-col flex-grow space-y-3 p-4">
+                  <CardContent className="flex flex-col flex-grow space-y-3 p-4 text-muted-foreground bg-[#fcfaf8]">
                     <div className=" inset-0 flex flex-col justify-end">
-                      <h3 className="text-primary text-xl font-bold line-clamp-1">
+                      <h3 className="text-black text-xl font-bold line-clamp-1">
                         {event.name}
                       </h3>
                       {event.description && (
-                        <p className="text-primary/90 text-sm mt-1 line-clamp-1">
+                        <p className="text-sm mt-1 line-clamp-1">
                           {event.description}
                         </p>
                       )}
                     </div>
 
-                    <div className="text-sm flex items-center pl-2 pt-4 pb-1 text-white border-t-2 border-[#1E1E1E]">
-                      <Calendar className="h-5 w-5 text-primary/90 mr-3" />
+                    <div className="text-sm flex items-center pl-2 pt-4 pb-1 border-t-2 border-primary">
+                      <Calendar className="h-5 w-5 mr-3" />
                       <span>
                         {new Date(event.date_time).toLocaleDateString("en-US", {
                           month: "short",
@@ -281,16 +281,16 @@ const AdminEvents = () => {
                     </div>
 
                     {event.max_attendees && (
-                      <div className="text-sm font-medium py-4 px-2 border-t-2 border-b-2 border-[#1E1E1E] text-white">
+                      <div className="text-sm font-medium py-4 px-2 border-t-2 border-b-2 border-primary">
                         {/* Top content */}
                         <div className="flex items-center mb-2">
-                          <Users className="h-5 w-5 text-primary/90 mr-3" />
+                          <Users className="h-5 w-5 mr-3" />
                           {event.rsvps?.length || 0}/{event.max_attendees}{" "}
                           RSVPed
                         </div>
 
                         {/* Progress bar */}
-                        <div className="w-full h-2 bg-[#1E1E1E] rounded-full overflow-hidden">
+                        <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
                           <div
                             className="h-full bg-primary transition-all duration-300"
                             style={{
@@ -307,7 +307,7 @@ const AdminEvents = () => {
                     )}
 
                     {typeof event.is_paid !== "undefined" && (
-                      <div className="text-sm font-medium py-2 text-white">
+                      <div className="text-sm font-medium py-2">
                         {event.is_paid
                           ? `💵 Paid Event – $${event.event_fee}`
                           : "🆓 Free Event"}
@@ -315,10 +315,10 @@ const AdminEvents = () => {
                     )}
 
                     <div className="flex items-center">
-                      <MapPin className="h-5 w-5 text-primary/90 mr-3" />
+                      <MapPin className="h-5 w-5 mr-3" />
 
                       {/* Location */}
-                      <div className="text-sm flex flex-col text-white">
+                      <div className="text-sm flex flex-col">
                         <span className="">
                           {event.location_name || "Location not specified"}
                         </span>
@@ -347,7 +347,7 @@ const AdminEvents = () => {
                         onClick={() =>
                           navigate(`/admin/event/${event.id}/edit`)
                         }
-                        className="text-white border-[#1E1E1E]"
+                        className="\"
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -356,7 +356,7 @@ const AdminEvents = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => handleDeleteEvent(event.id)}
-                        className="text-red-500 hover:text-red-600 border-[#1E1E1E]"
+                        className="text-red-500 hover:text-red-600 border-destructive"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

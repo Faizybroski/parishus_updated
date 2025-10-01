@@ -1,6 +1,6 @@
-import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
-import { useProfile } from '@/hooks/useProfile';
+import React from "react";
+import { NavLink, useLocation } from "react-router-dom";
+import { useProfile } from "@/hooks/useProfile";
 import {
   Sidebar,
   SidebarContent,
@@ -11,7 +11,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from '@/components/ui/sidebar';
+} from "@/components/ui/sidebar";
 import {
   LayoutDashboard,
   Users,
@@ -26,8 +26,8 @@ import {
   FileText,
   UtensilsCrossed,
   DollarSign,
-  Receipt
-} from 'lucide-react';
+  Receipt,
+} from "lucide-react";
 
 const AdminSidebar = () => {
   const location = useLocation();
@@ -35,10 +35,10 @@ const AdminSidebar = () => {
   const currentPath = location.pathname;
 
   const isActive = (path: string) => currentPath === path;
-  const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    isActive 
-      ? "bg-primary text-primary-foreground shadow-md font-medium" 
-      : "hover:bg-muted/50 hover:text-foreground transition-all duration-200";
+  const getNavCls = (isActive: boolean) =>
+  isActive
+    ? "bg-gradient-to-r from-primary/80 to-primary text-primary-foreground shadow-md font-medium"
+    : "hover:bg-muted/50 hover:text-foreground transition-all duration-200";
 
   // Define navigation items based on role
   const getNavigationItems = () => {
@@ -46,9 +46,21 @@ const AdminSidebar = () => {
       { title: "Dashboard", url: "/admin/dashboard", icon: LayoutDashboard },
       { title: "View all Events", url: "/admin/events", icon: Calendar },
       { title: "Plans", url: "/admin/plans", icon: DollarSign },
-      { title: "Wallet Requests", url: "/admin/wallet/requests", icon: DollarSign },
-      { title: "Subscriptions", url: "/admin/manage-subscriptions", icon: Receipt },
-      { title: "Restaurants", url: "/admin/restaurants", icon: UtensilsCrossed },
+      {
+        title: "Wallet Requests",
+        url: "/admin/wallet/requests",
+        icon: DollarSign,
+      },
+      {
+        title: "Subscriptions",
+        url: "/admin/manage-subscriptions",
+        icon: Receipt,
+      },
+      {
+        title: "Restaurants",
+        url: "/admin/restaurants",
+        icon: UtensilsCrossed,
+      },
       { title: "Users", url: "/admin/users", icon: Users },
       { title: "Crossed Paths", url: "/admin/crossed-paths", icon: Users },
       { title: "RSVPs", url: "/admin/rsvps", icon: UserCheck },
@@ -56,8 +68,12 @@ const AdminSidebar = () => {
       { title: "Notifications", url: "/admin/notifications", icon: Bell },
       { title: "Reports", url: "/admin/reports", icon: FileText },
       { title: "Profile", url: "/admin/profile", icon: User },
-      { title: "Admin Management", url: "/admin/admin-management", icon: Shield },
-      { title: "Global Settings", url: "/admin/settings", icon: Settings }
+      {
+        title: "Admin Management",
+        url: "/admin/admin-management",
+        icon: Shield,
+      },
+      { title: "Global Settings", url: "/admin/settings", icon: Settings },
     ];
 
     return baseItems;
@@ -72,9 +88,7 @@ const AdminSidebar = () => {
         <SidebarGroup>
           <SidebarGroupLabel className="flex items-center space-x-3 px-4 py-3 mb-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg mx-3">
             <Shield className="h-5 w-5 text-primary" />
-            <span className="font-semibold text-foreground">
-              Admin Panel
-            </span>
+            <span className="font-semibold text-foreground">Admin Panel</span>
           </SidebarGroupLabel>
 
           <SidebarGroupContent>
@@ -82,13 +96,13 @@ const AdminSidebar = () => {
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink 
-                      to={item.url} 
-                      end 
+                    <NavLink
+                      to={item.url}
+                      end={false} // 👈 allow parent routes to stay active
                       className={({ isActive }) => `
-                        ${getNavCls({ isActive })}
+                        ${getNavCls(isActive)}
                         flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium
-                        ${isActive ? 'shadow-lg' : ''}
+                        ${isActive ? "shadow-lg" : ""}
                       `}
                     >
                       <item.icon className="h-4 w-4 flex-shrink-0" />

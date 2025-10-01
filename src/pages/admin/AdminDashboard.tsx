@@ -15,7 +15,7 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -60,7 +60,7 @@ import {
   TrendingUp,
   UserCheck,
   Users,
-  UserX
+  UserX,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -72,29 +72,28 @@ import {
   Pie,
   PieChart,
   XAxis,
-  YAxis
+  YAxis,
 } from "recharts";
 
 const generateStubData = async () => {
   const now = new Date();
-  const monthsWindow = Array.from({ length: 12 })
-    .map((_, i) => {
-      const d = subMonths(now, 11 - i); 
-      return format(d, "MMM yyyy"); 
-    });
+  const monthsWindow = Array.from({ length: 12 }).map((_, i) => {
+    const d = subMonths(now, 11 - i);
+    return format(d, "MMM yyyy");
+  });
 
   // const { data: userRows, error: userError } = await supabase
   //   .from("profiles")
   //   .select("created_at");
   // if (userError) throw userError;
 
-    const { data: profileRows, error: profileError } = await supabase
+  const { data: profileRows, error: profileError } = await supabase
     .from("profiles")
     .select("created_at, dining_style, id, role");
   if (profileError) throw profileError;
 
   const userGrowthMap: Record<string, number> = {};
-  monthsWindow.forEach((m) => (userGrowthMap[m] = 0)); 
+  monthsWindow.forEach((m) => (userGrowthMap[m] = 0));
 
   profileRows.forEach(({ created_at }) => {
     const month = format(new Date(created_at), "MMM yyyy");
@@ -147,15 +146,22 @@ const generateStubData = async () => {
     name: formatName(style),
     value: profileRows.filter((p) => p.dining_style === style).length,
     color:
-      style === "adventurous" ? "#FF6F61" :
-      style === "foodie_enthusiast" ? "#6A5ACD" :
-      style === "local_lover" ? "#20B2AA" :
-      style === "comfort_food" ? "#FFD700" :
-      style === "health_conscious" ? "#32CD32" :
-      "#FF8C00",
+      style === "adventurous"
+        ? "#FF6F61"
+        : style === "foodie_enthusiast"
+        ? "#6A5ACD"
+        : style === "local_lover"
+        ? "#20B2AA"
+        : style === "comfort_food"
+        ? "#FFD700"
+        : style === "health_conscious"
+        ? "#32CD32"
+        : "#FF8C00",
   }));
 
-  const adminIds = profileRows.filter((p) => p.role === "admin").map((p) => p.id);
+  const adminIds = profileRows
+    .filter((p) => p.role === "admin")
+    .map((p) => p.id);
 
   if (adminIds.length === 0) {
     console.warn("No admins found, revenue will be zero.");
@@ -179,7 +185,10 @@ const generateStubData = async () => {
         revenueMap[month] += event_fee || 0;
       }
 
-      if (getMonth(eventDate) === thisMonth && getYear(eventDate) === thisYear) {
+      if (
+        getMonth(eventDate) === thisMonth &&
+        getYear(eventDate) === thisYear
+      ) {
         currentMonthRevenue += event_fee || 0;
       }
 
@@ -194,7 +203,14 @@ const generateStubData = async () => {
     revenue: revenueMap[month],
   }));
 
-  return { userGrowthData, eventTrendsData, revenueData, diningStylesData, currentMonthRevenue, currentYearRevenue };
+  return {
+    userGrowthData,
+    eventTrendsData,
+    revenueData,
+    diningStylesData,
+    currentMonthRevenue,
+    currentYearRevenue,
+  };
 };
 
 const AdminDashboard = () => {
@@ -219,7 +235,8 @@ const AdminDashboard = () => {
   const [eventSearchTerm, setEventSearchTerm] = useState("");
   const [userStatusFilter, setUserStatusFilter] = useState("all");
   const [eventStatusFilter, setEventStatusFilter] = useState("all");
-  const [pendingUserStatusFilter, setPendingUserStatusFilter] = useState("pending");
+  const [pendingUserStatusFilter, setPendingUserStatusFilter] =
+    useState("pending");
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -239,10 +256,7 @@ const AdminDashboard = () => {
   }, []);
 
   useEffect(() => {
-    if (
-      profile &&
-      (profile.role === "admin")
-    ) {
+    if (profile && profile.role === "admin") {
       fetchDashboardData();
     }
   }, [profile]);
@@ -264,7 +278,10 @@ const AdminDashboard = () => {
         `);
 
       // Fetch pending users
-      const { data: pendingUsersData } = await supabase.from("profiles").select(`*`).eq("approval_status", "pending");
+      const { data: pendingUsersData } = await supabase
+        .from("profiles")
+        .select(`*`)
+        .eq("approval_status", "pending");
 
       // Calculate RSVPs for the month
       const thisMonth = new Date();
@@ -306,13 +323,13 @@ const AdminDashboard = () => {
         .update({ approval_status: "approved" })
         .eq("user_id", userId)
         .select("email, first_name");
-  
+
       if (updateError) throw updateError;
 
       const approvedUserEmail = updatedProfiles?.[0]?.email;
       const approvedUserName = updatedProfiles?.[0]?.first_name;
       if (!approvedUserEmail) throw new Error("User email not found");
-  
+
       // await supabase.from("audit_logs").insert({
       //   admin_id: user?.id,
       //   action: "approve_user",
@@ -385,14 +402,14 @@ const AdminDashboard = () => {
                     </body>
                   </html>`,
       });
-  
+
       toast({ title: "User approved successfully" });
       fetchDashboardData();
     } catch (error) {
       toast({ title: "Error approving user", variant: "destructive" });
     }
   };
-  
+
   const handleRejectUser = async (userId: string) => {
     try {
       const { data: updatedProfiles, error: updateError } = await supabase
@@ -400,13 +417,13 @@ const AdminDashboard = () => {
         .update({ approval_status: "rejected" })
         .eq("user_id", userId)
         .select("email, first_name");
-  
+
       if (updateError) throw updateError;
 
       const approvedUserEmail = updatedProfiles?.[0]?.email;
       const approvedUserName = updatedProfiles?.[0]?.first_name;
       if (!approvedUserEmail) throw new Error("User email not found");
-  
+
       // await supabase.from("audit_logs").insert({
       //   admin_id: user?.id,
       //   action: "reject_user",
@@ -418,7 +435,7 @@ const AdminDashboard = () => {
       await sendEventInvite({
         to: approvedUserEmail,
         subject: "Update on Your Parish Application",
-         html: `<!DOCTYPE html>
+        html: `<!DOCTYPE html>
                   <html>
                     <head>
                       <meta charset="UTF-8" />
@@ -476,7 +493,7 @@ const AdminDashboard = () => {
                     </body>
                   </html>`,
       });
-  
+
       toast({ title: "User rejected successfully" });
       fetchDashboardData();
     } catch (error) {
@@ -536,25 +553,29 @@ const AdminDashboard = () => {
     }
   };
 
-    const deleteUser = async (userId: string) => {
-      if (!confirm("Are you sure you want to delete this user? This action cannot be undone."))return;
+  const deleteUser = async (userId: string) => {
+    if (
+      !confirm(
+        "Are you sure you want to delete this user? This action cannot be undone."
+      )
+    )
+      return;
 
-      try {
-        const { data, error } = await supabase.rpc("delete_user_account", {
-  target_user: userId
-});
-        if (error) {
-          console.error("❌ Error deleting user:", error.message);
-        } else {
-          console.log("✅ User deleted successfully!");
-          toast({ title: "User deleted successfully" });
-        }
-        fetchDashboardData();
-
-      } catch (error) {
-        toast({ title: "Error deleting user", variant: "destructive" });
+    try {
+      const { data, error } = await supabase.rpc("delete_user_account", {
+        target_user: userId,
+      });
+      if (error) {
+        console.error("❌ Error deleting user:", error.message);
+      } else {
+        console.log("✅ User deleted successfully!");
+        toast({ title: "User deleted successfully" });
       }
-    };
+      fetchDashboardData();
+    } catch (error) {
+      toast({ title: "Error deleting user", variant: "destructive" });
+    }
+  };
 
   const deleteEvent = async (eventId: string) => {
     if (!confirm("Are you sure you want to delete this event?")) return;
@@ -613,11 +634,11 @@ const AdminDashboard = () => {
   const sendEmail = async () => {
     // This would integrate with your email service
     try {
-          await sendEventInvite({
-            to: [emailData.to],
-            subject: `${emailData.subject.trim()}`,
-            text: `${emailData.message.trim()}`,
-              html: `
+      await sendEventInvite({
+        to: [emailData.to],
+        subject: `${emailData.subject.trim()}`,
+        text: `${emailData.message.trim()}`,
+        html: `
   <!doctype html>
   <html lang="en">
   <head>
@@ -652,7 +673,9 @@ const AdminDashboard = () => {
   </head>
   <body>
     <!-- preheader: short summary for inbox preview -->
-    <div class="preheader">${(emailData.message.trim() || '').slice(0,120).replace(/\\n/g,' ')}</div>
+    <div class="preheader">${(emailData.message.trim() || "")
+      .slice(0, 120)
+      .replace(/\\n/g, " ")}</div>
 
     <table role="presentation" class="email-body" cellpadding="0" cellspacing="0" width="100%">
       <tr>
@@ -669,7 +692,7 @@ const AdminDashboard = () => {
                 <h1 class="title">${emailData.subject.trim()}</h1>
 
                 <div class="message">
-                  ${(emailData.message.trim() || '').replace(/\\n/g,'<br/>')}
+                  ${(emailData.message.trim() || "").replace(/\\n/g, "<br/>")}
                 </div>
 
               </td>
@@ -687,12 +710,12 @@ const AdminDashboard = () => {
     </table>
   </body>
   </html>
-  `
-          })
-          toast({ title: "Email sent successfully" });
-        } catch {
-          toast({ title: "Error sending mail to user", variant: "destructive" });
-        }
+  `,
+      });
+      toast({ title: "Email sent successfully" });
+    } catch {
+      toast({ title: "Error sending mail to user", variant: "destructive" });
+    }
     setShowEmailModal(false);
     setEmailData({ to: "", subject: "", message: "" });
   };
@@ -703,28 +726,30 @@ const AdminDashboard = () => {
       .includes(searchTerm.toLowerCase().trim());
     const matchesStatus =
       userStatusFilter === "all" ||
-            (userStatusFilter === "active" &&
-              !user.is_suspended &&
-              user.onboarding_completed &&
-              user.approval_status === "approved") ||
-            (userStatusFilter === "suspended" &&
-              user.is_suspended &&
-              user.approval_status === "approved") ||
-            (userStatusFilter === "incomplete" &&
-              !user.onboarding_completed &&
-              user.approval_status === "approved") ||
-            (userStatusFilter === "pending" && user.approval_status === "pending") ||
-            (userStatusFilter === "rejected" && user.approval_status === "rejected");
+      (userStatusFilter === "active" &&
+        !user.is_suspended &&
+        user.onboarding_completed &&
+        user.approval_status === "approved") ||
+      (userStatusFilter === "suspended" &&
+        user.is_suspended &&
+        user.approval_status === "approved") ||
+      (userStatusFilter === "incomplete" &&
+        !user.onboarding_completed &&
+        user.approval_status === "approved") ||
+      (userStatusFilter === "pending" && user.approval_status === "pending") ||
+      (userStatusFilter === "rejected" && user.approval_status === "rejected");
     return matchesSearch && matchesStatus;
   });
 
-    const pendingFilteredUsers = pendingUsers.filter((user) => {
+  const pendingFilteredUsers = pendingUsers.filter((user) => {
     const matchesSearch = `${user.first_name} ${user.last_name} ${user.email}`
       .toLowerCase()
       .includes(pendingUserSearchTerm.toLowerCase().trim());
     const matchesStatus =
-            (pendingUserStatusFilter === "pending" && user.approval_status === "pending") ||
-            (pendingUserStatusFilter === "rejected" && user.approval_status === "rejected");
+      (pendingUserStatusFilter === "pending" &&
+        user.approval_status === "pending") ||
+      (pendingUserStatusFilter === "rejected" &&
+        user.approval_status === "rejected");
     return matchesSearch && matchesStatus;
   });
 
@@ -748,7 +773,7 @@ const AdminDashboard = () => {
     );
   }
 
-  if (!profile || (profile.role !== "admin")) {
+  if (!profile || profile.role !== "admin") {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-center space-y-4">
@@ -818,14 +843,14 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden bg-gradient-to-br from-accent/5 to-accent/10 border-accent/20 hover:shadow-lg transition-all duration-300">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-accent/20 to-transparent rounded-bl-full" />
+        <Card className="relative overflow-hidden bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 hover:shadow-lg transition-all duration-300">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-primary/20 to-transparent rounded-bl-full" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
               Total Events
             </CardTitle>
-            <div className="p-2 bg-accent/10 rounded-full">
-              <Calendar className="h-5 w-5 text-accent" />
+            <div className="p-2 bg-primary/10 rounded-full">
+              <Calendar className="h-5 w-5 text-primary" />
             </div>
           </CardHeader>
           <CardContent>
@@ -836,14 +861,14 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden bg-gradient-to-br from-secondary/5 to-secondary/10 border-secondary/20 hover:shadow-lg transition-all duration-300">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-secondary/20 to-transparent rounded-bl-full" />
+        <Card className="relative overflow-hidden bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 hover:shadow-lg transition-all duration-300">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-primary/20 to-transparent rounded-bl-full" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
               RSVPs This Month
             </CardTitle>
-            <div className="p-2 bg-secondary/10 rounded-full">
-              <UserCheck className="h-5 w-5 text-secondary-foreground" />
+            <div className="p-2 bg-primary/10 rounded-full">
+              <UserCheck className="h-5 w-5 text-primary" />
             </div>
           </CardHeader>
           <CardContent>
@@ -854,14 +879,14 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden bg-gradient-to-br from-muted/5 to-muted/10 border-muted/20 hover:shadow-lg transition-all duration-300">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-muted/20 to-transparent rounded-bl-full" />
+        <Card className="relative overflow-hidden bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 hover:shadow-lg transition-all duration-300">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-primary/20 to-transparent rounded-bl-full" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
               Monthly Revenue
             </CardTitle>
-            <div className="p-2 bg-muted/10 rounded-full">
-              <DollarSign className="h-5 w-5 text-foreground" />
+            <div className="p-2 bg-primary/10 rounded-full">
+              <DollarSign className="h-5 w-5 text-primary" />
             </div>
           </CardHeader>
           <CardContent>
@@ -875,13 +900,13 @@ const AdminDashboard = () => {
         </Card>
       </div>
 
-         {/* Charts Section */}
+      {/* Charts Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-2 gap-6 xl:gap-8">
         {/* User Growth */}
         <Card className="shadow-lg border-0 bg-card/80 backdrop-blur-sm">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center space-x-3 text-base md:text-lg">
-              <div className="p-2 bg-primary/10 rounded-lg">
+              <div className="p-2 rounded-lg">
                 <TrendingUp className="h-5 w-5 text-primary" />
               </div>
               <span className="font-semibold">User Growth Trends</span>
@@ -904,7 +929,9 @@ const AdminDashboard = () => {
                 <Line
                   type="monotone"
                   dataKey="users"
-                  stroke="var(--color-users)"
+                  stroke="var(--color-events)"
+                  dot={{ fill: "var(--color-events)" }}
+                  activeDot={{ fill: "var(--color-events)", r: 4 }}
                   strokeWidth={2}
                 />
               </LineChart>
@@ -916,8 +943,8 @@ const AdminDashboard = () => {
         <Card className="shadow-lg border-0 bg-card/80 backdrop-blur-sm">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center space-x-3 text-base md:text-lg">
-              <div className="p-2 bg-accent/10 rounded-lg">
-                <BarChart3 className="h-5 w-5 text-accent" />
+              <div className="p-2 rounded-lg">
+                <BarChart3 className="h-5 w-5 text-primary" />
               </div>
               <span className="font-semibold">Event Creation Trends</span>
             </CardTitle>
@@ -936,7 +963,11 @@ const AdminDashboard = () => {
                 <XAxis dataKey="month" />
                 <YAxis />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="events" fill="var(--color-events)" />
+                <Bar
+                  dataKey="events"
+                  fill="var(--color-events)"
+                  radius={[6, 6, 0, 0]}
+                />
               </BarChart>
             </ChartContainer>
           </CardContent>
@@ -946,7 +977,7 @@ const AdminDashboard = () => {
         <Card className="shadow-lg border-0 bg-card/80 backdrop-blur-sm">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center space-x-3 text-base md:text-lg">
-              <div className="p-2 bg-secondary/10 rounded-lg">
+              <div className="p-2 rounded-lg">
                 <DollarSign className="h-5 w-5 text-primary" />
               </div>
               <span className="font-semibold">Revenue Trends</span>
@@ -970,6 +1001,8 @@ const AdminDashboard = () => {
                   type="monotone"
                   dataKey="revenue"
                   stroke="var(--color-revenue)"
+                  dot={{ fill: "var(--color-revenue)" }}
+                  activeDot={{ fill: "var(--color-revenue)", r: 4 }}
                   strokeWidth={2}
                 />
               </LineChart>
@@ -981,39 +1014,40 @@ const AdminDashboard = () => {
         <Card className="shadow-lg border-0 bg-card/80 backdrop-blur-sm">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center space-x-3 text-base md:text-lg">
-              <div className="p-2 bg-muted/10 rounded-lg">
-                <Star className="h-5 w-5 text-foreground" />
+              <div className="p-2 rounded-lg">
+                <Star className="h-5 w-5 text-primary" />
               </div>
               <span className="font-semibold">Top Dining Styles</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="min-w-0">
             {chartData && chartData.diningStylesData?.length > 0 ? (
-            <ChartContainer   
-              config={{
-                adventurous: { label: "Adventurous", color: "#FF6F61" },
-                foodie: { label: "Foodie Enthusiast", color: "#6A5ACD" },
-                local: { label: "Local Lover", color: "#20B2AA" },
-                comfort: { label: "Comfort Food", color: "#FFD700" },
-                health: { label: "Health Conscious", color: "#32CD32" },
-                social: { label: "Social Butterfly", color: "#FF8C00" },
-              }} 
-              className="w-full h-[260px] sm:h-[300px] overflow-hidden">
-                          <PieChart>
-                <Pie
-                  data={chartData.diningStylesData}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  dataKey="value"
-                >
-                  {chartData.diningStylesData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <ChartTooltip content={<ChartTooltipContent />} />
-              </PieChart>
-            </ChartContainer>
+              <ChartContainer
+                config={{
+                  adventurous: { label: "Adventurous", color: "#FF6F61" },
+                  foodie: { label: "Foodie Enthusiast", color: "#6A5ACD" },
+                  local: { label: "Local Lover", color: "#20B2AA" },
+                  comfort: { label: "Comfort Food", color: "#FFD700" },
+                  health: { label: "Health Conscious", color: "#32CD32" },
+                  social: { label: "Social Butterfly", color: "#FF8C00" },
+                }}
+                className="w-full h-[260px] sm:h-[300px] overflow-hidden"
+              >
+                <PieChart>
+                  <Pie
+                    data={chartData.diningStylesData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    dataKey="value"
+                  >
+                    {chartData.diningStylesData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                </PieChart>
+              </ChartContainer>
             ) : (
               <p className="text-center text-gray-500">Loading chart...</p>
             )}
@@ -1028,7 +1062,10 @@ const AdminDashboard = () => {
             <Users className="h-4 w-4" />
             <span>User Management</span>
           </TabsTrigger>
-          <TabsTrigger value="pending_users" className="flex items-center space-x-2">
+          <TabsTrigger
+            value="pending_users"
+            className="flex items-center space-x-2"
+          >
             <Users className="h-4 w-4" />
             <span>Pending User Management</span>
           </TabsTrigger>
@@ -1040,283 +1077,292 @@ const AdminDashboard = () => {
 
         {/* User Management Tab */}
         <TabsContent value="users" className="space-y-4">
-  <Card className="max-w-full overflow-x-auto">
-    <CardHeader>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-        <CardTitle>User Management</CardTitle>
-        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-          <div className="flex items-center space-x-2">
-            <Search className="h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search users..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full sm:w-64"
-            />
-          </div>
-          <Select
-            value={userStatusFilter}
-            onValueChange={setUserStatusFilter}
-          >
-            <SelectTrigger className="w-full sm:w-40">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Users</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="suspended">Suspended</SelectItem>
-              <SelectItem value="incomplete">Incomplete</SelectItem>
-              <SelectItem value="pending">Pending Approval</SelectItem>
-              <SelectItem value="rejected">Rejected</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-    </CardHeader>
-    <CardContent className="overflow-x-auto">
-      <Table className="min-w-full">
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Events Created</TableHead>
-            <TableHead>RSVPs</TableHead>
-            <TableHead>Joined</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredUsers.slice(0, 10).map((user) => (
-            <TableRow key={user.id}>
-              <TableCell className="font-medium truncate max-w-[150px]">
-                {user.first_name} {user.last_name}
-              </TableCell>
-              <TableCell className="truncate max-w-[150px]">{user.email}</TableCell>
-              <TableCell>
-                <Badge
-                  variant={user.is_suspended ? "destructive" : "default"}
-                >
-                  {user.is_suspended ? "Suspended" : "Active"}
-                </Badge>
-              </TableCell>
-              <TableCell>{user.created_events?.[0]?.count || 0}</TableCell>
-              <TableCell>{user.rsvps?.[0]?.count || 0}</TableCell>
-              <TableCell>
-                {new Date(user.created_at).toLocaleDateString()}
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center space-x-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      setSelectedUser(user);
-                      setShowUserDetails(true);
-                    }}
+          <Card className="max-w-full overflow-x-auto">
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+                <CardTitle>User Management</CardTitle>
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <Search className="h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search users..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full sm:w-64"
+                    />
+                  </div>
+                  <Select
+                    value={userStatusFilter}
+                    onValueChange={setUserStatusFilter}
                   >
-                    <Eye className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      setEmailData({ ...emailData, to: user.email });
-                      setShowEmailModal(true);
-                    }}
-                  >
-                    <Mail className="h-3 w-3" />
-                  </Button>
-                  {user.approval_status === "pending" ? (
-                    <>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleApproveUser(user.user_id)}
-                      >
-                        Approve
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => handleRejectUser(user.user_id)}
-                      >
-                        Reject
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      {user.is_suspended ? (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => reactivateUser(user.user_id)}
-                        >
-                          <UserCheck className="h-3 w-3" />
-                        </Button>
-                      ) : (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => suspendUser(user.user_id)}
-                        >
-                          <Ban className="h-3 w-3" />
-                        </Button>
-                      )}
-                    </>
-                  )}
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => deleteUser(user.user_id)}
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
+                    <SelectTrigger className="w-full sm:w-40">
+                      <SelectValue placeholder="Filter by status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Users</SelectItem>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="suspended">Suspended</SelectItem>
+                      <SelectItem value="incomplete">Incomplete</SelectItem>
+                      <SelectItem value="pending">Pending Approval</SelectItem>
+                      <SelectItem value="rejected">Rejected</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </CardContent>
-  </Card>
-</TabsContent>
+              </div>
+            </CardHeader>
+            <CardContent className="overflow-x-auto">
+              <Table className="min-w-full">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Events Created</TableHead>
+                    <TableHead>RSVPs</TableHead>
+                    <TableHead>Joined</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredUsers.slice(0, 10).map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell className="font-medium truncate max-w-[150px]">
+                        {user.first_name} {user.last_name}
+                      </TableCell>
+                      <TableCell className="truncate max-w-[150px]">
+                        {user.email}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            user.is_suspended ? "destructive" : "default"
+                          }
+                        >
+                          {user.is_suspended ? "Suspended" : "Active"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {user.created_events?.[0]?.count || 0}
+                      </TableCell>
+                      <TableCell>{user.rsvps?.[0]?.count || 0}</TableCell>
+                      <TableCell>
+                        {new Date(user.created_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setShowUserDetails(true);
+                            }}
+                          >
+                            <Eye className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setEmailData({ ...emailData, to: user.email });
+                              setShowEmailModal(true);
+                            }}
+                          >
+                            <Mail className="h-3 w-3" />
+                          </Button>
+                          {user.approval_status === "pending" ? (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleApproveUser(user.user_id)}
+                              >
+                                Approve
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => handleRejectUser(user.user_id)}
+                              >
+                                Reject
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              {user.is_suspended ? (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => reactivateUser(user.user_id)}
+                                >
+                                  <UserCheck className="h-3 w-3" />
+                                </Button>
+                              ) : (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => suspendUser(user.user_id)}
+                                >
+                                  <Ban className="h-3 w-3" />
+                                </Button>
+                              )}
+                            </>
+                          )}
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => deleteUser(user.user_id)}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-<TabsContent value="pending_users" className="space-y-4">
-  <Card className="max-w-full overflow-x-auto">
-    <CardHeader>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-        <CardTitle>Pending User Management</CardTitle>
-        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-          <div className="flex items-center space-x-2">
-            <Search className="h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search pending users..."
-              value={pendingUserSearchTerm}
-              onChange={(e) => setPendingUserSearchTerm(e.target.value)}
-              className="w-full sm:w-64"
-            />
-          </div>
-          <Select
-            value={pendingUserStatusFilter}
-            onValueChange={setPendingUserStatusFilter}
-          >
-            <SelectTrigger className="w-full sm:w-40">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="pending">Pending Approval</SelectItem>
-              <SelectItem value="rejected">Rejected</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-    </CardHeader>
-    <CardContent className="overflow-x-auto">
-      <Table className="min-w-full">
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Joined</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {pendingFilteredUsers.slice(0, 10).map((user) => (
-            <TableRow key={user.id}>
-              <TableCell className="font-medium truncate max-w-[150px]">
-                {user.first_name} {user.last_name}
-              </TableCell>
-              <TableCell className="truncate max-w-[150px]">{user.email}</TableCell>
-              <TableCell>
-                <Badge
-                  variant={user.is_suspended ? "destructive" : "default"}
-                >
-                  {user.is_suspended ? "Suspended" : "Active"}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                {new Date(user.created_at).toLocaleDateString()}
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center space-x-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      setSelectedUser(user);
-                      setShowUserDetails(true);
-                    }}
+        <TabsContent value="pending_users" className="space-y-4">
+          <Card className="max-w-full overflow-x-auto">
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+                <CardTitle>Pending User Management</CardTitle>
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <Search className="h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search pending users..."
+                      value={pendingUserSearchTerm}
+                      onChange={(e) => setPendingUserSearchTerm(e.target.value)}
+                      className="w-full sm:w-64"
+                    />
+                  </div>
+                  <Select
+                    value={pendingUserStatusFilter}
+                    onValueChange={setPendingUserStatusFilter}
                   >
-                    <Eye className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      setEmailData({ ...emailData, to: user.email });
-                      setShowEmailModal(true);
-                    }}
-                  >
-                    <Mail className="h-3 w-3" />
-                  </Button>
-                  {user.approval_status === "pending" ? (
-                    <>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleApproveUser(user.user_id)}
-                      >
-                        <CheckCircle className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => handleRejectUser(user.user_id)}
-                      >
-                        <UserX className="h-3 w-3" />
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      {user.is_suspended ? (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => reactivateUser(user.user_id)}
-                        >
-                          <UserCheck className="h-3 w-3" />
-                        </Button>
-                      ) : (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => suspendUser(user.user_id)}
-                        >
-                          <Ban className="h-3 w-3" />
-                        </Button>
-                      )}
-                    </>
-                  )}
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => deleteUser(user.user_id)}
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
+                    <SelectTrigger className="w-full sm:w-40">
+                      <SelectValue placeholder="Filter by status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pending">Pending Approval</SelectItem>
+                      <SelectItem value="rejected">Rejected</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </CardContent>
-  </Card>
-</TabsContent>
-
+              </div>
+            </CardHeader>
+            <CardContent className="overflow-x-auto">
+              <Table className="min-w-full">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Joined</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pendingFilteredUsers.slice(0, 10).map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell className="font-medium truncate max-w-[150px]">
+                        {user.first_name} {user.last_name}
+                      </TableCell>
+                      <TableCell className="truncate max-w-[150px]">
+                        {user.email}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            user.is_suspended ? "destructive" : "default"
+                          }
+                        >
+                          {user.is_suspended ? "Suspended" : "Active"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {new Date(user.created_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setShowUserDetails(true);
+                            }}
+                          >
+                            <Eye className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setEmailData({ ...emailData, to: user.email });
+                              setShowEmailModal(true);
+                            }}
+                          >
+                            <Mail className="h-3 w-3" />
+                          </Button>
+                          {user.approval_status === "pending" ? (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleApproveUser(user.user_id)}
+                              >
+                                <CheckCircle className="h-3 w-3" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => handleRejectUser(user.user_id)}
+                              >
+                                <UserX className="h-3 w-3" />
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              {user.is_suspended ? (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => reactivateUser(user.user_id)}
+                                >
+                                  <UserCheck className="h-3 w-3" />
+                                </Button>
+                              ) : (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => suspendUser(user.user_id)}
+                                >
+                                  <Ban className="h-3 w-3" />
+                                </Button>
+                              )}
+                            </>
+                          )}
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => deleteUser(user.user_id)}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         {/* Event Management Tab */}
         <TabsContent value="events" className="space-y-4">
@@ -1834,7 +1880,7 @@ const AdminDashboard = () => {
                 id="email-to"
                 value={emailData.to}
                 onChange={(e) =>
-                  setEmailData({ ...emailData, to: e.target.value})
+                  setEmailData({ ...emailData, to: e.target.value })
                 }
                 placeholder="recipient@example.com"
               />
@@ -1845,7 +1891,7 @@ const AdminDashboard = () => {
                 id="email-subject"
                 value={emailData.subject}
                 onChange={(e) =>
-                  setEmailData({ ...emailData, subject: e.target.value})
+                  setEmailData({ ...emailData, subject: e.target.value })
                 }
                 placeholder="Email subject"
               />
@@ -1856,7 +1902,7 @@ const AdminDashboard = () => {
                 id="email-message"
                 value={emailData.message}
                 onChange={(e) =>
-                  setEmailData({ ...emailData, message: e.target.value})
+                  setEmailData({ ...emailData, message: e.target.value })
                 }
                 placeholder="Your message..."
                 rows={5}

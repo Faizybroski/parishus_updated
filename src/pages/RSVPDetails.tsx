@@ -578,7 +578,7 @@ const RSVPDetails = () => {
                 />
               ))}
             </div>
-            <Users className="text-white w-5 h-5 ml-4" />
+            <Users className=" w-5 h-5 ml-4 text-muted-foreground" />
           </div>
         </div>
 
