@@ -18,7 +18,7 @@ const ManageSubscriptions = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
       <div className="mb-10">
-        <h1 className="text-3xl font-bold mb-2">Manage User Subscriptions</h1>
+        <h1 className="text-3xl font-bold mb-2 font-script">Manage User Subscriptions</h1>
         <p className="text-muted-foreground">Overview of all user plans and statuses</p>
       </div>
 

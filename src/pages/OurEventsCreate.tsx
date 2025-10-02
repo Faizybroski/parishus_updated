@@ -14,7 +14,7 @@ const OurEventsCreate = () => {
 
       <div className="flex flex-col lg:flex-row gap-6 p-6">
         <div className="flex-1 space-y-6">
-          <h1 className="text-4xl font-semibold">My Event Name</h1>
+          <h1 className="text-4xl font-semibold font-script">My Event Name</h1>
           <button className="px-4 py-2 bg-gray-900 text-gray-400 rounded-md">
             Short Summary
           </button>

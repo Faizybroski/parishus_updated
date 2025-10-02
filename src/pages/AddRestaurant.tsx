@@ -36,7 +36,7 @@ const AddRestaurant = () => {
             <ArrowLeft className="h-4 w-4" />
             <span>Back to Restaurants</span>
           </Button>
-          <h1 className="text-3xl font-bold">Add New Restaurant</h1>
+          <h1 className="text-3xl font-bold font-script">Add New Restaurant</h1>
           <p className="text-muted-foreground mt-2">
             Search and add a restaurant using Google Places
           </p>

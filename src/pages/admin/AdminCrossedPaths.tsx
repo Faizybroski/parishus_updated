@@ -198,7 +198,7 @@ return (
 
         {/* Header */}
         <header>
-          <h1 className="text-xl sm:text-3xl font-bold text-foreground">
+          <h1 className="text-xl sm:text-3xl font-bold text-foreground font-script">
             Crossed Paths Analytics
           </h1>
           <p className="text-muted-foreground mt-1 text-sm sm:text-base">
@@ -221,7 +221,7 @@ return (
                     <p className="text-muted-foreground text-xs sm:text-sm">{stat.label}</p>
                     <p className="text-lg sm:text-2xl font-bold text-foreground">{stat.value}</p>
                   </div>
-                  <stat.icon className="h-6 w-6 sm:h-8 sm:w-8 text-peach-gold flex-shrink-0" />
+                  <stat.icon className="h-6 w-6 sm:h-8 sm:w-8   flex-shrink-0" />
                 </div>
               </CardContent>
             </Card>
@@ -326,7 +326,7 @@ return (
                       <div className="flex items-center space-x-2 min-w-[140px]">
                         <Avatar className="h-9 w-9 sm:h-10 sm:w-10">
                           <AvatarImage src={path.user_a.profile_photo_url} />
-                          <AvatarFallback className="bg-peach-gold text-background">
+                          <AvatarFallback className="text-background">
                             {path.user_a.first_name?.[0]}
                             {path.user_a.last_name?.[0]}
                           </AvatarFallback>
@@ -353,7 +353,7 @@ return (
                       <div className="flex items-center space-x-2 min-w-[140px]">
                         <Avatar className="h-9 w-9 sm:h-10 sm:w-10">
                           <AvatarImage src={path.user_b.profile_photo_url} />
-                          <AvatarFallback className="bg-peach-gold text-background">
+                          <AvatarFallback className="text-background">
                             {path.user_b.first_name?.[0]}
                             {path.user_b.last_name?.[0]}
                           </AvatarFallback>

@@ -844,7 +844,7 @@ const EventDetails = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="h-8 w-8 animate-spin mx-auto border-4 border-peach-gold border-t-transparent rounded-full" />
+          <div className="h-8 w-8 animate-spin mx-auto border-4 border border-t-transparent rounded-full" />
           <p className="text-muted-foreground">Loading event details...</p>
         </div>
       </div>
@@ -855,7 +855,7 @@ const EventDetails = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className="text-2xl font-bold text-foreground font-script">
             Event Not Found
           </h1>
           <p className="text-muted-foreground">
@@ -913,8 +913,8 @@ const EventDetails = () => {
               disabled={loading}
               className={
                 isInterested
-                  ? "bg-sage-green hover:bg-sage-green/90 mb-4"
-                  : "bg-peach-gold hover:bg-peach-gold/90 mb-4"
+                  ? "mb-4"
+                  : "mb-4"
               }
             >
               {loading
@@ -1064,7 +1064,7 @@ const EventDetails = () => {
                     <div>
                       <p className="font-medium">{event.location_name}</p>
                       {event.restaurants && (
-                        <p className="text-sm text-peach-gold">
+                        <p className="text-sm  ">
                           {event.restaurants.name} - {event.restaurants.city},{" "}
                           {event.restaurants.country}
                         </p>
@@ -1236,7 +1236,7 @@ const EventDetails = () => {
                                       0
                                     ) / eventReviews.length
                                   )
-                                    ? "text-peach-gold fill-current"
+                                    ? "  fill-current"
                                     : "text-muted-foreground"
                                 }`}
                               />
@@ -1277,7 +1277,7 @@ const EventDetails = () => {
                                     key={star}
                                     className={`h-3 w-3 ${
                                       star <= review.rating
-                                        ? "text-peach-gold fill-current"
+                                        ? "  fill-current"
                                         : "text-muted-foreground"
                                     }`}
                                   />
@@ -1335,8 +1335,8 @@ const EventDetails = () => {
                           onClick={handleRSVP}
                           className={`w-full ${
                             hasRSVP
-                              ? "bg-sage-green hover:bg-sage-green/90"
-                              : "bg-peach-gold hover:bg-peach-gold/90"
+                              ? ""
+                              : ""
                           }`}
                         >
                           {hasRSVP ? (
@@ -1356,8 +1356,8 @@ const EventDetails = () => {
                           onClick={handleRSVP}
                           className={`w-full ${
                             hasRSVP
-                              ? "bg-sage-green hover:bg-sage-green/90"
-                              : "bg-peach-gold hover:bg-peach-gold/90"
+                              ? ""
+                              : ""
                           }`}
                         >
                           <UserCheck className="h-4 w-4 mr-2" />
@@ -1431,7 +1431,7 @@ const EventDetails = () => {
                       <p className="text-sm text-muted-foreground">
                         Total Collected
                       </p>
-                      <p className="text-xl font-semibold text-peach-gold">
+                      <p className="text-xl font-semibold  ">
                         ${confirmedRSVPs.length * event.event_fee}
                       </p>
                     </div>
@@ -1447,7 +1447,7 @@ const EventDetails = () => {
                     </Badge>
                     <Button
                       onClick={() => navigate("/feedback")}
-                      className="w-full bg-peach-gold hover:bg-peach-gold/90"
+                      className="w-full"
                     >
                       <Star className="h-4 w-4 mr-2" />
                       Leave Review
@@ -1547,7 +1547,7 @@ const EventDetails = () => {
                           </div>
                         </div>
                         {isCreator && event.event_fee ? (
-                          <span className="text-sm text-peach-gold font-semibold">
+                          <span className="text-sm   font-semibold">
                             ${event.event_fee}
                           </span>
                         ) : null}

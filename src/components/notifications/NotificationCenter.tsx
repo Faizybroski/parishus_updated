@@ -133,7 +133,7 @@ const NotificationCenter = () => {
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'rsvp_confirmation':
-        return <Calendar className="h-4 w-4 text-peach-gold" />;
+        return <Calendar className="h-4 w-4  " />;
       case 'event_reminder':
         return <Bell className="h-4 w-4 text-blue-500" />;
       case 'crossed_paths_match':

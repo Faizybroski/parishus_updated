@@ -32,7 +32,7 @@ export default function CheckoutForm({ eventId, userName, userEmail }) {
       <button
         type="submit"
         disabled={!stripe || loading}
-        className="w-full bg-indigo-600 text-white py-2 rounded"
+        className="w-full py-2 rounded"
       >
         {loading ? "Processing..." : "Pay Now"}
       </button>

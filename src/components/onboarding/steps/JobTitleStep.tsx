@@ -59,8 +59,8 @@ export const JobTitleStep: React.FC<JobTitleStepProps> = ({ data, updateData }) 
                 key={job}
                 className={`cursor-pointer transition-all hover:shadow-card ${
                   data.job_title === job
-                    ? 'border-sage-green bg-sage-green/10' 
-                    : 'border-border hover:border-sage-green/50'
+                    ? 'border bg-primary text-primary-foreground' 
+                    : 'border-border hover:border-secondary hover:bg-secondary'
                 }`}
                 onClick={() => handleJobSelect(job)}
               >

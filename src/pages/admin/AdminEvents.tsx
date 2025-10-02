@@ -195,7 +195,7 @@ const AdminEvents = () => {
     return (
       <div className="p-8">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8">Event Management</h1>
+          <h1 className="text-3xl font-bold mb-8 font-script">Event Management</h1>
           <div className="text-center py-8">Loading events...</div>
         </div>
       </div>
@@ -207,7 +207,7 @@ const AdminEvents = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold">Event Management</h1>
+            <h1 className="text-3xl font-bold font-script">Event Management</h1>
             <p className="text-muted-foreground">
               Manage all events in the system
             </p>
@@ -242,7 +242,7 @@ const AdminEvents = () => {
               return (
                 <Card
                   key={event.id}
-                  className="flex flex-col h-full bg-[#0A0A0A] border border-primary rounded-sm overflow-hidden shadow-sm"
+                  className="flex flex-col h-full border border-primary rounded-sm overflow-hidden shadow-sm"
                 >
                   <div className="relative w-full flex items-center justify-center bg-primary flex-shrink-0 h-48">
                     <img
@@ -253,7 +253,7 @@ const AdminEvents = () => {
                     {/* <div className="absolute inset-0 bg-black/70 z-10" /> */}
                   </div>
 
-                  <CardContent className="flex flex-col flex-grow space-y-3 p-4 text-muted-foreground bg-[#fcfaf8]">
+                  <CardContent className="flex flex-col flex-grow space-y-3 p-4 text-muted-foreground">
                     <div className=" inset-0 flex flex-col justify-end">
                       <h3 className="text-black text-xl font-bold line-clamp-1">
                         {event.name}

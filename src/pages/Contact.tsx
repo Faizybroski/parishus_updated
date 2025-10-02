@@ -69,7 +69,7 @@ export const ContactPage: React.FC = () => {
         <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* Info Section */}
           <section className=" p-4 flex flex-col justify-center">
-            <h1 className="text-4xl font-bold mb-8">Let's Start a Conversation</h1>
+            <h1 className="text-4xl font-bold mb-8 font-script">Let's Start a Conversation</h1>
             <p className="text-foreground/70 mb-12 text-base">
               We are always excited to work on new projects and help businesses achieve their digital goals. Whether you need a simple website or a complex software solution, we're here to help.
             </p>

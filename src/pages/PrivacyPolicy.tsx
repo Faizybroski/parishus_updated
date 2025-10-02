@@ -22,7 +22,7 @@ export default function PrivacyPolicy() {
     <div className="min-h-screen bg-background text-foreground px-6 md:px-20 py-12">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <h1 className="text-4xl lg:text-5xl font-bold text-[#e4c29a] mb-4 text-center">
+        <h1 className="text-4xl lg:text-5xl font-bold mb-4 text-center font-script">
           Parish Privacy Policy
         </h1>
         <p className="text-muted-foreground text-center mb-10">
@@ -34,7 +34,7 @@ export default function PrivacyPolicy() {
           <aside className="hidden md:block">
             <Card className="sticky top-20 bg-muted/40 border-none shadow-sm rounded-2xl">
               <CardContent className="p-4">
-                <h2 className="text-lg font-semibold text-[#e4c29a] mb-4">Quick Navigation</h2>
+                <h2 className="text-lg font-semibold text-primary mb-4">Quick Navigation</h2>
                 <ul className="space-y-3 text-sm">
                   {sections.map((section) => (
                     <li key={section.id}>
@@ -70,7 +70,7 @@ export default function PrivacyPolicy() {
 
               {sections.map((section) => (
                 <section key={section.id} id={section.id} className=" scroll-mt-28">
-                  <h2 className="text-xl font-semibold text-[#e4c29a] mb-3">
+                  <h2 className="text-xl text-primary font-semibold mb-3">
                     {section.title}
                   </h2>
                   <Separator className="mb-4" />

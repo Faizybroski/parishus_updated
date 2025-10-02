@@ -76,8 +76,8 @@ const Navigation = () => {
               src="/Parishus logo.png"
               alt="Logo"
             />
-            <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent whitespace-nowrap"
-             style={{ fontSize: "30px", color: "#9dc0b3", fontFamily: 'Sergio Trendy'}}>
+            <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-black whitespace-nowrap font-script"
+             style={{ fontSize: "30px", }}>
               Parish
             </h1>
           </div>
@@ -100,7 +100,7 @@ const Navigation = () => {
                       variant="ghost"
                       className={`flex items-center space-x-1 ${
                         isActive
-                          ? "text-peach-gold bg-peach-gold/10"
+                          ? "  bg-peach-gold/10"
                           : "text-muted-foreground hover:text-foreground"
                       }`}
                       onClick={() => navigate(item.path)}
@@ -123,14 +123,14 @@ const Navigation = () => {
                     >
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={profile?.profile_photo_url || ""} />
-                        <AvatarFallback className="bg-peach-gold/20 text-peach-gold">
+                        <AvatarFallback className="text-black font-serif">
                           {profile?.first_name?.[0]}
                           {profile?.last_name?.[0]}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuContent className="w-56 font-serif " align="end" forceMount>
                     <DropdownMenuItem onClick={() => navigate("/profile")}>
                       <User className="mr-2 h-4 w-4" />
                       Profile
@@ -185,7 +185,7 @@ const Navigation = () => {
                   }}
                   className={`w-full flex items-center px-4 py-2 text-left ${
                     isActive
-                      ? "bg-peach-gold/10 text-peach-gold"
+                      ? "bg-peach-gold/10  "
                       : "text-muted-foreground hover:text-foreground"
                   }`}
                 >

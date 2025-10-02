@@ -50,7 +50,7 @@ export const DiningStyleStep: React.FC<DiningStyleStepProps> = ({ data, updateDa
   return (
     <div className="space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-semibold text-[#F7C992]">What's your dining style?</h1>
+        <h1 className="text-3xl font-semibold font-script">What's your dining style?</h1>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -64,23 +64,25 @@ export const DiningStyleStep: React.FC<DiningStyleStepProps> = ({ data, updateDa
               onClick={() => updateData('dining_style', style.id)}
               className={`cursor-pointer hover:shadow-secondary shadow transition-all duration-200 rounded-xl border
                 ${isSelected
-                  ? 'border-[#9DC0B3] bg-[#9DC0B3]/10'
-                  : 'border-[#333] hover:border-[#9DC0B3]/60 hover:bg-[#1e1e1e]'}
+                  ? 'border bg-secondary/10'
+                  : 'border hover:border-secondary/60 hover:bg-secondary'}
               `}
             >
               <CardContent className="p-4 text-center space-y-3">
                 <div
                   className={`h-12 w-12 rounded-full flex items-center justify-center mx-auto 
-                    ${isSelected ? 'bg-[#9DC0B3]/30' : 'bg-[#2a2a2a]'}`}
+                    ${isSelected
+                      ? 'border bg-secondary'
+                      : 'border-border/50'}`}
                 >
                   <Icon
                     className={`h-6 w-6 
-                      ${isSelected ? 'text-[#9DC0B3]' : 'text-[#F7C992]'}`}
+                      ${isSelected ? 'text-primary' : ''}`}
                   />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-[#FEFEFE]">{style.name}</h3>
-                  <p className={`text-sm  ${isSelected ? 'text-[#9DC0B3]' : 'text-[#EFEFEF]/50'} opacity-80`}>{style.description}</p>
+                  <h3 className="font-semibold">{style.name}</h3>
+                  <p className={`text-sm  ${isSelected ? 'text-primary' : 'text-mute'} opacity-80`}>{style.description}</p>
                 </div>
               </CardContent>
             </Card>

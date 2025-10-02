@@ -196,7 +196,7 @@ return (
     <div className="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
       <div className="space-y-8">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Crossed Paths</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground font-script">Crossed Paths</h1>
           <p className="text-sm sm:text-base text-muted-foreground mt-1">
             People you've crossed paths with at restaurants within the last 14 days
           </p>
@@ -223,7 +223,7 @@ return (
                     <div className="flex items-start space-x-4">
                       <Avatar className="h-14 w-14 sm:h-16 sm:w-16">
                         <AvatarImage src={path.matched_user.profile_photo_url} />
-                        <AvatarFallback className="bg-peach-gold text-background">
+                        <AvatarFallback className="text-background">
                           {path.matched_user.first_name?.[0]}
                           {path.matched_user.last_name?.[0]}
                         </AvatarFallback>
@@ -284,7 +284,7 @@ return (
                       </Button>
                       <Button
                         onClick={() => handleInviteToDinner(path)}
-                        className="bg-peach-gold hover:bg-peach-gold/90 text-background w-full sm:w-auto"
+                        className="text-background w-full sm:w-auto"
                         size="sm"
                       >
                         Invite to Dinner

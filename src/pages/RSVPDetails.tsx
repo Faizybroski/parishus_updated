@@ -450,7 +450,7 @@ const RSVPDetails = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="h-8 w-8 animate-spin mx-auto border-4 border-peach-gold border-t-transparent rounded-full" />
+          <div className="h-8 w-8 animate-spin mx-auto border-4 border border-t-transparent rounded-full" />
           <p className="text-muted-foreground">Loading event details...</p>
         </div>
       </div>
@@ -461,7 +461,7 @@ const RSVPDetails = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className="text-2xl font-bold text-foreground font-script">
             Event Not Found
           </h1>
           <p className="text-muted-foreground">
@@ -605,8 +605,8 @@ const RSVPDetails = () => {
                   onClick={handleRSVP}
                   className={`w-full ${
                     hasRSVP
-                      ? "bg-sage-green hover:bg-sage-green/90"
-                      : "bg-peach-gold hover:bg-peach-gold/90"
+                      ? ""
+                      : ""
                   }`}
                 >
                   {hasRSVP ? (

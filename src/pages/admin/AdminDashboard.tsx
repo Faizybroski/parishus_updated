@@ -778,7 +778,7 @@ const AdminDashboard = () => {
       <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-center space-y-4">
           <AlertTriangle className="h-12 w-12 text-red-500 mx-auto" />
-          <h1 className="text-2xl font-bold text-foreground">Access Denied</h1>
+          <h1 className="text-2xl font-bold text-foreground font-script">Access Denied</h1>
           <p className="text-muted-foreground">
             You don't have permission to access this area.
           </p>
@@ -793,7 +793,7 @@ const AdminDashboard = () => {
       <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-background rounded-2xl p-8 border border-primary/20">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2 font-script">
               Welcome back, {profile?.first_name}!
             </h1>
             <p className="text-muted-foreground text-lg">

@@ -132,7 +132,7 @@ const AdminSettings = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
         <div className="flex items-center space-x-2">
           <Settings className="h-6 w-6" />
-          <h1 className="text-xl sm:text-2xl font-semibold">Global Settings</h1>
+          <h1 className="text-xl sm:text-2xl font-semibold font-script">Global Settings</h1>
         </div>
         <Badge variant="outline" className="self-start sm:self-auto">
           Super Admin Only

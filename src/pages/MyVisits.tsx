@@ -146,7 +146,7 @@ const MyVisits = () => {
           {/* Header */}
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">My Restaurant Visits</h1>
+              <h1 className="text-3xl font-bold text-foreground font-script">My Restaurant Visits</h1>
               <p className="text-muted-foreground mt-1">
                 Track your dining history and discover crossed paths
               </p>
@@ -163,7 +163,7 @@ const MyVisits = () => {
                     <p className="text-muted-foreground text-sm">Total Visits</p>
                     <p className="text-2xl font-bold text-foreground">{visits.length}</p>
                   </div>
-                  <Building className="h-8 w-8 text-peach-gold" />
+                  <Building className="h-8 w-8  " />
                 </div>
               </CardContent>
             </Card>
@@ -181,7 +181,7 @@ const MyVisits = () => {
                       }).length}
                     </p>
                   </div>
-                  <Calendar className="h-8 w-8 text-peach-gold" />
+                  <Calendar className="h-8 w-8  " />
                 </div>
               </CardContent>
             </Card>
@@ -194,7 +194,7 @@ const MyVisits = () => {
                       {new Set(visits.map(v => v.restaurant_name)).size}
                     </p>
                   </div>
-                  <MapPin className="h-8 w-8 text-peach-gold" />
+                  <MapPin className="h-8 w-8  " />
                 </div>
               </CardContent>
             </Card>

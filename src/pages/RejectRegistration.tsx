@@ -3,7 +3,7 @@ import { XCircle, Mail, ShieldOff } from "lucide-react"; // Icons for rejection
 
 const RejectedRegistration = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#121212] via-[#1E1E1E] to-[#121212] flex flex-col items-center justify-center px-6 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden">
       {/* Floating shield-off for security rejection */}
       <div className="absolute top-10 left-10 animate-bounce">
         <ShieldOff size={50} className="text-red-400 opacity-40" />
@@ -15,10 +15,10 @@ const RejectedRegistration = () => {
       </div>
 
       <div className="text-center max-w-xl z-10">
-        <h1 className="text-[4rem] font-extrabold mb-2 text-red-500 leading-none animate-pulse">
+        <h1 className="text-[4rem] font-extrabold mb-2 text-red-500 leading-none animate-pulse font-script">
           Profile Rejected
         </h1>
-        <p className="text-2xl font-medium mb-4 text-[#FEFEFE] animate-fadeIn">
+        <p className="text-2xl font-medium mb-4  animate-fadeIn">
           We’re sorry, but your account could not be approved.
         </p>
         {/* <p className="text-lg text-[#9DC0B3] mb-8">

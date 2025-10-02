@@ -20,6 +20,8 @@ export default {
 		extend: {
 			fontFamily: {
       	sergio: ['Sergio Trendy'],
+				script: ['Dancing Script', 'cursive'],
+        serif: ['Crimson Text', 'serif'],
     	},
 			colors: {
 				placeholderColor: {
@@ -69,12 +71,6 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Parish custom colors
-				'peach-gold': 'hsl(var(--peach-gold))',
-				'sage-green': 'hsl(var(--sage-green))',
-				'dark-surface': 'hsl(var(--dark-surface))',
-				'dark-surface-alt': 'hsl(var(--dark-surface-alt))',
-				'mystery-purple': 'hsl(var(--mystery-purple))'
 			},
 			backgroundImage: {
 				'gradient-primary': 'var(--gradient-primary)',

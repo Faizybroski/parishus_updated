@@ -57,11 +57,7 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { signIn, signUp, resetPassword, signInWithGoogle, signInWithApple } =
-    useAuth();
-
-  console.info("instagram:=====>>>>", instagram);
-  console.info("linkedin:=====>>>>", linkedin);
+  const { signIn, signUp, resetPassword, signInWithGoogle, signInWithApple } = useAuth();
 
   const handleNext = () => {
     if (currentStep < onboardingCards.length) setCurrentStep(currentStep + 1);
@@ -249,11 +245,9 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
               </div>
               <div>
                 <h1
-                  className="text-2xl font-extrabold font-playfair text-primary"
+                  className="text-2xl font-extrabold font-playfair text-black font-script"
                   style={{
                     fontSize: "60px",
-                    color: "#9dc0b3",
-                    fontFamily: "Sergio Trendy",
                   }}
                 >
                   Parish
@@ -571,11 +565,9 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
               }}
             />
             <h1
-              className="text-3xl font-playfair font-extrabold text-primary mb-4"
+              className="text-3xl font-playfair font-extrabold mb-4 font-script"
               style={{
                 fontSize: "70px",
-                color: "#9dc0b3",
-                fontFamily: "Sergio Trendy",
               }}
             >
               {currentCard.title}
@@ -585,7 +577,6 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
               style={{
                 fontWeight: "600",
                 paddingBottom: "90px",
-                color: "#f7c992",
                 fontSize: "21px",
               }}
             >
@@ -594,7 +585,7 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
           </>
         ) : (
           <>
-            <h1 className="text-3xl font-playfair font-extrabold text-primary mb-2">
+            <h1 className="text-3xl font-playfair font-extrabold text-primary mb-2 font-script">
               {currentCard.title}
             </h1>
             <div className="flex justify-center my-6">

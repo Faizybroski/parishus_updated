@@ -249,7 +249,7 @@ const Dashboard = () => {
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">
+              <h1 className="text-3xl font-bold text-foreground font-script">
                 Welcome back!
               </h1>
               <p className="text-muted-foreground mt-1">
@@ -417,7 +417,7 @@ const Dashboard = () => {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <span className="flex items-center">
-                    <Heart className="h-5 w-5 mr-2 text-sage-green" />
+                    <Heart className="h-5 w-5 mr-2" />
                     Crossed Paths
                   </span>
                   <Button
@@ -439,8 +439,8 @@ const Dashboard = () => {
                     className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-2 bg-dark-surface rounded-lg"
                   >
                     <div className="flex items-center space-x-4 min-w-0">
-                      <div className="h-10 w-10 bg-sage-green/20 rounded-full flex items-center justify-center">
-                        <span className="text-sage-green font-semibold">
+                      <div className="h-10 w-10 rounded-full flex items-center justify-center">
+                        <span className="font-semibold">
                           {path.matched_user.first_name?.[0]}
                           {path.matched_user.last_name?.[0]}
                         </span>
@@ -475,7 +475,7 @@ const Dashboard = () => {
                         onClick={() => handleInviteToDinner(path)}
                         variant="outline"
                         size="sm"
-                        className="border-sage-green text-sage-green hover:bg-sage-green/10"
+                        className="border"
                       >
                         Invite
                       </Button>
@@ -498,8 +498,8 @@ const Dashboard = () => {
             <Card className="shadow-card border-border cursor-pointer hover:shadow-glow transition-shadow">
               <Link to={`/create-event/`}>
                 <CardContent className="p-6 text-center">
-                  <div className="h-12 w-12 bg-peach-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Plus className="h-6 w-6 text-peach-gold" />
+                  <div className="h-12 w-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Plus className="h-6 w-6  " />
                   </div>
                   <h3 className="font-semibold mb-2">Create Event</h3>
                   <p className="text-sm text-muted-foreground">
@@ -514,8 +514,8 @@ const Dashboard = () => {
               onClick={() => navigate("/explore")}
             >
               <CardContent className="p-6 text-center">
-                <div className="h-12 w-12 bg-sage-green/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Search className="h-6 w-6 text-sage-green" />
+                <div className="h-12 w-12 bg rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Search className="h-6 w-6 " />
                 </div>
                 <h3 className="font-semibold mb-2">Explore Events</h3>
                 <p className="text-sm text-muted-foreground">

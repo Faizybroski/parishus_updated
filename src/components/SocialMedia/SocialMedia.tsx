@@ -88,11 +88,9 @@ export const SocialLinks = () => {
             </div>
             <div>
               <h1
-                className="text-2xl font-extrabold font-playfair text-primary"
+                className="text-2xl font-extrabold font-playfair text-primary font-script"
                 style={{
                   fontSize: "60px",
-                  color: "#9dc0b3",
-                  fontFamily: 'Sergio Trendy'
                 }}
               >
                 Parish

@@ -43,7 +43,7 @@ const Plans = () => {
     <div className="min-h-screen bg-background px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Subscription Plans</h1>
+          <h1 className="text-3xl font-bold text-foreground font-script">Subscription Plans</h1>
           <p className="text-muted-foreground mt-1">Manage your pricing and subscription tiers</p>
         </div>
 

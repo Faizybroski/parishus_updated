@@ -390,7 +390,7 @@ const Profile = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-foreground">Profile</h1>
+            <h1 className="text-3xl font-bold text-foreground font-script">Profile</h1>
             <Button onClick={signOut} variant="outline">
               Sign Out
             </Button>
@@ -433,7 +433,7 @@ const Profile = () => {
                 <div className="relative">
                   <Avatar className="h-24 w-24">
                     <AvatarImage src={profile.profile_photo_url || ""} />
-                    <AvatarFallback className="bg-peach-gold text-background text-xl">
+                    <AvatarFallback className="text-background text-xl">
                       {profile.first_name?.[0]}
                       {profile.last_name?.[0]}
                     </AvatarFallback>
@@ -450,7 +450,7 @@ const Profile = () => {
                     <Button
                       asChild
                       size="sm"
-                      className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0 bg-peach-gold hover:bg-peach-gold/90 text-background cursor-pointer"
+                      className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0 text-background cursor-pointer"
                       disabled={uploading}
                     >
                       <span>

@@ -48,8 +48,8 @@ export const DietaryPreferencesStep: React.FC<DietaryPreferencesStepProps> = ({ 
   return (
     <div className="space-y-6">
       <div className="text-center space-y-2">
-        <h2 className="text-xl font-semibold text-[#F7C992]">Dietary Preferences</h2>
-        <p className="text-[#FEFEFE] opacity-70">
+        <h2 className="text-xl font-semibold ">Dietary Preferences</h2>
+        <p className=" opacity-70">
           Select any dietary restrictions or preferences you have
         </p>
       </div>
@@ -64,23 +64,23 @@ export const DietaryPreferencesStep: React.FC<DietaryPreferencesStepProps> = ({ 
               onClick={() => togglePreference(option.id)}
               className={`cursor-pointer transition-all rounded-lg border 
                 ${selected
-                  ? 'border-[#9DC0B3] bg-[#9DC0B3]/10'
-                  : 'border-[#333] hover:border-[#9DC0B3]/50 hover:bg-[#1f1f1f]'}
+                  ? 'border bg-secondary/10'
+                  : 'border hover:border-secondary/50 hover:bg-secondary'}
               `}
             >
               <CardContent className="p-3 flex items-center space-x-4">
                 <div
                   className={`h-6 w-6 flex items-center justify-center rounded-full border-2 
                     ${selected
-                      ? 'border-[#9DC0B3] bg-[#9DC0B3] text-[#121212]'
+                      ? 'border bg-secondary'
                       : 'border-[#666]'}
                   `}
                 >
-                  {selected && <Check className="h-4 w-4 text-[#121212]" />}
+                  {selected && <Check className="h-4 w-4" />}
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-medium text-[#FEFEFE]">{option.name}</h3>
-                  <p className="text-sm text-[#9DC0B3] opacity-80">{option.description}</p>
+                  <h3 className="font-medium">{option.name}</h3>
+                  <p className="text-sm opacity-80">{option.description}</p>
                 </div>
               </CardContent>
             </Card>

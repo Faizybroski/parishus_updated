@@ -218,7 +218,7 @@ const OurExploreEvents = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
-        <h1 className="parish-loader text-7xl font-extrabold">Parish</h1>
+        <h1 className="parish-loader text-7xl font-extrabold font-script">Parish</h1>
       </div>
     );
   }

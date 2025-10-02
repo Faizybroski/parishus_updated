@@ -96,7 +96,7 @@ const AdminAnalytics = () => {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold">Analytics</h1>
+          <h1 className="text-2xl font-semibold font-script">Analytics</h1>
         </div>
         <div className="flex items-center justify-center py-8">
           <div className="text-muted-foreground">Loading analytics...</div>
@@ -110,7 +110,7 @@ const AdminAnalytics = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <BarChart3 className="h-6 w-6" />
-          <h1 className="text-2xl font-semibold">Analytics Dashboard</h1>
+          <h1 className="text-2xl font-semibold font-script">Analytics Dashboard</h1>
         </div>
         <Badge variant="outline">Real-time Data</Badge>
       </div>

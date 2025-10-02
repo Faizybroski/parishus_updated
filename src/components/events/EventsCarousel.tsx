@@ -343,7 +343,7 @@ const EventsCarousel = () => {
                 />
 
                 <div className="flex flex-wrap gap-4 px-2">
-                  <Card className="relative flex bg-[#0A0A0A] flex-col w-full sm:w-[20rem] lg:w-[25rem] h-[420px] border border-secondary overflow-hidden group hover:shadow-xl transition">
+                  <Card className="relative flex flex-col w-full sm:w-[20rem] lg:w-[25rem] h-[420px] border border-secondary overflow-hidden group hover:shadow-xl transition">
                     {/* Background */}
                     <div className="relative w-full flex items-center justify-center bg-primary flex-shrink-0 h-48">
                       <img
@@ -354,7 +354,7 @@ const EventsCarousel = () => {
                     </div>
 
                     {/* Card Content */}
-                    <CardContent className="flex flex-col flex-grow p-4 text-muted-foreground bg-[#fcfaf8]">
+                    <CardContent className="flex flex-col flex-grow p-4 text-muted-foreground">
                       {/* Title */}
                       <div className="mb-4">
                         <h3 className="text-2xl text-black font-bold truncate">

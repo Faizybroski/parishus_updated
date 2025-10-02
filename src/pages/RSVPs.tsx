@@ -231,7 +231,7 @@ const RSVPs = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="h-8 w-8 animate-spin mx-auto border-4 border-peach-gold border-t-transparent rounded-full" />
+          <div className="h-8 w-8 animate-spin mx-auto border-4 border border-t-transparent rounded-full" />
           <p className="text-muted-foreground">Loading your RSVPs...</p>
         </div>
       </div>
@@ -243,7 +243,7 @@ const RSVPs = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">My RSVPs</h1>
+            <h1 className="text-3xl font-bold text-foreground font-script">My RSVPs</h1>
             <p className="text-muted-foreground mt-1">
               Manage your event reservations and attendance
             </p>
@@ -275,7 +275,7 @@ const RSVPs = () => {
                     <CardTitle className="text-lg">Total RSVPs</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-3xl font-bold text-peach-gold">
+                    <div className="text-3xl font-bold  ">
                       {rsvps.length}
                     </div>
                   </CardContent>

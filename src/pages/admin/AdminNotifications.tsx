@@ -105,7 +105,7 @@ const AdminNotifications = () => {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold">Notifications</h1>
+          <h1 className="text-2xl font-semibold font-script">Notifications</h1>
         </div>
         <div className="flex items-center justify-center py-8">
           <div className="text-muted-foreground">Loading notifications...</div>
@@ -120,7 +120,7 @@ const AdminNotifications = () => {
   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div className="flex items-center space-x-2">
       <Bell className="h-6 w-6" />
-      <h1 className="text-xl sm:text-2xl font-semibold">Notification Center</h1>
+      <h1 className="text-xl sm:text-2xl font-semibold font-script">Notification Center</h1>
     </div>
     <div className="flex flex-wrap gap-2">
       <Badge variant="outline" className="w-fit">

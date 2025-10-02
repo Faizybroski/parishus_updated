@@ -374,7 +374,7 @@ const CreateEvent = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="h-8 w-8 animate-spin mx-auto border-4 border-peach-gold border-t-transparent rounded-full" />
+          <div className="h-8 w-8 animate-spin mx-auto border-4 border border-t-transparent rounded-full" />
           <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
@@ -398,7 +398,7 @@ const CreateEvent = () => {
           </p>
           <Button
             onClick={() => navigate("/profile")}
-            className="bg-peach-gold hover:bg-peach-gold/90"
+            className=""
           >
             Complete Profile
           </Button>
@@ -412,7 +412,7 @@ const CreateEvent = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">
+            <h1 className="text-3xl font-bold text-foreground font-script">
               Create New Event
             </h1>
             <p className="text-muted-foreground mt-1">

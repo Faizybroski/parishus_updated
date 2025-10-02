@@ -192,7 +192,7 @@ const InvitationNotifications: React.FC<InvitationNotificationsProps> = ({ onInv
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-3">
                   <div className="p-2 bg-peach-gold/10 rounded-lg">
-                    <Utensils className="h-5 w-5 text-peach-gold" />
+                    <Utensils className="h-5 w-5  " />
                   </div>
                   <div className="flex-1">
                     <h4 className="text-lg font-semibold text-foreground">

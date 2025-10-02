@@ -220,7 +220,7 @@ const InviteToPrivateDinnerModal: React.FC<InviteToPrivateDinnerModalProps> = ({
                 {crossedPath.locations.length > 0 ? crossedPath.locations[0] : 'restaurants'}{' '}
                 {crossedPath.total_crosses} time{crossedPath.total_crosses !== 1 ? 's' : ''}!
                 <br />
-                <span className="text-peach-gold">
+                <span className=" ">
                   We've set up an event for you on {selectedDate ? format(selectedDate, 'EEEE') : 'Thursday'} at {format(new Date(`2000-01-01T${selectedTime}`), 'h:mm a')}!
                 </span>
               </>

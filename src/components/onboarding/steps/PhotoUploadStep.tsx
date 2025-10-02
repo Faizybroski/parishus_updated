@@ -73,7 +73,7 @@ export const PhotoUploadStep: React.FC<PhotoUploadStepProps> = ({ data, updateDa
       <div className="flex flex-col items-center space-y-6">
         <Avatar className="h-32 w-32 border-4 border-border">
           <AvatarImage src={data.profile_photo_url} />
-          <AvatarFallback className="text-2xl bg-peach-gold/20 text-peach-gold">
+          <AvatarFallback className="text-2xl">
             {data.profile_photo_url ? <User className="h-12 w-12" /> : getInitials()}
           </AvatarFallback>
         </Avatar>
@@ -92,7 +92,7 @@ export const PhotoUploadStep: React.FC<PhotoUploadStepProps> = ({ data, updateDa
             <Button
               asChild
               disabled={uploading}
-              className="bg-sage-green hover:bg-sage-green/90 cursor-pointer"
+              className="cursor-pointer"
             >
               <span>
                 {uploading ? (

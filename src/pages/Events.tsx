@@ -599,7 +599,7 @@ const Events = () => {
           return (
             <Card
               key={event.id}
-              className="flex flex-col h-full bg-[#0A0A0A] border border-primary rounded-sm overflow-hidden shadow-sm"
+              className="flex flex-col h-full border border-primary rounded-sm overflow-hidden shadow-sm"
             >
               {/* Image with Overlay */}
               <div className="relative w-full flex items-center justify-center bg-primary flex-shrink-0 h-48">
@@ -629,7 +629,7 @@ const Events = () => {
                 </div>
 
                 {/* Date & Time */}
-                <div className="text-sm flex items-center text-white pl-2 pt-4 pb-1 border-t-2 border-[#1E1E1E]">
+                <div className="text-sm flex items-center text-white pl-2 pt-4 pb-1 border-t-2 border">
                   <Calendar className="h-5 w-5 text-primary/90 mr-3" />
                   <span>
                     {new Date(event.date_time).toLocaleDateString("en-US", {
@@ -650,7 +650,7 @@ const Events = () => {
                   //   <Users className="h-5 w-5 text-muted-foreground mr-3" />
                   //   {event.rsvp_count || 0}/{event.max_attendees} RSVPed
                   // </div>
-                  <div className="text-sm font-medium py-4 px-2 border-t-2 border-b-2 border-[#1E1E1E] text-white">
+                  <div className="text-sm font-medium py-4 px-2 border-t-2 border-b-2 border text-white">
                     {/* Top content */}
                     <div className="flex items-center mb-2">
                       <Users className="h-5 w-5 text-primary/90 mr-3" />
@@ -658,7 +658,7 @@ const Events = () => {
                     </div>
 
                     {/* Progress bar */}
-                    <div className="w-full h-2 bg-[#1E1E1E] rounded-full overflow-hidden">
+                    <div className="w-full h-2 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-primary transition-all duration-300"
                         style={{
@@ -713,7 +713,7 @@ const Events = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => navigate(`/event/${event.id}/edit`)}
-                      className="text-white border-[#1E1E1E]"
+                      className=""
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -725,7 +725,7 @@ const Events = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => deleteEvent && deleteEvent(event.id)}
-                      className="text-red-500 hover:text-red-600 border-[#1E1E1E]"
+                      className="text-red-500 hover:text-red-600"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -774,7 +774,7 @@ const Events = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="h-8 w-8 animate-spin mx-auto border-4 border-peach-gold border-t-transparent rounded-full" />
+          <div className="h-8 w-8 animate-spin mx-auto border-4 border border-t-transparent rounded-full" />
           <p className="text-muted-foreground">Loading events...</p>
         </div>
       </div>
@@ -787,7 +787,7 @@ const Events = () => {
         <div className="space-y-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">My Events</h1>
+              <h1 className="text-3xl font-bold text-foreground font-script">My Events</h1>
               <p className="text-muted-foreground mt-1">
                 Manage your created events
               </p>

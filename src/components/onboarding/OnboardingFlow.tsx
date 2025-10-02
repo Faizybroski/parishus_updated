@@ -146,29 +146,29 @@ const OnboardingFlow = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#121212] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-2xl space-y-6">
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center">
             <img className='max-w-24' src="/Parishus logo.png" alt="Parish Logo" />
           </div>
-          <h1 className="text-3xl font-bold text-[#F7C992]">
-            Welcome to <span style={{fontFamily: 'Sergio Trendy'}}>Parish</span>!
+          <h1 className="text-3xl font-bold text-black font-script">
+            Welcome to <span>Parish</span>!
           </h1>
-          <p className="text-[#FEFEFE]">
+          <p className="">
             Let's set up your profile to find the perfect dining experiences
           </p>
         </div>
 
-        <Card className="bg-[#1E1E1E] text-[#FEFEFE] border border-[#9DC0B3] shadow-xl">
+        <Card className="border shadow-xl">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-[#F7C992] mb-3">{STEPS[currentStep].title}</CardTitle>
-              <span className="text-sm text-[#9DC0B3]">
+              <CardTitle className="mb-3">{STEPS[currentStep].title}</CardTitle>
+              <span className="text-sm">
                 {currentStep + 1} of {STEPS.length}
               </span>
             </div>
-            <Progress value={progress} className="w-full bg-[#2D2D2D]" />
+            <Progress value={progress} className="w-full " />
           </CardHeader>
 
           <CardContent className="space-y-6">
@@ -182,14 +182,14 @@ const OnboardingFlow = () => {
                 variant="outline"
                 onClick={handleBack}
                 disabled={currentStep === 0}
-                className="border-[#9DC0B3] text-[#9DC0B3] hover:bg-[#2D2D2D] hover:text-[#EFEFEF]"
+                className=""
               >
                 Back
               </Button>
               <Button
                 onClick={handleNext}
                 disabled={!isStepComplete() || loading}
-                className="bg-[#9DC0B3] text-black hover:bg-[#9DC0B3]/90"
+                className=""
               >
                 {currentStep === STEPS.length - 1 ? 'Complete' : 'Continue'}
               </Button>

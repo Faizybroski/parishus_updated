@@ -23,7 +23,7 @@ const NotificationBanner: React.FC<NotificationBannerProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="flex-shrink-0">
-              <Users className="h-6 w-6 text-peach-gold" />
+              <Users className="h-6 w-6  " />
             </div>
             <div>
               <h3 className="font-semibold text-foreground">

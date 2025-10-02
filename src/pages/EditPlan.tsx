@@ -130,7 +130,7 @@ const EditPlan = () => {
             <ArrowLeft className="h-4 w-4" />
             <span>Back to Plans</span>
           </Button>
-          <h1 className="text-3xl font-bold">Edit Subscription Plan</h1>
+          <h1 className="text-3xl font-bold font-script">Edit Subscription Plan</h1>
           <p className="text-muted-foreground mt-2">
             Update your subscription pricing and details.
           </p>

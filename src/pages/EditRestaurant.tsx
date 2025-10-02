@@ -39,7 +39,7 @@ const EditRestaurant = () => {
       <div className="min-h-screen bg-background">
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="text-center">
-            <h1 className="text-2xl font-bold">Restaurant not found</h1>
+            <h1 className="text-2xl font-bold font-script">Restaurant not found</h1>
             <Button variant="outline" onClick={handleCancel} className="mt-4">
               Back to Restaurants
             </Button>
@@ -61,7 +61,7 @@ const EditRestaurant = () => {
             <ArrowLeft className="h-4 w-4" />
             <span>Back to Restaurants</span>
           </Button>
-          <h1 className="text-3xl font-bold">Edit Restaurant</h1>
+          <h1 className="text-3xl font-bold font-script">Edit Restaurant</h1>
           <p className="text-muted-foreground mt-2">
             Update restaurant information using Google Places
           </p>

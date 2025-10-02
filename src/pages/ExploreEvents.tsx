@@ -450,7 +450,7 @@ const ExploreEvents = () => {
           return (
             <Card
               key={event.id}
-              className="flex flex-col h-full bg-[#0A0A0A] border border-secondary rounded-sm overflow-hidden shadow-sm"
+              className="flex flex-col h-full border border-secondary rounded-sm overflow-hidden shadow-sm"
             >
               {/* Image with Overlay */}
               <div className="relative w-full flex items-center justify-center bg-primary flex-shrink-0 h-48">
@@ -497,7 +497,7 @@ const ExploreEvents = () => {
 
                 {/* RSVP Count */}
                 {event.max_attendees && (
-                  <div className="text-sm font-medium py-4 px-2 border-t-2 border-b-2 border-[#1E1E1E] text-white">
+                  <div className="text-sm font-medium py-4 px-2 border-t-2 border-b-2 border text-white">
                                       {/* Top content */}
                                       <div className="flex items-center mb-2">
                                         <Users className="h-5 w-5 text-secondary/90 mr-3" />
@@ -505,9 +505,9 @@ const ExploreEvents = () => {
                                       </div>
                   
                                       {/* Progress bar */}
-                                      <div className="w-full h-2 bg-[#1E1E1E] rounded-full overflow-hidden">
+                                      <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
                                         <div
-                                          className="h-full bg-[#8bac97] transition-all duration-300"
+                                          className="h-full bg-primary transition-all duration-300"
                                           style={{
                                             width: `${Math.min(
                                               ((event.rsvp_count || 0) / event.max_attendees) *
@@ -608,7 +608,7 @@ const ExploreEvents = () => {
                       variant={hasRSVP ? "default" : "outline"}
                       size="sm"
                       className={
-                        hasRSVP ? "bg-sage-green hover:bg-sage-green/90" : "text-white"
+                        hasRSVP ? "" : "text-white"
                       }
                     >
                       {hasRSVP ? (
@@ -631,7 +631,7 @@ const ExploreEvents = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="h-8 w-8 animate-spin mx-auto border-4 border-peach-gold border-t-transparent rounded-full" />
+          <div className="h-8 w-8 animate-spin mx-auto border-4 border border-t-transparent rounded-full" />
           <p className="text-muted-foreground">Loading events...</p>
         </div>
       </div>
@@ -644,7 +644,7 @@ const ExploreEvents = () => {
         <div className="space-y-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">
+              <h1 className="text-3xl font-bold text-foreground font-script">
                 Explore Events
               </h1>
               <p className="text-muted-foreground mt-1">

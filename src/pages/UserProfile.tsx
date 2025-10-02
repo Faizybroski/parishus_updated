@@ -104,7 +104,7 @@ const UserProfile = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-foreground">Profile</h1>
+            <h1 className="text-3xl font-bold text-foreground font-script">Profile</h1>
           </div>
 
           <Card className="shadow-card border-border">
@@ -113,7 +113,7 @@ const UserProfile = () => {
                 <div className="relative">
                   <Avatar className="h-24 w-24">
                     <AvatarImage src={user_profile.profile_photo_url || ""} />
-                    <AvatarFallback className="bg-peach-gold text-background text-xl">
+                    <AvatarFallback className="text-background text-xl">
                       {user_profile.first_name?.[0]}
                       {user_profile.last_name?.[0]}
                     </AvatarFallback>

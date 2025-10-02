@@ -356,7 +356,7 @@ const AdminCreateEvent = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="h-8 w-8 animate-spin mx-auto border-4 border-peach-gold border-t-transparent rounded-full" />
+          <div className="h-8 w-8 animate-spin mx-auto border-4 border border-t-transparent rounded-full" />
           <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
@@ -380,7 +380,7 @@ const AdminCreateEvent = () => {
           </p>
           <Button
             onClick={() => navigate("/profile")}
-            className="bg-peach-gold hover:bg-peach-gold/90"
+            className=""
           >
             Complete Profile
           </Button>
@@ -403,7 +403,7 @@ const AdminCreateEvent = () => {
               <span>Back to Events</span>
             </Button>
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Create New Event</h1>
+              <h1 className="text-3xl font-bold text-foreground font-script">Create New Event</h1>
               <p className="text-muted-foreground mt-1">
                 Plan your next dining experience and invite others to join
               </p>
@@ -887,7 +887,7 @@ const AdminCreateEvent = () => {
               <Button
                 type="submit"
                 disabled={!isFormValid || loading}
-                className="bg-peach-gold hover:bg-peach-gold/90"
+                className=""
               >
                 {loading ? "Creating..." : "Create Event"}
               </Button>

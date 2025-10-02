@@ -17,8 +17,8 @@ export const Navbar = () => {
             alt="Logo"
           />
           <h1
-            className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent whitespace-nowrap"
-            style={{ fontSize: "30px", color: "#9dc0b3", fontFamily: "Sergio Trendy" }}
+            className="text-2xl font-bold bg-gradient-primary bg-clip-text text-black whitespace-nowrap font-script"
+            style={{ fontSize: "30px", }}
           >
             Parish
           </h1>
@@ -41,7 +41,6 @@ export const Navbar = () => {
         <Button
           variant="default"
           size="default"
-          className="bg-[#9dc0b3]"
           onClick={() => navigate("/auth")}
         >
           Sign Up

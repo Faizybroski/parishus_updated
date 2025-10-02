@@ -127,11 +127,9 @@ export const ParishUsLanding: React.FC = () => {
                 alt="Logo"
               />
               <h1
-                className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent whitespace-nowrap"
+                className="text-2xl font-bold bg-gradient-primary bg-clip-text text-black whitespace-nowrap font-script"
                 style={{
                   fontSize: "30px",
-                  color: "#9dc0b3",
-                  fontFamily: "Sergio Trendy",
                 }}
               >
                 Parish
@@ -180,7 +178,7 @@ export const ParishUsLanding: React.FC = () => {
                 Every week in your city
               </div>
 
-              <h1 className="text-5xl md:text-7xl font-extrabold leading-tight text-foreground mb-6">
+              <h1 className="text-5xl md:text-7xl font-extrabold leading-tight text-foreground mb-6 ">
                 Strangers become <span className="text-primary">friends</span>{" "}
                 over
                 <span className="text-primary"> dinner</span> or coffee — one
@@ -200,15 +198,15 @@ export const ParishUsLanding: React.FC = () => {
 
               <ul className="text-xl text-foreground/80 leading-relaxed">
                 <li className="flex items-center">
-                  <Check className="h-5 w-5 mr-2 text-[#e4c29a]" />
+                  <Check className="h-5 w-5 mr-2 text-primary" />
                   Small, curated groups (5-6)
                 </li>
                 <li className="flex items-center">
-                  <Check className="h-5 w-5 mr-2 text-[#e4c29a]" />
+                  <Check className="h-5 w-5 mr-2 text-primary" />
                   Matched by vibe + interests
                 </li>
                 <li className="flex items-center">
-                  <Check className="h-5 w-5 mr-2 text-[#e4c29a]" />
+                  <Check className="h-5 w-5 mr-2 text-primary" />
                   Dinners, coffee, or tea - every week
                 </li>
               </ul>
@@ -227,7 +225,7 @@ export const ParishUsLanding: React.FC = () => {
                 <Button
                   variant="outline"
                   size="default"
-                  className="border border-[#e4c29a]"
+                  className="border "
                   onClick={() => setShowAuth(true)}
                 >
                   Host a Table
@@ -259,7 +257,7 @@ export const ParishUsLanding: React.FC = () => {
       <section id="how" className="py-20 border-t border-border">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 font-script">
               How Parish works
             </h2>
             <p className="text-xl text-foreground/70 max-w-2xl mx-auto">
@@ -325,7 +323,7 @@ export const ParishUsLanding: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-end justify-between mb-12">
             <div>
-              <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+              <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 font-script">
                 Events
               </h2>
               <p className="text-xl text-foreground/70">
@@ -365,7 +363,7 @@ export const ParishUsLanding: React.FC = () => {
               events.map((event) => (
                 <Card
                   key={event.id}
-                  className="relative flex flex-col bg-[#0A0A0A] w-full sm:w-[20rem] lg:w-[25rem] h-[420px] border border-primary overflow-hidden group hover:shadow-xl transition"
+                  className="relative flex flex-col  w-full sm:w-[20rem] lg:w-[25rem] h-[420px] border border-primary overflow-hidden group hover:shadow-xl transition"
                 >
                   {/* Background */}
                   <div className="relative w-full flex items-center justify-center bg-primary flex-shrink-0 h-48">
@@ -377,7 +375,7 @@ export const ParishUsLanding: React.FC = () => {
                   </div>
 
                   {/* Card Content */}
-                  <CardContent className="flex flex-col flex-grow p-4 text-muted-foreground bg-[#fcfaf8]">
+                  <CardContent className="flex flex-col flex-grow p-4 text-muted-foreground">
                     {/* Top Section */}
                     <div className="mb-4">
                       <h3 className="text-2xl text-black font-bold truncate">
@@ -454,7 +452,7 @@ export const ParishUsLanding: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+              <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6 font-script">
                 Made for hosts & admins
               </h2>
               <div className="space-y-4 mb-8">
@@ -495,7 +493,7 @@ export const ParishUsLanding: React.FC = () => {
                   "Get your seat confirmation by email/text",
                 ].map((step, index) => (
                   <div key={index} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">
+                    <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold font-script">
                       {index + 1}
                     </div>
                     <span className="text-foreground">{step}</span>
@@ -518,7 +516,7 @@ export const ParishUsLanding: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-8">
+              <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-8 font-script">
                 Mornings, evenings — better with company
               </h2>
               <div className="space-y-6 mb-8">
@@ -578,7 +576,7 @@ export const ParishUsLanding: React.FC = () => {
       <section id="faq" className="py-20 border-t border-border bg-card/30">
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 font-script">
               Got questions? We've got answers
             </h2>
             <p className="text-xl text-foreground/70">
@@ -592,7 +590,7 @@ export const ParishUsLanding: React.FC = () => {
       {/* Support Callout */}
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h3 className="text-3xl font-bold text-foreground mb-4">
+          <h3 className="text-3xl font-bold text-foreground mb-4 font-script">
             Still have questions?
           </h3>
           <p className="text-xl text-foreground/70 mb-8">
@@ -628,25 +626,25 @@ export const ParishUsLanding: React.FC = () => {
 
             {/* Links */}
             <nav className="flex flex-wrap justify-center gap-6 text-sm text-primary-foreground/80">
-              <Link to="/contact-us" className="text-white">
+              <Link to="/contact-us">
                 Contact Us
               </Link>
-              <Link to="/refund-policy" className="text-white">
+              <Link to="/refund-policy">
                 Refund Policy
               </Link>
-              <Link to="/safety-guidelines" className="text-white">
+              <Link to="/safety-guidelines">
                 Safety Guidelines
               </Link>
-              <Link to="/terms-conditions" className="text-white">
+              <Link to="/terms-conditions">
                 Terms & Conditions
               </Link>
-              <Link to="/privacy-policy" className="text-white">
+              <Link to="/privacy-policy">
                 Privacy Policy
               </Link>
             </nav>
 
             {/* Copyright */}
-            <p className="text-white text-center">
+            <p className="text-center">
               © {new Date().getFullYear()} Parish
             </p>
           </div>

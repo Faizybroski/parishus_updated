@@ -67,8 +67,8 @@ export default function PaymentCheckoutPage() {
     return <div className="text-white text-center mt-10">Loading...</div>;
 
   return (
-    // <div className="min-h-screen bg-[#121212] text-white px-4 py-10">
-    //   <h1 className="text-3xl font-bold text-center mb-10">Secure Payment</h1>
+    // <div className="min-h-screen px-4 py-10">
+    //   <h1 className="text-3xl font-bold text-center mb-10 font-script">Secure Payment</h1>
     //   <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
     //     <div className="bg-[#1e1e1e] p-6 rounded-2xl shadow-lg col-span-1">
     //       <Elements stripe={stripePromise} options={{ clientSecret }}>
@@ -110,11 +110,11 @@ export default function PaymentCheckoutPage() {
     //   </div>
     // </div>
 
- <div className="min-h-screen bg-[#121212] text-white px-4 py-10 flex flex-col items-center">
+ <div className="min-h-screen px-4 py-10 flex flex-col items-center">
   <div className="w-full max-w-2xl space-y-6">
 
     {/* User Info Card */}
-    <Card className="bg-[#1e1e1e] text-white border-none shadow-lg">
+    <Card className="text-white border-none shadow-lg">
       <CardHeader>
         <CardTitle>👤 User Info</CardTitle>
       </CardHeader>
@@ -130,7 +130,7 @@ export default function PaymentCheckoutPage() {
 
     {/* Event Info Card */}
     {event && (
-      <Card className="bg-[#1e1e1e] text-white border-none shadow-lg">
+      <Card className=" text-white border-none shadow-lg">
         <CardHeader>
           <CardTitle>🎉 Event Info</CardTitle>
         </CardHeader>
@@ -145,7 +145,7 @@ export default function PaymentCheckoutPage() {
     )}
 
     {/* Payment Form */}
-    <div className="bg-[#1e1e1e] p-6 rounded-2xl shadow-lg border border-neutral-800">
+    <div className="p-6 rounded-2xl shadow-lg border border-neutral-800">
       <Elements stripe={stripePromise} options={{ clientSecret }}>
         <CheckoutForm
           userName={userName}
@@ -403,7 +403,7 @@ const result = await stripe.confirmCardPayment(clientSecret, {
   <Button
     type="submit"
     disabled={!stripe || loading}
-    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+    className="w-full"
   >
     {loading ? "Processing..." : "Pay Now"}
   </Button>

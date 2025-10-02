@@ -49,7 +49,7 @@ export const AdminLogin = () => {
             <div className="w-6" />
             <div className="flex items-center">
               <img className='max-w-8 mr-2' src='/Parishus logo.png' alt="Parish Logo" />
-              <h1 className="text-2xl font-extrabold font-playfair text-primary" style={{fontFamily: 'Sergio Trendy'}}>
+              <h1 className="text-2xl font-extrabold font-script text-black">
                 Parish
               </h1>
             </div>

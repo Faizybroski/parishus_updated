@@ -3,16 +3,15 @@ import { useNavigate } from "react-router-dom";
 export default function RsvpSuccessPage() {
   const navigate = useNavigate();
   return (
-    <div className="min-h-screen bg-[#121212] flex items-center justify-center px-4 py-5">
-      <div className="max-w-sm w-full bg-[#1e1e1e] text-white p-6 rounded-3xl shadow-lg border border-[#3b3b3b] flex flex-col items-center space-y-6">
+    <div className="min-h-screen flex items-center justify-center px-4 py-5">
+      <div className="max-w-sm w-full p-6 rounded-3xl shadow-lg border border flex flex-col items-center space-y-6">
         <h1
-          className="text-center mt-4"
+          className="text-center mt-4 font-script"
           style={{
             fontWeight: "bold",
             fontSize: "47px",
             lineHeight: "53px",
             padding: "0 5px",
-            fontFamily: "revert-layer",
             color: "#f3c88d",
           }}
         >

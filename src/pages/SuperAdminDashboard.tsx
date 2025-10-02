@@ -14,7 +14,7 @@ const SuperAdminDashboard = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground">
+        <h1 className="text-3xl font-bold text-foreground font-script">
           Admin Dashboard
         </h1>
         <p className="text-muted-foreground mt-2">

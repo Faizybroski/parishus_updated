@@ -151,7 +151,7 @@ function CheckoutForm({
   <Button
     type="submit"
     disabled={!stripe || loading}
-    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+    className="w-full"
   >
     {loading ? "Processing..." : "Pay Now"}
   </Button>
@@ -181,10 +181,10 @@ export default function UserCheckout() {
   }
 
   return (
- <div className="min-h-screen bg-[#121212] text-white px-4 py-10 flex flex-col items-center">
+ <div className="min-h-screen px-4 py-10 flex flex-col items-center">
   <div className="w-full max-w-2xl space-y-6">
 
-    <Card className="bg-[#1e1e1e] text-white border-none shadow-lg">          
+    <Card className="border-none shadow-lg">          
       <CardHeader>
             <CardTitle>User Info</CardTitle>
           </CardHeader>
@@ -228,7 +228,7 @@ export default function UserCheckout() {
             </ul>
           </CardContent>
         </Card>
- <div className="bg-[#1e1e1e] p-6 rounded-2xl shadow-lg border border-neutral-800">
+ <div className="p-6 rounded-2xl shadow-lg border border-neutral-800">
             <Elements stripe={stripePromise} options={{ clientSecret }}>
       <CheckoutForm
         plan={plan}

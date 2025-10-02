@@ -93,7 +93,7 @@ const AddPlan = () => {
             <ArrowLeft className="h-4 w-4" />
             <span>Back to Plans</span>
           </Button>
-          <h1 className="text-3xl font-bold">Add New Subscription Plan</h1>
+          <h1 className="text-3xl font-bold font-script">Add New Subscription Plan</h1>
           <p className="text-muted-foreground mt-2">Create a new plan to offer for event subscriptions.</p>
         </div>
 

@@ -204,7 +204,7 @@ const EventRSVP = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
           <AlertTriangle className="h-12 w-12 text-red-500 mx-auto" />
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className="text-2xl font-bold text-foreground font-script">
             Event Not Found
           </h1>
           <p className="text-muted-foreground">
@@ -262,7 +262,7 @@ const EventRSVP = () => {
 
             <div className="space-y-4">
               <div className="flex items-start justify-between">
-                <h1 className="text-3xl font-bold text-foreground">
+                <h1 className="text-3xl font-bold text-foreground font-script">
                   {event.name}
                 </h1>
                 <Badge

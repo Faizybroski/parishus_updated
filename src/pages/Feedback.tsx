@@ -213,7 +213,7 @@ const Feedback = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Event Feedback</h1>
+            <h1 className="text-3xl font-bold text-foreground font-script">Event Feedback</h1>
             <p className="text-muted-foreground mt-1">
               Share your experience from attended events
             </p>
@@ -246,8 +246,8 @@ const Feedback = () => {
                           onClick={() => handleStarClick(star)}
                           className={`p-1 transition-colors ${
                             star <= feedback.rating
-                              ? 'text-peach-gold'
-                              : 'text-muted-foreground hover:text-peach-gold/70'
+                              ? ' '
+                              : 'text-muted-foreground hover: /70'
                           }`}
                         >
                           <Star className={`h-8 w-8 ${star <= feedback.rating ? 'fill-current' : ''}`} />
@@ -279,7 +279,7 @@ const Feedback = () => {
                     <Button
                       type="submit"
                       disabled={feedback.rating === 0 || submitting}
-                      className="bg-peach-gold hover:bg-peach-gold/90 text-background"
+                      className="text-background"
                     >
                       {submitting ? 'Submitting...' : existingFeedback ? 'Update Feedback' : 'Submit Feedback'}
                     </Button>

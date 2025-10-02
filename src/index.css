@@ -1,9 +1,9 @@
 @import url("https://fonts.cdnfonts.com/css/sergio-trendy");
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Dancing+Script:wght@400..700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Parish Design System - Dark Theme with Peach/Gold & Sage Green Accents */
 
 @layer base {
   :root {
@@ -227,7 +227,9 @@
 
   body {
     @apply bg-background text-foreground;
+    @apply font-serif;
   }
+      
   body {
   overflow: auto;
   -ms-overflow-style: none; /* IE/Edge */

@@ -13,25 +13,25 @@ export const Footer = () => {
 
           {/* Links */}
           <nav className="flex flex-wrap justify-center gap-6 text-sm text-primary-foreground/80">
-            <Link to="/contact-us" className="text-white">
+            <Link to="/contact-us">
               Contact Us
             </Link>
-            <Link to="/refund-policy" className="text-white">
+            <Link to="/refund-policy">
               Refund Policy
             </Link>
-            <Link to="/safety-guidelines" className="text-white">
+            <Link to="/safety-guidelines">
               Safety Guidelines
             </Link>
-            <Link to="/terms-conditions" className="text-white">
+            <Link to="/terms-conditions">
               Terms & Conditions
             </Link>
-            <Link to="/privacy-policy" className="text-white">
+            <Link to="/privacy-policy">
               Privacy Policy
             </Link>
           </nav>
 
           {/* Copyright */}
-          <p className="text-white text-center">
+          <p className="text-center">
             © {new Date().getFullYear()} Parish
           </p>
         </div>

@@ -8,7 +8,7 @@ export default function RefundPolicyPage() {
           <CardContent className="p-10 md:p-14">
             
             {/* Heading */}
-            <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-6">
+            <h1 className="text-4xl md:text-5xl font-extrabold text-black mb-6 font-script">
               Parish Refund Policy
             </h1>
             <p className="text-foreground/80 text-lg mb-10">
