@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
+import {LoaderText} from "@/components/loader/Loader"
 import {
   Select,
   SelectContent,
@@ -229,11 +230,8 @@ const RSVPs = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="h-8 w-8 animate-spin mx-auto border-4 border border-t-transparent rounded-full" />
-          <p className="text-muted-foreground">Loading your RSVPs...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
       </div>
     );
   }

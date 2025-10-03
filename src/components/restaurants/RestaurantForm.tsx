@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useRestaurants } from '@/hooks/useRestaurants';
 import { useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
+import {LoaderText} from "@/components/loader/Loader"
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
@@ -87,14 +88,13 @@ const RestaurantForm: React.FC<RestaurantFormProps> = ({
 
   if (profileLoading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-center space-y-2">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent mx-auto"></div>
-          <p className="text-sm text-muted-foreground">Loading profile...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
       </div>
     );
   }
+
+
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">

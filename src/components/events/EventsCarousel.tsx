@@ -15,6 +15,7 @@ import {
   Share2,
 } from "lucide-react";
 import { format } from "date-fns";
+import { LoaderText } from "@/components/loader/Loader";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -287,12 +288,16 @@ const EventsCarousel = () => {
   };
 
   if (loading) {
-    return <div className="h-96 rounded-xl animate-pulse bg-muted" />;
+    return (
+      <div className="flex items-center justify-center bg-background">
+        <LoaderText text="Loading" />
+      </div>
+    );
   }
 
   if (events.length === 0) {
     return (
-      <div className="h-96 flex items-center justify-center text-center text-muted-foreground bg-muted rounded-xl">
+      <div className="h-96 flex items-center justify-center text-center text-muted-foreground bg-background rounded-xl">
         <div>
           <h3 className="text-2xl font-semibold mb-2">No Events Found</h3>
           <Button onClick={() => navigate("/create-event")}>
@@ -414,17 +419,21 @@ const EventsCarousel = () => {
                       {/* Push buttons to bottom */}
                       <div className="flex gap-2 mt-auto">
                         {!event.is_paid && (
-                          <Button 
-                          variant="outline"
-                          size="icon"
-                          onClick={() => navigate(`/event/${event.id}/details`)}
-                          className="">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() =>
+                              navigate(`/event/${event.id}/details`)
+                            }
+                            className=""
+                          >
                             <Share2 className="h-4 w-4 text-muted-foreground" />
                           </Button>
                         )}
-                        <Button 
-                        onClick={() => navigate(`/rsvp/${event.id}/details`)}
-                        className="flex-grow px-4 py-3 text-lg font-medium text-black flex items-center gap-2 justify-center rounded-lg">
+                        <Button
+                          onClick={() => navigate(`/rsvp/${event.id}/details`)}
+                          className="flex-grow px-4 py-3 text-lg font-medium text-black flex items-center gap-2 justify-center rounded-lg"
+                        >
                           {rsvpStatus === "yes" ? "Un-RSVP" : "RSVP"}
                           <ChevronRight className="w-5 h-5" />
                         </Button>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { LoaderText } from "@/components/loader/Loader";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
@@ -374,13 +375,8 @@ const Profile = () => {
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-card rounded w-48 mb-8"></div>
-            <div className="h-64 bg-card rounded"></div>
-          </div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
       </div>
     );
   }

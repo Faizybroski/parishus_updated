@@ -7,6 +7,7 @@ import ParishLogo from "@/components/ui/logo";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { toast } from "@/hooks/use-toast";
+import { LoaderText } from "@/components/loader/Loader";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
@@ -72,8 +73,8 @@ export const SocialLinks = () => {
 
   if (authLoading || profileLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
       </div>
     );
   }

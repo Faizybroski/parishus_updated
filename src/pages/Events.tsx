@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {LoaderText} from "@/components/loader/Loader"
 import {
   Calendar,
   Clock,
@@ -773,11 +774,8 @@ const Events = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="h-8 w-8 animate-spin mx-auto border-4 border border-t-transparent rounded-full" />
-          <p className="text-muted-foreground">Loading events...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
       </div>
     );
   }

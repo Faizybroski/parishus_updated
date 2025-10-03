@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {LoaderText} from "@/components/loader/Loader";
 import { Badge } from "@/components/ui/badge";
 import { Check, Crown, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -137,17 +138,8 @@ export default function Subscription() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background p-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-muted rounded w-64"></div>
-            <div className="grid md:grid-cols-2 gap-6">
-              {[1, 2].map((i) => (
-                <div key={i} className="h-96 bg-muted rounded-lg"></div>
-              ))}
-            </div>
-          </div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
       </div>
     );
   }

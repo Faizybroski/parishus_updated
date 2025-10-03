@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {LoaderText} from "@/components/loader/Loader";
 import { toast } from "@/hooks/use-toast";
 import {
   Calendar,
@@ -193,11 +194,8 @@ const AdminEvents = () => {
 
   if (loading) {
     return (
-      <div className="p-8">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8 font-script">Event Management</h1>
-          <div className="text-center py-8">Loading events...</div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
       </div>
     );
   }

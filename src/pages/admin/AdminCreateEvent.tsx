@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import {LoaderText} from "@/components/loader/Loader"
 import {
   Select,
   SelectContent,
@@ -354,11 +355,8 @@ const AdminCreateEvent = () => {
     formData.cover_photo_url;
   if (authLoading || profileLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="h-8 w-8 animate-spin mx-auto border-4 border border-t-transparent rounded-full" />
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
       </div>
     );
   }

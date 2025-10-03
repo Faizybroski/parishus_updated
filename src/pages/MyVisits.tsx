@@ -13,6 +13,7 @@ import RestaurantVisitTracker from '@/components/restaurants/RestaurantVisitTrac
 import VisitEditModal from '@/components/restaurants/VisitEditModal';
 import VisitDeleteModal from '@/components/restaurants/VisitDeleteModal';
 import { Portal } from '@radix-ui/react-portal';
+import {LoaderText} from "@/components/loader/Loader"
 
 interface RestaurantVisit {
   id: string;
@@ -125,16 +126,10 @@ const MyVisits = () => {
     fetchVisits(); // Refresh the list when a new visit is tracked
   };
 
-  if (loading) {
+    if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="animate-pulse space-y-4">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-24 bg-card rounded-lg"></div>
-            ))}
-          </div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
       </div>
     );
   }

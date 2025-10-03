@@ -4,6 +4,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { ChevronDown, Calendar } from "lucide-react";
 import PriceFilter from "@/components/filter/PriceFilter";
 import ParishLogo from "@/components/ui/logo";
+import { LoaderText } from "@/components/loader/Loader";
 import { useZoomWidth } from "@/hooks/use-width";
 
 const OurExploreEvents = () => {
@@ -18,7 +19,6 @@ const OurExploreEvents = () => {
   const [priceRange, setPriceRange] = useState([0, 200]); // min and max
   const maxPrice = 1000; // or whatever ceiling you want
   const width = useZoomWidth();
-
 
   const trendingOptions = ["Trending", "Newest", "Largest"];
   const timeframeOptions = ["Today", "This Month", "Right Now"];
@@ -141,7 +141,10 @@ const OurExploreEvents = () => {
     },
   ];
 
-  const repeatedEvents = Array.from({ length: 42 }, (_, i) => events[i % events.length]);
+  const repeatedEvents = Array.from(
+    { length: 42 },
+    (_, i) => events[i % events.length]
+  );
 
   const cardImages = [
     "https://posh.vip/cdn-cgi/image/width=1080,quality=75,fit=scale-down,format=auto/https://posh-images-originals-production.s3.amazonaws.com/68d16a2a37fbb1803ecf52ee",
@@ -217,14 +220,14 @@ const OurExploreEvents = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <h1 className="parish-loader text-7xl font-extrabold font-script">Parish</h1>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#010101] text-white">
+    <div className="min-h-screen bg-background text-white">
       <div className="w-full relative -mt-[2px]">
         {/* Nav ABOVE carousel */}
         <nav className="absolute top-0 left-0 w-full z-30 h-[80px] hidden sm:block">
@@ -399,7 +402,7 @@ const OurExploreEvents = () => {
           <div
             key={index}
             className=" rounded-lg overflow-hidden shadow-lg border border-[0.1px] hover:border-white hover:bg-white/10 hover:cursor-pointer transition-all duration-300 sm:w-[90%]"
-            style={{ width: window.innerWidth <= 768 ? '88%' : `${width}px` }}
+            style={{ width: window.innerWidth <= 768 ? "88%" : `${width}px` }}
           >
             <div className="relative">
               {/* Image */}
@@ -427,9 +430,7 @@ const OurExploreEvents = () => {
                   <div className="absolute -top-32 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent"></div>
 
                   <div className="pl-5 pt-1 flex flex-col gap-2 relative z-10">
-                    <h3 className="text-2xl text-white">
-                      {event.name}
-                    </h3>
+                    <h3 className="text-2xl text-white">{event.name}</h3>
                     <p className="text-white pb-7 text-sm">{event.city}</p>
                   </div>
                 </div>

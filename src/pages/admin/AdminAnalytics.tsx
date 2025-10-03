@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
+import {LoaderText} from "@/components/loader/Loader"
 import { BarChart3, TrendingUp, Users, Calendar, UserCheck, Activity } from 'lucide-react';
 
 interface AnalyticsData {
@@ -94,13 +95,8 @@ const AdminAnalytics = () => {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold font-script">Analytics</h1>
-        </div>
-        <div className="flex items-center justify-center py-8">
-          <div className="text-muted-foreground">Loading analytics...</div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
       </div>
     );
   }

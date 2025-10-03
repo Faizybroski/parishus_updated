@@ -4,6 +4,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { useNavigate, useLocation } from 'react-router-dom';
 import AuthPage from '@/components/auth/AuthPage';
 import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
+import { LoaderText } from '@/components/loader/Loader';
 import { Loader2 } from 'lucide-react';
 import { AdminLogin } from '@/components/adminLogin/AdminLogin';
 import { ParishUsLanding } from '@/pages/LandingPage';
@@ -169,11 +170,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   // NOW we can do conditional logic and early returns
   if (authLoading || profileLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto  " />
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
       </div>
     );
   }

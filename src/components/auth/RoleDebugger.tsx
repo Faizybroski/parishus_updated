@@ -1,11 +1,18 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
-import { useProfile } from '@/hooks/useProfile';
-import { useNavigate } from 'react-router-dom';
-import { Crown, Shield, User, RefreshCw } from 'lucide-react';
+import React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { LoaderText } from "@/components/loader/Loader";
+import { useProfile } from "@/hooks/useProfile";
+import { useNavigate } from "react-router-dom";
+import { Crown, Shield, User, RefreshCw } from "lucide-react";
 
 const RoleDebugger = () => {
   const { user } = useAuth();
@@ -14,7 +21,7 @@ const RoleDebugger = () => {
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case 'admin':
+      case "admin":
         return <Shield className="h-4 w-4 text-green-500" />;
       default:
         return <User className="h-4 w-4 text-blue-500" />;
@@ -23,19 +30,19 @@ const RoleDebugger = () => {
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'admin':
-        return 'bg-green-500';
+      case "admin":
+        return "bg-green-500";
       default:
-        return 'bg-blue-500';
+        return "bg-blue-500";
     }
   };
 
   const getExpectedRoute = (role: string) => {
     switch (role) {
-      case 'admin':
-        return '/admin/dashboard';
+      case "admin":
+        return "/admin/dashboard";
       default:
-        return '/';
+        return "/";
     }
   };
 
@@ -69,8 +76,12 @@ const RoleDebugger = () => {
           <div className="p-4 bg-muted rounded-lg">
             <h3 className="font-semibold mb-2">Current User</h3>
             <div className="text-sm space-y-1">
-              <div><strong>Email:</strong> {user.email}</div>
-              <div><strong>User ID:</strong> {user.id}</div>
+              <div>
+                <strong>Email:</strong> {user.email}
+              </div>
+              <div>
+                <strong>User ID:</strong> {user.id}
+              </div>
             </div>
           </div>
 
@@ -78,7 +89,9 @@ const RoleDebugger = () => {
           <div className="p-4 bg-muted rounded-lg">
             <h3 className="font-semibold mb-2">Profile Information</h3>
             {loading ? (
-              <div>Loading profile...</div>
+              <div className="min-h-screen flex items-center justify-center bg-background">
+                <LoaderText text="Parish" />
+              </div>
             ) : profile ? (
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
@@ -88,9 +101,19 @@ const RoleDebugger = () => {
                     {profile.role}
                   </Badge>
                 </div>
-                <div><strong>Name:</strong> {profile.first_name} {profile.last_name}</div>
-                <div><strong>Onboarding:</strong> {profile.onboarding_completed ? '✅ Complete' : '❌ Incomplete'}</div>
-                <div><strong>Profile ID:</strong> {profile.id}</div>
+                <div>
+                  <strong>Name:</strong> {profile.first_name}{" "}
+                  {profile.last_name}
+                </div>
+                <div>
+                  <strong>Onboarding:</strong>{" "}
+                  {profile.onboarding_completed
+                    ? "✅ Complete"
+                    : "❌ Incomplete"}
+                </div>
+                <div>
+                  <strong>Profile ID:</strong> {profile.id}
+                </div>
               </div>
             ) : (
               <div className="text-red-500">❌ No profile found</div>
@@ -104,10 +127,16 @@ const RoleDebugger = () => {
                 🎯 Expected Behavior
               </h3>
               <div className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
-                <div><strong>Should redirect to:</strong> {getExpectedRoute(profile.role)}</div>
-                <div><strong>Should have access to:</strong> {
-                  profile.role === 'user' ? 'User Dashboard only' : 'Admin Panel'
-                }</div>
+                <div>
+                  <strong>Should redirect to:</strong>{" "}
+                  {getExpectedRoute(profile.role)}
+                </div>
+                <div>
+                  <strong>Should have access to:</strong>{" "}
+                  {profile.role === "user"
+                    ? "User Dashboard only"
+                    : "Admin Panel"}
+                </div>
               </div>
             </div>
           )}
@@ -115,23 +144,20 @@ const RoleDebugger = () => {
           {/* Test Buttons */}
           {profile && (
             <div className="flex gap-2 flex-wrap">
-              <Button 
-                variant="outline" 
-                onClick={() => navigate('/')}
-              >
+              <Button variant="outline" onClick={() => navigate("/")}>
                 Go to Home
               </Button>
-              
-              {(profile.role === 'admin') && (
-                <Button 
+
+              {profile.role === "admin" && (
+                <Button
                   variant="outline"
-                  onClick={() => navigate('/admin/dashboard')}
+                  onClick={() => navigate("/admin/dashboard")}
                 >
                   Go to Admin Dashboard
                 </Button>
               )}
-              
-              <Button 
+
+              <Button
                 variant="outline"
                 onClick={() => window.location.reload()}
               >

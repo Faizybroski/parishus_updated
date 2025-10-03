@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import {LoaderText} from "@/components/loader/Loader"
 import {
   Elements,
   useStripe,
@@ -64,7 +65,10 @@ export default function PaymentCheckoutPage() {
   }, [publishableKey]);
 
   if (!clientSecret || !stripePromise)
-    return <div className="text-white text-center mt-10">Loading...</div>;
+    return(
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
+      </div>)
 
   return (
     // <div className="min-h-screen px-4 py-10">

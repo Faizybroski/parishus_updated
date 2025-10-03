@@ -183,7 +183,7 @@ const Navigation = () => {
                     navigate(item.path);
                     setIsOpen(false);
                   }}
-                  className={`w-full flex items-center px-4 py-2 text-left ${
+                  className={`w-full flex justify-start items-center px-4 py-2 text-left ${
                     isActive
                       ? ""
                       : "text-muted-foreground hover:text-foreground"

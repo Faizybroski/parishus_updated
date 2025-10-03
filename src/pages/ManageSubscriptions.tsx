@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useUserSubscriptions } from "@/hooks/useUserSubscriptions";
+import { LoaderText } from "@/components/loader/Loader";
 import clsx from "clsx";
 
 const ManageSubscriptions = () => {
@@ -14,6 +15,14 @@ const ManageSubscriptions = () => {
     const name = `${s.profiles?.first_name || ""} ${s.profiles?.last_name || ""}`.toLowerCase();
     return name.includes(search.toLowerCase().trim());
   });
+
+    if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">

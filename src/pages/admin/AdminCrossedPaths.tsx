@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { MapPin, Calendar, Search, TrendingUp, Users, Building, MessageCircle } from 'lucide-react';
+import {LoaderText} from "@/components/loader/Loader";
 import { toast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -179,14 +180,8 @@ const AdminCrossedPaths = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="animate-pulse space-y-4">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-32 bg-card rounded-lg"></div>
-            ))}
-          </div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
       </div>
     );
   }

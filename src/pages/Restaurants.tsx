@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Plus, MapPin, Edit, Trash2, Search, User } from 'lucide-react';
 import { toast } from 'sonner';
+import {LoaderText} from "@/components/loader/Loader"
 
 const Restaurants = () => {
   const { restaurants, loading, deleteRestaurant, canEdit, canDelete, refetch } = useRestaurants();
@@ -93,13 +94,10 @@ const Restaurants = () => {
   const addRestaurantPath = isAdminRoute ? '/admin/restaurants/add' : '/restaurants/add';
   const getEditPath = (id: string) => isAdminRoute ? `/admin/restaurants/edit/${id}` : `/restaurants/edit/${id}`;
 
-  if (loading) {
+    if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto"></div>
-          <p className="text-muted-foreground">Loading restaurants...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
       </div>
     );
   }

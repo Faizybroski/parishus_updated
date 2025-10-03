@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { useForm } from 'react-hook-form';
 import { Shield, UserPlus, Search, Edit, Trash2, Crown } from 'lucide-react';
+import {LoaderText} from "@/components/loader/Loader";
 
 interface Admin {
   id: string;
@@ -180,13 +181,8 @@ const AdminManagement = () => {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold font-script">Admin Management</h1>
-        </div>
-        <div className="flex items-center justify-center py-8">
-          <div className="text-muted-foreground">Loading admin users...</div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
       </div>
     );
   }

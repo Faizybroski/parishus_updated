@@ -14,6 +14,7 @@ import {
   Trash2,
   Loader2,
 } from "lucide-react";
+import { LoaderText } from "@/components/loader/Loader";
 import { useToast } from "@/components/ui/use-toast";
 import { sendEventInvite } from "@/lib/sendInvite";
 
@@ -449,6 +450,14 @@ const AdminWalletRequests = () => {
       setLoading(null);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">

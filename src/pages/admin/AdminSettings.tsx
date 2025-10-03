@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {LoaderText} from "@/components/loader/Loader";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Settings, Database, Mail, Bell, Shield, Globe } from "lucide-react";
 
 const AdminSettings = () => {
+  const [loading, setLoading] = useState(true);
   const [settings, setSettings] = useState({
     // General Settings
     siteName: "Table Talk",
@@ -52,6 +54,7 @@ const AdminSettings = () => {
   }, []);
 
   const fetchStripeSettings = async () => {
+    setLoading(true);
     try {
       const { data: stripeSettings, error } = await supabase
         .from("system_settings")
@@ -70,6 +73,8 @@ const AdminSettings = () => {
       }));
     } catch (error) {
       console.error("Error fetching Stripe settings:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -81,6 +86,7 @@ const AdminSettings = () => {
   };
 
   const saveSettings = async (category: string) => {
+    setLoading(true);
     try {
       if (category === "Stripe") {
         // Save Stripe settings to system_settings table
@@ -124,8 +130,19 @@ const AdminSettings = () => {
         description: error.message || "Failed to save settings",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 p-4 sm:p-6 lg:p-8">
       {/* Header */}

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
+import {LoaderText} from "@/components/loader/Loader";
 import { FileText, Download, Calendar, Users, TrendingUp, BarChart3 } from 'lucide-react';
 
 interface ReportData {
@@ -118,13 +119,8 @@ const AdminReports = () => {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold font-script">Reports</h1>
-        </div>
-        <div className="flex items-center justify-center py-8">
-          <div className="text-muted-foreground">Loading reports...</div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
       </div>
     );
   }

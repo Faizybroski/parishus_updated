@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/contexts/AuthContext";
+import { LoaderText } from "@/components/loader/Loader";
 import { toast } from "@/hooks/use-toast";
 import { useProfile } from "@/hooks/useProfile";
 import { useRestaurants } from "@/hooks/useRestaurants";
@@ -567,7 +568,9 @@ const EventDetails = () => {
         <p><strong>📅 Date & Time:</strong> ${new Date(
           event.date_time
         ).toLocaleString()}</p>
-        <p><strong>📍 Location:</strong> ${event.location_name} <span style="margin: 2px 0; font-size: 14px; color: #d4a373;">
+        <p><strong>📍 Location:</strong> ${
+          event.location_name
+        } <span style="margin: 2px 0; font-size: 14px; color: #d4a373;">
          – ${event.location_address}
       </span></p>
         <p><strong>⏳ RSVP By:</strong> ${new Date(
@@ -842,11 +845,8 @@ const EventDetails = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="h-8 w-8 animate-spin mx-auto border-4 border border-t-transparent rounded-full" />
-          <p className="text-muted-foreground">Loading event details...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
       </div>
     );
   }
@@ -911,11 +911,7 @@ const EventDetails = () => {
             <Button
               onClick={handleInterest}
               disabled={loading}
-              className={
-                isInterested
-                  ? "mb-4"
-                  : "mb-4"
-              }
+              className={isInterested ? "mb-4" : "mb-4"}
             >
               {loading
                 ? "Updating..."
@@ -1333,11 +1329,7 @@ const EventDetails = () => {
                       !event.event_fee || event.event_fee == 0 ? (
                         <Button
                           onClick={handleRSVP}
-                          className={`w-full ${
-                            hasRSVP
-                              ? ""
-                              : ""
-                          }`}
+                          className={`w-full ${hasRSVP ? "" : ""}`}
                         >
                           {hasRSVP ? (
                             <>
@@ -1354,11 +1346,7 @@ const EventDetails = () => {
                       ) : hasRSVP ? (
                         <Button
                           onClick={handleRSVP}
-                          className={`w-full ${
-                            hasRSVP
-                              ? ""
-                              : ""
-                          }`}
+                          className={`w-full ${hasRSVP ? "" : ""}`}
                         >
                           <UserCheck className="h-4 w-4 mr-2" />
                           Going - Cancel RSVP

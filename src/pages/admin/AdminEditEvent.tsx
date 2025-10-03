@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { LoaderText } from "@/components/loader/Loader";
 import { useProfile } from "@/hooks/useProfile";
 import { useParams } from "react-router-dom";
 import { useRestaurants, Restaurant } from "@/hooks/useRestaurants";
@@ -408,11 +409,8 @@ const AdminEditEvent = () => {
   // Show loading while authentication or profile is loading
   if (authLoading || profileLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="h-8 w-8 animate-spin mx-auto border-4 border border-t-transparent rounded-full" />
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
       </div>
     );
   }

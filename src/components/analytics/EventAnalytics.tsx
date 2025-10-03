@@ -12,6 +12,7 @@ import {
   LabelList,
 } from "recharts";
 import { useNavigate } from "react-router-dom";
+import { LoaderText } from "@/components/loader/Loader";
 import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/useProfile";
 
@@ -100,13 +101,20 @@ export default function EventAnalyticsDashboard({
 
   if (loading) {
     return (
-      <p className="text-center text-muted-foreground mt-10 text-lg font-semibold animate-pulse">
-        Loading analytics...
-      </p>
+      <Card className="bg-background shadow-lg rounded-lg max-w-3xl mx-auto p-10 flex items-center justify-center">
+        <CardHeader className="w-full text-center">
+          <CardTitle className="font-semibold mb-4">
+            <div className="flex items-center justify-center bg-background">
+              <LoaderText text="Loading analytics..." />
+            </div>
+          </CardTitle>
+        </CardHeader>
+      </Card>
     );
   }
+
   return (
-    <Card className="bg-dark-surface shadow-lg rounded-lg max-w-3xl mx-auto p-6">
+    <Card className="bg-background shadow-lg rounded-lg max-w-3xl mx-auto p-6">
       <CardHeader>
         <CardTitle className="text-2xl font-semibold mb-4">
           Event Analytics

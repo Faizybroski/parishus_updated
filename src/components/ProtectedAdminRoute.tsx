@@ -2,6 +2,7 @@ import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { Navigate } from 'react-router-dom';
+import { LoaderText } from '@/components/loader/Loader';
 import { Loader2 } from 'lucide-react';
 
 interface ProtectedAdminRouteProps {
@@ -18,11 +19,8 @@ const ProtectedAdminRoute: React.FC<ProtectedAdminRouteProps> = ({
 
   if (authLoading || profileLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto  " />
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
       </div>
     );
   }

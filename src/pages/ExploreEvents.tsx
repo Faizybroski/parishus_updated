@@ -18,6 +18,7 @@ import {
   Trash2
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import {LoaderText} from "@/components/loader/Loader"
 import { useLocation, useNavigate } from "react-router-dom";
 
 interface Event {
@@ -629,11 +630,8 @@ const ExploreEvents = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="h-8 w-8 animate-spin mx-auto border-4 border border-t-transparent rounded-full" />
-          <p className="text-muted-foreground">Loading events...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
       </div>
     );
   }

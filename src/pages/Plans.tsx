@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { LoaderText } from "@/components/loader/Loader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -38,6 +39,14 @@ const Plans = () => {
         ? plan.interval === "month"
         : plan.interval === "year"
     );
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">

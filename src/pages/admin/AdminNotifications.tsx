@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Bell, Eye, Trash2, RefreshCw } from 'lucide-react';
+import { LoaderText } from '@/components/loader/Loader';
 
 interface Notification {
   id: string;
@@ -103,13 +104,8 @@ const AdminNotifications = () => {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold font-script">Notifications</h1>
-        </div>
-        <div className="flex items-center justify-center py-8">
-          <div className="text-muted-foreground">Loading notifications...</div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
       </div>
     );
   }

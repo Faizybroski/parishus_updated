@@ -7,6 +7,12 @@
 
 @layer base {
   :root {
+
+      --parish-stroke: 2px;           /* outline width */
+  --parish-padding: 0.18em;       /* safe padding so stroke never clips */
+  --parish-anim-duration: 2.6s;
+  --parish-ease: cubic-bezier(.22,.9,.28,1); 
+
     --background: 39 33% 96%; /* Warm cream/parchment */
     --foreground: 0 0% 18%; /* Deep charcoal for text */
 
@@ -122,25 +128,94 @@
   touch-action: pan-y !important;
 }
 
-.parish-loader {
-  font-family: "Arial Black", sans-serif;
-  color: transparent;
-  -webkit-text-stroke: 2px white; /* outlined text */
+/* .parish-loader {
+  color: hsl(var(--muted));
+  -webkit-text-stroke: 2px hsl(var(--foreground, 0 0% 18%)); 
   position: relative;
   overflow: hidden;
 }
 
 .parish-loader::before {
-  content: "Parish";
+  content: attr(data-text);
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  color: white;
-  clip-path: inset(0 100% 0 0); /* start hidden */
+  color: #d2bdad;
+  clip-path: inset(0 100% 0 0); 
   animation: fillText 3s ease-in-out infinite alternate;
+} */
+
+/* .parish-loader {
+  position: relative;
+  display: inline-block;
+  font-weight: 900;
+  font-size: clamp(2rem, 8vw, 6rem);
+  color: transparent;
+
+  -webkit-text-stroke: 1px hsl(var(--foreground));
+  text-stroke: 1px hsl(var(--foreground));
+
+  overflow: visible;
+  white-space: nowrap;
 }
+
+.parish-loader::before {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  color: transparent;
+
+  background: linear-gradient(
+    90deg,
+    hsl(var(--primary)) 0%,
+    hsl(var(--primary)) 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  animation: parish-breath 3s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes parish-breath {
+  from { background-position: 200% 0; } 
+  to   { background-position: 0% 0; }   
+  */
+
+@layer utilities {
+  .stroke-foreground {
+    -webkit-text-stroke: 1px hsl(var(--foreground));
+  }
+  .loader-fill {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--primary)) 0%,
+      transparent 50%,
+      hsl(var(--primary)) 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: loader-sweep 3s ease-in-out infinite alternate;
+  }
+
+  @keyframes loader-sweep {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+}
+
 
 /* In your CSS file */
 .event-container {
@@ -208,17 +283,17 @@
   }
 }
 
-@keyframes fillText {
+/* @keyframes fillText {
   0% {
-    clip-path: inset(0 100% 0 0); /* hidden */
+    clip-path: inset(0 100% 0 0);
   }
   50% {
-    clip-path: inset(0 0 0 0); /* fully visible */
+    clip-path: inset(0 0 0 0);
   }
   100% {
-    clip-path: inset(0 100% 0 0); /* hide again */
+    clip-path: inset(0 100% 0 0); 
   }
-}
+} */
 
 @layer base {
   * {
