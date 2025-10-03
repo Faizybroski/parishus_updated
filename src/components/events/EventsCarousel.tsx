@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Carousel } from "react-responsive-carousel";
 import useEmblaCarousel from "embla-carousel-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ const EventsCarousel = () => {
   const [events, setEvents] = useState([]);
   const [rsvps, setRsvps] = useState([]);
   const [attendeeCounts, setAttendeeCounts] = useState({});
+  const [currentSlide, setCurrentSlide] = useState(0);
   const [loading, setLoading] = useState(true);
   const [userProfileId, setUserProfileId] = useState(null);
 
@@ -309,7 +311,7 @@ const EventsCarousel = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {/* Header & Controls */}
       <div className="flex justify-between items-center">
         <div>
@@ -318,18 +320,18 @@ const EventsCarousel = () => {
             Discover unique dining experiences
           </p>
         </div>
-        <div className="flex gap-2">
+        {/* <div className="flex gap-2">
           <Button size="icon" variant="outline" onClick={scrollPrev}>
             <ChevronLeft />
           </Button>
           <Button size="icon" variant="outline" onClick={scrollNext}>
             <ChevronRight />
           </Button>
-        </div>
+        </div> */}
       </div>
 
       <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex gap-1">
+        {/* <div className="flex gap-1">
           {events.map((event) => {
             const rsvpStatus = getRSVPStatus(event.id);
             const isCreator = isEventCreator(event);
@@ -349,7 +351,7 @@ const EventsCarousel = () => {
 
                 <div className="flex flex-wrap gap-4 px-2">
                   <Card className="relative flex flex-col w-full sm:w-[20rem] lg:w-[25rem] h-[420px] border border-secondary overflow-hidden group hover:shadow-xl transition">
-                    {/* Background */}
+                    
                     <div className="relative w-full flex items-center justify-center bg-primary flex-shrink-0 h-48">
                       <img
                         src={event.cover_photo_url}
@@ -358,9 +360,9 @@ const EventsCarousel = () => {
                       />
                     </div>
 
-                    {/* Card Content */}
+                    
                     <CardContent className="flex flex-col flex-grow p-4 text-muted-foreground">
-                      {/* Title */}
+                      
                       <div className="mb-4">
                         <h3 className="text-2xl text-black font-bold truncate">
                           {event.name}
@@ -391,23 +393,15 @@ const EventsCarousel = () => {
                           )}
                         </span>
                       </div>
-                      {/* <div className="text-center rounded-lg p-3 pb-3">
-                          <MapPin className="w-5 h-5 text-white" />
-                          <p
-                            className="text-[1.5rem] font-bold mt-1 truncate text-center max-w-[350px]"
-                            title={event.location_name}
-                          >
-                            {event.location_name}
-                          </p>
-                        </div>  */}
+                      
                       <div className="flex items-center">
                         <MapPin className="w-5 h-5 " />
-                        {/* Location */}
+                        
                         <div className="text-sm flex flex-col ml-2">
                           <span className="truncate">
                             {event.location_name || "Location not specified"}
                           </span>
-                          {/* Address */}
+                          
                           {event.location_address && (
                             <span className="text-sm text-gray-500 line-clamp-1 truncate">
                               {event.location_address}
@@ -416,7 +410,7 @@ const EventsCarousel = () => {
                         </div>
                       </div>
 
-                      {/* Push buttons to bottom */}
+                      
                       <div className="flex gap-2 mt-auto">
                         {!event.is_paid && (
                           <Button
@@ -444,6 +438,136 @@ const EventsCarousel = () => {
               </div>
             );
           })}
+        </div> */}
+        <div className="sm:pt-[40px] touch-pan-y">
+          <Carousel
+            showThumbs={false}
+            autoPlay
+            infiniteLoop
+            showStatus={false}
+            interval={4000}
+            showArrows={false}
+            onChange={(index) => setCurrentSlide(index)}
+            swipeable={true}
+            preventMovementUntilSwipeScrollTolerance={true}
+            swipeScrollTolerance={50}
+            emulateTouch={true}
+            className="rounded-xl overflow-hidden"
+          >
+            {events.map((event, index) => {
+              const rsvpStatus = getRSVPStatus(event.id);
+              const isCreator = isEventCreator(event);
+              const attendeeCount = attendeeCounts[event.id] || 0;
+              return (
+                <div
+                  key={event.id}
+                  className="relative rounded-xl overflow-hidden"
+                  style={{ touchAction: "pan-y" }}
+                >
+                  {/* Matte background for each slide */}
+                  <div
+                    className="absolute inset-0 z-0"
+                    style={{
+                      backgroundImage: `url(${event.cover_photo_url})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      filter: "blur(12px)",
+                    }}
+                  ></div>
+
+                  <div
+                    className="absolute inset-0 rounded-xl z-0 
+  bg-gradient-to-b from-neutral-100/80 via-neutral-200/50 to-transparent 
+  backdrop-blur-sm"
+                  ></div>
+
+                  {/* Slide content */}
+                  <div className="relative z-10 flex flex-col lg:flex-row items-stretch justify-start px-4 sm:px-8 lg:px-72 py-6 sm:py-10">
+                    <div className="lg:w-[50%] w-full h-[400px] mr-4">
+                      <img
+                        src={event.cover_photo_url}
+                        alt={`Event ${index + 1}`}
+                        className="w-full h-full object-cover rounded-md shadow-lg"
+                      />
+                    </div>
+                    <div className="lg:w-[65%] w-full lg:pl-6 flex flex-col justify-center text-left h-full py-6 text-muted-foreground">
+                      <h2 className="text-4xl font-bold mb-3 text-black truncate ">
+                        {event.name}
+                      </h2>
+                      {event.description && (
+                        <p className="text-lg mb-3 line-clamp-4">
+                          {event.description}
+                        </p>
+                      )}
+                      {/* <p className="text-xl mb-2">{event.location_name}</p> */}
+                      <div className="text-xl flex flex-col mb-2">
+                        <span className="truncate">
+                          {event.location_name || "Location not specified"}
+                        </span>
+
+                        {event.location_address && (
+                          <span className="text-xl line-clamp-1 truncate">
+                            {event.location_address}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-lg ">
+                        {new Date(event.date_time).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                        {" - "}
+                        {new Date(event.date_time).toLocaleTimeString("en-US", {
+                          hour: "numeric",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                      {/* {!event.is_paid && (
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => navigate(`/event/${event.id}/details`)}
+                          className=""
+                        >
+                          <Share2 className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                      )}
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => navigate(`/rsvp/${event.id}/details`)}
+                        className="mt-6 bg-white text-black px-8 py-3 rounded-full font-semibold hover:bg-gray-300 transition-all duration-200 w-fit"
+                      >
+                        {rsvpStatus === "yes" ? "Un-RSVP" : "RSVP"}
+                        <ChevronRight className="w-5 h-5" />
+                      </Button> */}
+                      <div className="flex gap-2 mt-6">
+                        {!event.is_paid && (
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() =>
+                              navigate(`/event/${event.id}/details`)
+                            }
+                            className=""
+                          >
+                            <Share2 className="h-4 w-4 text-muted-foreground" />
+                          </Button>
+                        )}
+                        <Button
+                          onClick={() => navigate(`/rsvp/${event.id}/details`)}
+                          className="flex-grow px-4 py-3 text-lg font-medium text-black flex items-center gap-2 justify-center rounded-lg"
+                        >
+                          {rsvpStatus === "yes" ? "Un-RSVP" : "RSVP"}
+                          <ChevronRight className="w-5 h-5" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </Carousel>
         </div>
       </div>
     </div>
