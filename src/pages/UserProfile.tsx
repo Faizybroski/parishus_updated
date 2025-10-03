@@ -161,16 +161,16 @@ const UserProfile = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label>Dining Style</Label>
-                <p className="text-foreground text-primary p-2 mt-1">
+                <Label>Dining Style:</Label>
+                <span className="p-2 mt-1 text-primary ">
                   {user_profile.dining_style
                     ? user_profile.dining_style.replace("_", " ")
                     : "Not set"}
-                </p>
+                </span>
               </div>
 
               <div>
-                <Label>Dietary Preferences</Label>
+                <Label>Dietary Preferences: </Label>
                 <div className="flex flex-wrap gap-2 mt-1">
                   {user_profile.dietary_preferences &&
                   user_profile.dietary_preferences.length > 0 ? (
@@ -180,18 +180,18 @@ const UserProfile = () => {
                       </Badge>
                     ))
                   ) : (
-                    <p className="text-muted-foreground">None set</p>
+                    <span className="text-primary">None set</span>
                   )}
                 </div>
               </div>
 
               <div>
-                <Label>Gender Identity</Label>
-                <p className="text-foreground text-primary p-2 mt-1">
+                <Label>Gender Identity:</Label>
+                <span className="text-primary p-2 mt-1">
                   {user_profile.gender_identity
                     ? user_profile.gender_identity.replace("_", " ")
                     : "Not set"}
-                </p>
+                </span>
               </div>
             </CardContent>
           </Card>

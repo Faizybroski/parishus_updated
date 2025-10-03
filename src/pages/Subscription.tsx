@@ -245,7 +245,7 @@ export default function Subscription() {
         </div>
 
         <div className="mt-8 text-center">
-          <Button variant="ghost" onClick={checkSubscriptionStatus}>
+          <Button onClick={checkSubscriptionStatus}>
             Refresh Subscription Status
           </Button>
         </div>

@@ -1,4 +1,4 @@
-import { Button } from "@/components/OnboardingCarousel/ui/button";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/OnboardingCarousel/ui/card";
 import { Checkbox } from "@/components/OnboardingCarousel/ui/checkbox";
 import { Input } from "@/components/OnboardingCarousel/ui/input";
@@ -389,8 +389,10 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
             )}
             {isLogin && (
               <div className="text-right">
-                <button
+                <Button
+                  variant="link"
                   type="button"
+                  className="text-sm underline bg-background p-0 m-0 hover:text-primary"
                   onClick={async () => {
                     if (!email) {
                       toast({
@@ -415,15 +417,14 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
                       });
                     }
                   }}
-                  className="text-primary text-sm underline"
                 >
                   Forgot Password?
-                </button>
+                </Button>
               </div>
             )}
             <Button
               type="submit"
-              className="w-full py-3 bg-secondary hover:bg-secondary/70 font-semibold"
+              className="w-full py-3 font-semibold"
               disabled={
                 (!isLogin && (!agreeToTerms || (!linkedin && !instagram))) ||
                 loading

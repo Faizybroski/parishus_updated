@@ -154,7 +154,7 @@ const NotificationCenter = () => {
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
             <Badge 
-              className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 bg-peach-gold text-background text-xs flex items-center justify-center"
+              className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-background text-xs flex items-center justify-center"
             >
               {unreadCount > 9 ? '9+' : unreadCount}
             </Badge>
@@ -207,7 +207,7 @@ const NotificationCenter = () => {
               <Card
                 key={notification.id}
                 className={`shadow-card border-border cursor-pointer transition-colors ${
-                  !notification.is_read ? 'bg-peach-gold/5 border-peach-gold/20' : ''
+                  !notification.is_read ? '' : ''
                 }`}
                 onClick={() => !notification.is_read && markAsRead(notification.id)}
               >
@@ -222,7 +222,7 @@ const NotificationCenter = () => {
                           {notification.title}
                         </h4>
                         {!notification.is_read && (
-                          <div className="h-2 w-2 bg-peach-gold rounded-full flex-shrink-0 ml-2" />
+                          <div className="h-2 w-2 rounded-full flex-shrink-0 ml-2" />
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground mt-1">

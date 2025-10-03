@@ -169,7 +169,7 @@ const VisitEditModal: React.FC<VisitEditModalProps> = ({ visit, onVisitUpdated }
               <Button 
                 type="submit" 
                 disabled={loading || !selectedRestaurant}
-                className="flex-1 bg-peach-gold hover:bg-peach-gold/90 text-background"
+                className="flex-1 text-background"
               >
                 {loading ? 'Updating...' : 'Update Visit'}
               </Button>

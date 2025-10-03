@@ -173,15 +173,15 @@ export const ParishUsLanding: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 py-20 lg:py-32 relative">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="animate-fade-in">
-              <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-primary/10 text-primary border border-primary/20 mb-6 animate-slide-in">
-                <Sparkles className="w-4 h-4 mr-2" />
+              <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-primary text-muted-foreground border border-primary/20 mb-6 animate-slide-in">
+                <Sparkles className="w-4 h-4 mr-2 text-muted-foreground" />
                 Every week in your city
               </div>
 
               <h1 className="text-5xl md:text-7xl font-extrabold leading-tight text-foreground mb-6 ">
-                Strangers become <span className="text-primary">friends</span>{" "}
+                Strangers become <span className="text-[#d2bdad]">friends</span>{" "}
                 over
-                <span className="text-primary"> dinner</span> or coffee — one
+                <span className="text-[#d2bdad]"> dinner</span> or coffee — one
                 great conversation at a time.
               </h1>
 
@@ -233,7 +233,7 @@ export const ParishUsLanding: React.FC = () => {
               </div>
 
               <div className="flex flex-wrap gap-3">
-                <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-primary text-background border border-primary/20">
+                <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-primary text-muted-foreground border border-primary/20">
                   Weekly dinners • coffees • teas
                 </div>
               </div>
@@ -423,7 +423,7 @@ export const ParishUsLanding: React.FC = () => {
                     <div className="flex gap-2 w-full mt-auto">
                       <Button
                         onClick={() => navigate(`/auth`)}
-                        className="flex-grow px-4 py-4 text-lg font-medium bg-secondary text-black hover:bg-secondary/90 flex items-center gap-2 justify-center"
+                        className="flex-grow px-4 py-4 text-lg font-medium text-black flex items-center gap-2 justify-center"
                       >
                         RSVP
                         <ChevronRight className="w-5 h-5" />

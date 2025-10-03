@@ -100,7 +100,7 @@ const Navigation = () => {
                       variant="ghost"
                       className={`flex items-center space-x-1 ${
                         isActive
-                          ? "  bg-peach-gold/10"
+                          ? ""
                           : "text-muted-foreground hover:text-foreground"
                       }`}
                       onClick={() => navigate(item.path)}
@@ -177,7 +177,7 @@ const Navigation = () => {
               const isActive = location.pathname === item.path;
 
               return (
-                <button
+                <Button
                   key={item.path}
                   onClick={() => {
                     navigate(item.path);
@@ -185,13 +185,13 @@ const Navigation = () => {
                   }}
                   className={`w-full flex items-center px-4 py-2 text-left ${
                     isActive
-                      ? "bg-peach-gold/10  "
+                      ? ""
                       : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   <Icon className="mr-2 h-5 w-5" />
                   {item.label}
-                </button>
+                </Button>
               );
             })}
           </div>

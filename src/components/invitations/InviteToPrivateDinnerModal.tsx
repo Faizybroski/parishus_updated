@@ -238,7 +238,7 @@ const InviteToPrivateDinnerModal: React.FC<InviteToPrivateDinnerModalProps> = ({
             <RadioGroup value={selectedLocationId} onValueChange={handleLocationSelect}>
               {/* Display all crossed-path restaurants as radio cards */}
               {crossedPath?.location_details?.map((locationDetail, index) => (
-                <Card key={index} className={`cursor-pointer transition-colors ${selectedLocationId === index.toString() ? 'ring-2 ring-peach-gold' : ''}`}>
+                <Card key={index} className={`cursor-pointer transition-colors ${selectedLocationId === index.toString() ? 'ring-2' : ''}`}>
                   <CardContent className="p-4">
                     <div className="flex items-center space-x-3">
                       <RadioGroupItem value={index.toString()} id={`location-${index}`} />
@@ -264,7 +264,7 @@ const InviteToPrivateDinnerModal: React.FC<InviteToPrivateDinnerModalProps> = ({
               )) || 
               /* Fallback to basic locations if location_details not available */
               crossedPath?.locations.map((location, index) => (
-                <Card key={index} className={`cursor-pointer transition-colors ${selectedLocationId === index.toString() ? 'ring-2 ring-peach-gold' : ''}`}>
+                <Card key={index} className={`cursor-pointer transition-colors ${selectedLocationId === index.toString() ? 'ring-2' : ''}`}>
                   <CardContent className="p-4">
                     <div className="flex items-center space-x-3">
                       <RadioGroupItem value={index.toString()} id={`location-${index}`} />
@@ -287,7 +287,7 @@ const InviteToPrivateDinnerModal: React.FC<InviteToPrivateDinnerModalProps> = ({
               ))}
 
               {/* Select a New Spot option */}
-              <Card className={`cursor-pointer transition-colors ${selectedLocationId === 'new' ? 'ring-2 ring-peach-gold' : ''}`}>
+              <Card className={`cursor-pointer transition-colors ${selectedLocationId === 'new' ? 'ring-2' : ''}`}>
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <RadioGroupItem value="new" id="new-spot" />
@@ -393,7 +393,7 @@ const InviteToPrivateDinnerModal: React.FC<InviteToPrivateDinnerModalProps> = ({
             <Button 
               onClick={handleSendInvite}
               disabled={loading || !selectedLocationId || (selectedLocationId === 'new' && !selectedRestaurant)}
-              className="bg-peach-gold hover:bg-peach-gold/90 text-background"
+              className=""
             >
               {loading ? 'Sending...' : '✉️ Send Invite'}
             </Button>

@@ -573,8 +573,9 @@ const Events = () => {
               : "No events available at the moment"}
           </p>
           <Button
+            variant="outline"
             onClick={() => navigate("/create-event")}
-            className="bg-secondary hover:bg-secondary/90"
+            className=""
           >
             <Plus className="h-4 w-4 mr-2" />
             {showActions ? "Create Your First Event" : "Create Event"}
@@ -793,8 +794,9 @@ const Events = () => {
               </p>
             </div>
             <Button
+              variant="outline"
               onClick={() => navigate("/create-event")}
-              className="bg-secondary hover:bg-secondary/90 mt-4 sm:mt-0"
+              className=""
             >
               <Plus className="h-4 w-4 mr-2" />
               Create Event

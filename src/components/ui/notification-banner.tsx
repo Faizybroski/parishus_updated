@@ -18,7 +18,7 @@ const NotificationBanner: React.FC<NotificationBannerProps> = ({
   if (crossedPathsCount === 0) return null;
 
   return (
-    <Card className="mb-6 bg-gradient-to-r from-peach-gold/10 to-peach-gold/5 border-peach-gold/20">
+    <Card className="mb-6 border-border bg-background">
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -38,7 +38,7 @@ const NotificationBanner: React.FC<NotificationBannerProps> = ({
             <Button
               onClick={() => navigate('/crossed-paths')}
               size="sm"
-              className="bg-peach-gold hover:bg-peach-gold/90 text-background"
+              className="text-background"
             >
               View Paths
               <ArrowRight className="h-4 w-4 ml-1" />

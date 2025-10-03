@@ -3,22 +3,22 @@ import { PauseCircle, AlertTriangle, Lock } from "lucide-react"; // Icons for su
 
 const SuspendedAccount = () => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 relative overflow-hidden">
       {/* Floating alert icon for attention */}
-      <div className="absolute top-12 left-12 animate-bounce">
+      <div className="absolute top-10 left-10 animate-bounce">
         <AlertTriangle size={50} className="text-yellow-400 opacity-40" />
       </div>
 
       {/* Floating lock for account restriction */}
       <div className="absolute bottom-12 right-12 animate-spin-slow">
-        <Lock size={60} className="text-yellow-500 opacity-30" />
+        <Lock size={60} className="text-yellow-500 opacity-50" />
       </div>
 
       <div className="text-center max-w-xl z-10">
         <h1 className="text-[4rem] font-extrabold mb-2 text-yellow-500 leading-none animate-pulse font-script">
           Account Suspended
         </h1>
-        <p className="text-2xl font-medium mb-4  animate-fadeIn">
+        <p className="text-2xl font-medium mb-4 text-mute-foreground animate-fadeIn">
           Your account has been temporarily disabled due to policy violations or suspicious activity.
         </p>
         {/* <p className="text-lg text-[#d4d4d4] mb-8">
@@ -34,8 +34,8 @@ const SuspendedAccount = () => {
 
       {/* Decorative animated dots */}
       <div className="absolute top-1/4 left-1/3 w-2 h-2 bg-yellow-500 rounded-full animate-ping"></div>
-      <div className="absolute top-1/3 right-1/4 w-3 h-3 bg-[#9DC0B3] rounded-full animate-ping"></div>
-      <div className="absolute bottom-1/4 left-1/4 w-1.5 h-1.5 bg-[#FEFEFE] rounded-full animate-ping"></div>
+      <div className="absolute top-1/3 right-1/4 w-3 h-3 bg-yellow-500 rounded-full animate-ping"></div>
+      <div className="absolute bottom-1/4 left-1/4 w-1.5 h-1.5 bg-yellow-500 rounded-full animate-ping"></div>
     </div>
   );
 };

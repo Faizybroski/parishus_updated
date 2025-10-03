@@ -18,6 +18,9 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-primary hover:text-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        onboarding: "bg-gradient-primary text-primary-foreground hover:shadow-glow hover:scale-105 font-semibold font-serif ",
+        onboardingSecondary: "border border-border bg-card text-card-foreground hover:bg-secondary/50 hover:border-primary/30 font-serif ",
+        google: "bg-card text-card-foreground border border-border hover:bg-secondary/50 hover:border-primary/30 font-serif ",
       },
       size: {
         default: "h-10 px-4 py-2",

@@ -415,14 +415,16 @@ const EventsCarousel = () => {
                       <div className="flex gap-2 mt-auto">
                         {!event.is_paid && (
                           <Button 
+                          variant="outline"
+                          size="icon"
                           onClick={() => navigate(`/event/${event.id}/details`)}
-                          className="w-12 px-4 py-3 border border-secondary font-medium bg-transparent text-white hover:bg-secondary/20">
+                          className="">
                             <Share2 className="h-4 w-4 text-muted-foreground" />
                           </Button>
                         )}
                         <Button 
                         onClick={() => navigate(`/rsvp/${event.id}/details`)}
-                        className="flex-grow px-4 py-3 text-lg font-medium bg-secondary text-black hover:bg-secondary/90 flex items-center gap-2 justify-center rounded-lg">
+                        className="flex-grow px-4 py-3 text-lg font-medium text-black flex items-center gap-2 justify-center rounded-lg">
                           {rsvpStatus === "yes" ? "Un-RSVP" : "RSVP"}
                           <ChevronRight className="w-5 h-5" />
                         </Button>

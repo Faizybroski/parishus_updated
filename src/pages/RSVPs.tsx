@@ -259,8 +259,9 @@ const RSVPs = () => {
                   something interesting!
                 </p>
                 <Button
+                  variant="outline"
                   onClick={() => navigate("/events")}
-                  className="bg-secondary hover:bg-secondary/90"
+                  className=""
                 >
                   Browse Events
                 </Button>

@@ -185,13 +185,13 @@ const InvitationNotifications: React.FC<InvitationNotificationsProps> = ({ onInv
       </h3>
       
       {invitations.map((invitation) => (
-        <Card key={invitation.id} className="shadow-card border-border bg-peach-gold/5 border-peach-gold/20">
+        <Card key={invitation.id} className="shadow-card border-border border">
           <CardContent className="p-4">
             <div className="space-y-4">
               {/* Invitation Header */}
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-3">
-                  <div className="p-2 bg-peach-gold/10 rounded-lg">
+                  <div className="p-2 rounded-lg">
                     <Utensils className="h-5 w-5  " />
                   </div>
                   <div className="flex-1">
@@ -203,7 +203,7 @@ const InvitationNotifications: React.FC<InvitationNotificationsProps> = ({ onInv
                     </p>
                   </div>
                 </div>
-                <Badge className="bg-peach-gold text-background">
+                <Badge className="text-background">
                   New
                 </Badge>
               </div>

@@ -62,7 +62,7 @@ const RestaurantVisitTracker: React.FC<RestaurantVisitTrackerProps> = ({ onVisit
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-peach-gold hover:bg-peach-gold/90 text-background">
+        <Button className="text-background">
           <Plus className="h-4 w-4 mr-2" />
           Track Visit
         </Button>
@@ -130,7 +130,7 @@ const RestaurantVisitTracker: React.FC<RestaurantVisitTrackerProps> = ({ onVisit
             <Button 
               type="submit" 
               disabled={isTracking || !selectedRestaurant || restaurantsLoading}
-              className="flex-1 bg-peach-gold hover:bg-peach-gold/90 text-background"
+              className="flex-1 text-background"
             >
               {isTracking ? 'Tracking...' : 'Track Visit'}
             </Button>

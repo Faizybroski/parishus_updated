@@ -11,8 +11,8 @@ const PendingApproval = () => {
       </div>
 
       {/* Floating clock for waiting */}
-      <div className="absolute bottom-10 right-10 animate-spin-slow">
-        <Clock size={60} className="text-secondary opacity-30" />
+      <div className="absolute bottom-10 right-10 animate-bounce">
+        <Clock size={60} className="text-secondary opacity-50" />
       </div>
 
       <div className="text-center max-w-xl z-10">
@@ -31,7 +31,7 @@ const PendingApproval = () => {
       {/* Decorative animated dots */}
       <div className="absolute top-1/4 left-1/3 w-2 h-2 bg-primary rounded-full animate-ping"></div>
       <div className="absolute top-1/3 right-1/4 w-3 h-3 bg-secondary rounded-full animate-ping"></div>
-      <div className="absolute bottom-1/4 left-1/4 w-1.5 h-1.5 bg-mute rounded-full animate-ping"></div>
+      <div className="absolute bottom-1/4 left-1/4 w-1.5 h-1.5 bg-primary rounded-full animate-ping"></div>
     </div>
   );
 };

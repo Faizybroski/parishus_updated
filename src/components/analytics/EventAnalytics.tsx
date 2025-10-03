@@ -12,7 +12,7 @@ import {
   LabelList,
 } from "recharts";
 import { useNavigate } from "react-router-dom";
-
+import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/useProfile";
 
 interface AnalyticsData {
@@ -87,12 +87,12 @@ export default function EventAnalyticsDashboard({
           <p className="text-muted-foreground text-base leading-relaxed max-w-md mx-auto mb-6">
             Analytics are only available for Premium users.
           </p>
-          <button
+          <Button
             onClick={() => navigate("/subscription")}
-            className="bg-peach-gold text-surface px-6 py-2 rounded-md font-semibold hover:bg-peach-gold/90 transition"
+            className="text-surface px-6 py-2 rounded-md font-semibold transition"
           >
             Go to Subscription
-          </button>
+          </Button>
         </CardContent>
       </Card>
     );

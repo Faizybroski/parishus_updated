@@ -161,18 +161,15 @@ export const LocationStep: React.FC<LocationStepProps> = ({ data, updateData }) 
       </div>
 
       <div className="space-y-4">
-        <Card className="border-border">
-          <CardContent className="p-4">
             <Button
+              variant="outline"
               onClick={getCurrentLocation}
               disabled={locating}
-              className="w-full bg-peach-gold hover:bg-peach-gold/90"
+              className="w-full p-10 border border-border bg-background hover:bg-primary hover:text-foreground"
             >
               <Navigation className={`h-4 w-4 mr-2 ${locating ? "animate-spin" : ""}`} />
               {locating ? "Getting your location..." : "Use Current Location"}
             </Button>
-          </CardContent>
-        </Card>
 
         <div className="flex items-center space-x-4">
           <div className="flex-1 h-px bg-border"></div>
