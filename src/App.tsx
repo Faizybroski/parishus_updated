@@ -62,6 +62,7 @@ import {AdminLogin} from "./components/adminLogin/AdminLogin";
 import ResetPassword from "./pages/ResetPassword";
 import AuthPage from "@/components/auth/AuthPage";
 import { SocialLinks } from "@/components/SocialMedia/SocialMedia"
+import AuthLogin from "@/components/authLogin/AuthLogin";
 import { ContactPage } from "@/pages/Contact";
 import RefundPolicyPage from "@/pages/RefundPolicy";
 import SafetyGuidelines from "@/pages/SafetyGIuidelines"
@@ -85,6 +86,10 @@ const App = () => (
                 path="/auth"
                 element={<div>Auth page rendered by ProtectedRoute</div>}
               /> */}
+              <Route
+                path="/login"
+                element={<AuthLogin />}
+              />
               <Route
                 path="/auth"
                 element={<AuthPage />}

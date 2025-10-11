@@ -159,7 +159,7 @@ const Restaurants = () => {
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
-                        <CardTitle className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
+                        <CardTitle className="text-xl font-semibold text-foreground transition-colors">
                           {restaurant.name}
                         </CardTitle>
                         <CardDescription className="flex items-center mt-2">

@@ -77,7 +77,7 @@ const Navigation = () => {
               alt="Logo"
             />
             <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-black whitespace-nowrap font-script"
-             style={{ fontSize: "30px", }}>
+              style={{ fontSize: "30px", }}>
               Parish
             </h1>
           </div>
@@ -90,7 +90,7 @@ const Navigation = () => {
           ) : (
             <>
               {/* Desktop Menu */}
-              <div className="hidden md:flex items-center space-x-6">
+              <div className="hidden nav:flex items-center space-x-6">
                 {navItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = location.pathname === item.path;
@@ -98,11 +98,10 @@ const Navigation = () => {
                     <Button
                       key={item.path}
                       variant="ghost"
-                      className={`flex items-center space-x-1 ${
-                        isActive
+                      className={`flex items-center space-x-1 ${isActive
                           ? ""
                           : "text-muted-foreground hover:text-foreground"
-                      }`}
+                        }`}
                       onClick={() => navigate(item.path)}
                     >
                       <Icon className="h-5 w-5" />
@@ -136,11 +135,11 @@ const Navigation = () => {
                       Profile
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate("/subscription")}>
-                      <Receipt  className="mr-2 h-4 w-4" />
+                      <Receipt className="mr-2 h-4 w-4" />
                       Subscription
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate("/user/dashboard")}>
-                      <LayoutDashboard  className="mr-2 h-4 w-4" />
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
                       Dashboard
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleSignOut}>
@@ -151,7 +150,7 @@ const Navigation = () => {
                 </DropdownMenu>
 
                 {/* Hamburger Icon */}
-                <div className="md:hidden">
+                <div className="nav:hidden">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -171,7 +170,7 @@ const Navigation = () => {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden mt-2 space-y-1">
+          <div className="nav:hidden mt-2 space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
@@ -183,11 +182,10 @@ const Navigation = () => {
                     navigate(item.path);
                     setIsOpen(false);
                   }}
-                  className={`w-full flex justify-start items-center px-4 py-2 text-left ${
-                    isActive
+                  className={`w-full flex justify-start items-center px-4 py-2 text-left ${isActive
                       ? ""
                       : "text-muted-foreground hover:text-foreground"
-                  }`}
+                    }`}
                 >
                   <Icon className="mr-2 h-5 w-5" />
                   {item.label}

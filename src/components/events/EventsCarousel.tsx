@@ -439,136 +439,125 @@ const EventsCarousel = () => {
             );
           })}
         </div> */}
-        <div className="sm:pt-[40px] touch-pan-y">
-          <Carousel
-            showThumbs={false}
-            autoPlay
-            infiniteLoop
-            showStatus={false}
-            interval={4000}
-            showArrows={false}
-            onChange={(index) => setCurrentSlide(index)}
-            swipeable={true}
-            preventMovementUntilSwipeScrollTolerance={true}
-            swipeScrollTolerance={50}
-            emulateTouch={true}
-            className="rounded-xl overflow-hidden"
-          >
-            {events.map((event, index) => {
-              const rsvpStatus = getRSVPStatus(event.id);
-              const isCreator = isEventCreator(event);
-              const attendeeCount = attendeeCounts[event.id] || 0;
-              return (
-                <div
-                  key={event.id}
-                  className="relative rounded-xl overflow-hidden"
-                  style={{ touchAction: "pan-y" }}
+        <div className="pt-6 sm:pt-10 touch-pan-y">
+  <Carousel
+    showThumbs={false}
+    autoPlay
+    infiniteLoop
+    showStatus={false}
+    interval={4000}
+    showArrows={false}
+    onChange={(index) => setCurrentSlide(index)}
+    swipeable
+    emulateTouch
+    className="rounded-xl overflow-hidden"
+  >
+    {events.map((event) => {
+      const rsvpStatus = getRSVPStatus(event.id);
+      const attendeeCount = attendeeCounts[event.id] || 0;
+
+      return (
+        <div
+          key={event.id}
+          className="relative rounded-xl overflow-hidden min-h-[75vh] sm:min-h-[70vh] lg:min-h-[80vh] flex items-center justify-center"
+          style={{ touchAction: "pan-y" }}
+        >
+          {/* Background with blur */}
+          <div
+            className="absolute inset-0 z-0"
+            style={{
+              backgroundImage: `url(${event.cover_photo_url})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              filter: "brightness(0.35) blur(8px)",
+            }}
+          ></div>
+
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 rounded-xl z-0 bg-gradient-to-b from-neutral-100/20 via-neutral-200/5 to-transparent backdrop-blur-sm" ></div>
+
+          {/* Content */}
+          <div className="relative font-sans z-10 flex flex-col lg:flex-row items-center justify-center w-full px-4 sm:px-8 lg:px-16 py-10 gap-6 sm:gap-10 text-white">
+            {/* Event Image */}
+            <div className="w-full sm:w-[80%] md:w-[55%] lg:w-[25%] flex justify-center">
+              <img
+                src={event.cover_photo_url}
+                alt={event.name}
+                className="w-full max-w-[400px] h-auto rounded-2xl shadow-2xl object-cover"
+                loading="lazy"
+              />
+            </div>
+
+            {/* Text Content */}
+            <div className="w-full lg:w-[50%] text-center lg:text-left flex flex-col items-center lg:items-start">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 leading-snug text-white line-clamp-2">
+                {event.name}
+              </h2>
+
+              {event.description && (
+                <p className="text-sm sm:text-base md:text-lg text-gray-200 mb-4 line-clamp-4">
+                  {event.description}
+                </p>
+              )}
+
+              {/* Location */}
+              <div className="text-gray-100 mb-2 text-sm sm:text-base">
+                <p className="font-medium truncate">
+                  {event.location_name || "Location not specified"}
+                </p>
+                {event.location_address && (
+                  <p className="text-gray-300 truncate">
+                    {event.location_address}
+                  </p>
+                )}
+              </div>
+
+              {/* Date & Time */}
+              <p className="text-gray-200 text-sm sm:text-base">
+                {new Date(event.date_time).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                })}{" "}
+                -{" "}
+                {new Date(event.date_time).toLocaleTimeString("en-US", {
+                  hour: "numeric",
+                  minute: "2-digit",
+                })}
+              </p>
+
+              {/* Attendees */}
+              <div className="flex items-center justify-center lg:justify-start gap-2 text-gray-300 text-sm mt-2">
+                <Users className="w-4 h-4" />
+                <span>{attendeeCount} attending</span>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex flex-col sm:flex-row items-center lg:justify-start justify-center gap-3 mt-6 w-full">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => navigate(`/event/${event.id}/details`)}
+                  className="bg-white/10 hover:bg-white/20 text-white border-white/30 rounded-full transition"
                 >
-                  {/* Matte background for each slide */}
-                  <div
-                    className="absolute inset-0 z-0"
-                    style={{
-                      backgroundImage: `url(${event.cover_photo_url})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                      filter: "blur(12px)",
-                    }}
-                  ></div>
-
-                  <div
-                    className="absolute inset-0 rounded-xl z-0 
-  bg-gradient-to-b from-neutral-100/80 via-neutral-200/50 to-transparent 
-  backdrop-blur-sm"
-                  ></div>
-
-                  {/* Slide content */}
-                  <div className="relative z-10 flex flex-col lg:flex-row items-stretch justify-start px-4 sm:px-8 lg:px-72 py-6 sm:py-10">
-                    <div className="lg:w-[50%] w-full h-[400px] mr-4">
-                      <img
-                        src={event.cover_photo_url}
-                        alt={`Event ${index + 1}`}
-                        className="w-full h-full object-cover rounded-md shadow-lg"
-                      />
-                    </div>
-                    <div className="lg:w-[65%] w-full lg:pl-6 flex flex-col justify-center text-left h-full py-6 text-muted-foreground">
-                      <h2 className="text-4xl font-bold mb-3 text-black truncate ">
-                        {event.name}
-                      </h2>
-                      {event.description && (
-                        <p className="text-lg mb-3 line-clamp-4">
-                          {event.description}
-                        </p>
-                      )}
-                      {/* <p className="text-xl mb-2">{event.location_name}</p> */}
-                      <div className="text-xl flex flex-col mb-2">
-                        <span className="truncate">
-                          {event.location_name || "Location not specified"}
-                        </span>
-
-                        {event.location_address && (
-                          <span className="text-xl line-clamp-1 truncate">
-                            {event.location_address}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-lg ">
-                        {new Date(event.date_time).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                        })}
-                        {" - "}
-                        {new Date(event.date_time).toLocaleTimeString("en-US", {
-                          hour: "numeric",
-                          minute: "2-digit",
-                        })}
-                      </p>
-                      {/* {!event.is_paid && (
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => navigate(`/event/${event.id}/details`)}
-                          className=""
-                        >
-                          <Share2 className="h-4 w-4 text-muted-foreground" />
-                        </Button>
-                      )}
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => navigate(`/rsvp/${event.id}/details`)}
-                        className="mt-6 bg-white text-black px-8 py-3 rounded-full font-semibold hover:bg-gray-300 transition-all duration-200 w-fit"
-                      >
-                        {rsvpStatus === "yes" ? "Un-RSVP" : "RSVP"}
-                        <ChevronRight className="w-5 h-5" />
-                      </Button> */}
-                      <div className="flex gap-2 mt-6">
-                        {!event.is_paid && (
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() =>
-                              navigate(`/event/${event.id}/details`)
-                            }
-                            className=""
-                          >
-                            <Share2 className="h-4 w-4 text-muted-foreground" />
-                          </Button>
-                        )}
-                        <Button
-                          onClick={() => navigate(`/rsvp/${event.id}/details`)}
-                          className="flex-grow px-4 py-3 text-lg font-medium text-black flex items-center gap-2 justify-center rounded-lg"
-                        >
-                          {rsvpStatus === "yes" ? "Un-RSVP" : "RSVP"}
-                          <ChevronRight className="w-5 h-5" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </Carousel>
+                  <Share2 className="h-5 w-5 text-[#d2bdad]" />
+                </Button>
+                <Button
+                  onClick={() => navigate(`/rsvp/${event.id}/details`)}
+                  className="w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-lg font-semibold bg-white text-black hover:bg-gray-200 rounded-full flex items-center justify-center gap-2 transition-all"
+                >
+                  {rsvpStatus === "yes" ? "Un-RSVP" : "RSVP"}
+                  <ChevronRight className="w-5 h-5" />
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
+      );
+    })}
+  </Carousel>
+</div>
+
+
       </div>
     </div>
   );

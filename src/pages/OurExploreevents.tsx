@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import { ChevronDown, Calendar } from "lucide-react";
+import { ChevronDown, Calendar, Turtle } from "lucide-react";
 import PriceFilter from "@/components/filter/PriceFilter";
 import ParishLogo from "@/components/ui/logo";
 import { LoaderText } from "@/components/loader/Loader";
@@ -202,9 +202,10 @@ const OurExploreEvents = () => {
                     placeholder="Enter a City"
                     className="w-full px-4 py-2 border-t border-gray-300 outline-none text-sm"
                     onKeyDown={(e) => {
-                      if (e.key === "Enter" && e.target.value) {
-                        menu.setter(e.target.value);
-                        e.target.value = "";
+                      const target = e.target as HTMLInputElement;
+                      if (e.key === "Enter" && target.value) {
+                        menu.setter(target.value);
+                        target.value = "";
                         setOpenDropdown(null);
                       }
                     }}
@@ -269,45 +270,52 @@ const OurExploreEvents = () => {
             autoPlay
             infiniteLoop
             showStatus={false}
-            interval={4000}
-            showArrows={false}
+            interval={3000}
+            showArrows={true}
             onChange={(index) => setCurrentSlide(index)}
-            swipeable={true}
-            preventMovementUntilSwipeScrollTolerance={true}
-            swipeScrollTolerance={50}
-            emulateTouch={true}
+            swipeable={false}
+            emulateTouch
           >
             {sliderData.map((item, index) => (
               <div
                 key={index}
-                className="relative"
+                className="relative flex flex-col font-sans lg:flex-row items-center justify-center px-4 sm:px-8 lg:px-12 py-6 sm:py-10 gap-6 lg:gap-10 min-h-[60vh] sm:min-h-[70vh] lg:min-h-[80vh]"
                 style={{ touchAction: "pan-y" }}
               >
-                {/* Matte background for each slide */}
+                {/* Matte background */}
                 <div
                   className="absolute inset-0 z-0"
                   style={{
                     backgroundImage: `url(${item.image})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
-                    filter: "brightness(0.5) blur(8px)",
+                    filter: "brightness(0.4) blur(10px)",
                   }}
                 ></div>
 
-                {/* Slide content */}
-                <div className="relative z-10 flex flex-col lg:flex-row items-stretch justify-start px-4 sm:px-8 lg:px-72 py-6 sm:py-10">
-                  <div className="lg:w-[50%] w-full h-[400px] mr-4">
+                {/* Content wrapper */}
+                <div className="relative z-10 flex flex-col lg:flex-row items-center justify-center w-full p-7 gap-8">
+                  {/* Image container */}
+                  <div className="w-full sm:w-[70%] md:w-[60%] lg:w-[30%] max-w-[500px]">
                     <img
                       src={item.image}
                       alt={`Event ${index + 1}`}
-                      className="w-full h-full object-cover rounded-md shadow-lg"
+                      className="w-full h-auto rounded-xl shadow-2xl object-cover"
                     />
                   </div>
-                  <div className="lg:w-[65%] w-full lg:pl-6 flex flex-col justify-center text-left h-full py-6 text-white">
-                    <h2 className="text-4xl font-bold mb-3">{item.title}</h2>
-                    <p className="text-xl mb-2">{item.location}</p>
-                    <p className="text-lg text-gray-300">{item.dateTime}</p>
-                    <button className="mt-6 bg-white text-black px-8 py-3 rounded-full font-semibold hover:bg-gray-300 transition-all duration-200 w-fit">
+
+                  {/* Text content */}
+                  <div className="text-white flex flex-col justify-center items-center lg:items-start text-center lg:text-left max-w-2xl px-2 sm:px-0">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 leading-tight">
+                      {item.title}
+                    </h2>
+                    <p className="text-base sm:text-lg md:text-xl mb-2 text-gray-200">
+                      {item.location}
+                    </p>
+                    <p className="text-sm sm:text-base md:text-lg text-gray-300 mb-6">
+                      {item.dateTime}
+                    </p>
+                    <button className="bg-white text-black px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold hover:bg-gray-200 transition-all duration-200">
                       Get Tickets
                     </button>
                   </div>
@@ -397,12 +405,11 @@ const OurExploreEvents = () => {
         </div>
       )}
 
-      <div className="flex flex-wrap my-5 justify-center gap-3">
+      <div className="flex flex-wrap justify-center gap-5 px-4 my-5">
         {repeatedEvents.map((event, index) => (
           <div
             key={index}
-            className=" rounded-lg overflow-hidden shadow-lg border border-[0.1px] hover:border-white hover:bg-white/10 hover:cursor-pointer transition-all duration-300 sm:w-[90%]"
-            style={{ width: window.innerWidth <= 768 ? "88%" : `${width}px` }}
+            className="font-sans rounded-lg overflow-hidden shadow-md border border-gray-200 hover:border-gray-700 hover:bg-white/10 hover:cursor-pointer transition-all duration-300 w-full sm:w-[90%] md:w-[45%] lg:w-[30%] max-w-[420px]"
           >
             <div className="relative">
               {/* Image */}
@@ -412,21 +419,14 @@ const OurExploreEvents = () => {
                 src={event.image}
                 alt={event.name}
               />
-              <span className="flex items-center justify-center absolute top-2 bg-white right-4 border border-white/20 text-black text-sm px-4 py-1 rounded-full shadow-md">
-                <Calendar className="w-3 h-3 mr-2" />
-                More Dates
-              </span>
 
               {/* Title container with black bg + gradient top */}
               <div className="absolute inset-x-0 bottom-0">
                 <div className="relative bg-black">
-                  <div className="absolute -top-[17.5rem] left-0 right-0 h-[17.5rem] bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10"></div>
-                  {/* Day/Time badge (anchored ABOVE this block) */}
-                  <span className="absolute -top-12 left-5 border border-white/20 text-white text-sm text-2x1 px-3 py-2 rounded shadow-md z-20">
+                  <div className="absolute -top-[17.5rem] left-0 right-0 h-[17.5rem] bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10"></div>
+                  <span className="absolute -top-12 left-5 border border-white/20 text-white text-sm px-3 py-2 rounded shadow-md z-20">
                     {event.date}
                   </span>
-
-                  {/* Gradient only for text block */}
                   <div className="absolute -top-32 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent"></div>
 
                   <div className="pl-5 pt-1 flex flex-col gap-2 relative z-10">

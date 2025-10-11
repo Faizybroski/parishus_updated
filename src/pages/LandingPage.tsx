@@ -30,12 +30,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import AuthPage from "@/components/auth/AuthPage";
+import AuthLogin from "@/components/authLogin/AuthLogin";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
 export const ParishUsLanding: React.FC = () => {
   const navigate = useNavigate();
   const [showAuth, setShowAuth] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
   const [attendeeCounts, setAttendeeCounts] = useState({});
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState([]);
@@ -114,6 +116,11 @@ export const ParishUsLanding: React.FC = () => {
   if (showAuth) {
     return <AuthPage />;
   }
+
+  if (showLogin) {
+    return <AuthLogin />;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -138,15 +145,9 @@ export const ParishUsLanding: React.FC = () => {
           </div>
 
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium ">
-            <a href="#how">
-              How it works
-            </a>
-            <a href="#events">
-              Events
-            </a>
-            <a href="#faq">
-              FAQ
-            </a>
+            <a href="#how">How it works</a>
+            <a href="#events">Events</a>
+            <a href="#faq">FAQ</a>
             <a
               onClick={() => navigate("contact-us")}
               className="cursor-pointer"
@@ -157,9 +158,15 @@ export const ParishUsLanding: React.FC = () => {
 
           <div className="flex flex-wrap items-center gap-3 justify-end">
             <Button
+              variant="outline"
+              size="default"
+              onClick={() => setShowLogin(true)}
+            >
+              Sign In
+            </Button>
+            <Button
               variant="default"
               size="default"
-              className="bg-background border border-primary"
               onClick={() => setShowAuth(true)}
             >
               Sign Up
@@ -170,7 +177,7 @@ export const ParishUsLanding: React.FC = () => {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-[linear-gradient(to_top_left,_primary_0%,_transparent_25%)]">
-        <div className="max-w-7xl mx-auto px-4 py-20 lg:py-32 relative">
+        <div className="max-w-7xl mx-auto px-4 py-20 lg:py-10 relative">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="animate-fade-in">
               <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-primary text-muted-foreground border border-primary/20 mb-6 animate-slide-in">
@@ -178,7 +185,7 @@ export const ParishUsLanding: React.FC = () => {
                 Every week in your city
               </div>
 
-              <h1 className="text-5xl md:text-7xl font-extrabold leading-tight text-foreground mb-6 ">
+              <h1 className="text-5xl md:text-6xl font-extrabold leading-tight text-foreground mb-6 ">
                 Strangers become <span className="text-[#d2bdad]">friends</span>{" "}
                 over
                 <span className="text-[#d2bdad]"> dinner</span> or coffee — one
@@ -307,9 +314,9 @@ export const ParishUsLanding: React.FC = () => {
             ))}
           </div>
 
-          <div className="max-w-2xl mx-auto mt-12">
+          <div className="max-w-5xl mx-auto mt-12">
             <div className="p-4 rounded-xl bg-muted border border-secondary/20 text-center">
-              <p className="text-sm text-muted-foreground font-medium">
+              <p className="text-xl text-muted-foreground font-medium">
                 💡 We match groups by interests and conversation style to create
                 engaging, pressure-free dinners and coffee meetups.
               </p>
@@ -339,7 +346,7 @@ export const ParishUsLanding: React.FC = () => {
             </Button>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div className="flex flex-wrap  gap-5 px-4 my-5">
             {loading ? (
               Array.from({ length: 3 }).map((_, i) => (
                 <div
@@ -361,76 +368,114 @@ export const ParishUsLanding: React.FC = () => {
               </Card>
             ) : (
               events.map((event) => (
-                <Card
+                // <Card
+                //   key={event.id}
+                //   className="relative flex flex-col  w-full sm:w-[20rem] lg:w-[25rem] h-[420px] border border-primary overflow-hidden group hover:shadow-xl transition"
+                // >
+                //   {/* Background */}
+                //   <div className="relative w-full flex items-center justify-center bg-primary flex-shrink-0 h-48">
+                //     <img
+                //       src={event.cover_photo_url}
+                //       alt={event.name}
+                //       className="max-h-full w-full object-contain"
+                //     />
+                //   </div>
+
+                //   {/* Card Content */}
+                //   <CardContent className="flex flex-col flex-grow p-4 text-muted-foreground">
+                //     {/* Top Section */}
+                //     <div className="mb-4">
+                //       <h3 className="text-2xl text-black font-bold truncate">
+                //         {event.name}
+                //       </h3>
+                //       {event.description && (
+                //         <p className=" text-sm mt-1 line-clamp-1 truncate">
+                //           {event.description}
+                //         </p>
+                //       )}
+                //     </div>
+
+                //     <div className="flex items-center mb-2">
+                //       <Calendar className="h-5 w-5 mr-3" />
+                //       <span>
+                //         {new Date(event.date_time).toLocaleDateString("en-US", {
+                //           month: "short",
+                //           day: "numeric",
+                //         })}
+                //         {" - "}
+                //         {new Date(event.date_time).toLocaleTimeString("en-US", {
+                //           hour: "numeric",
+                //           minute: "2-digit",
+                //         })}
+                //       </span>
+                //     </div>
+
+                //     <div className="flex items-center">
+                //       <MapPin className="w-5 h-5 " />
+                //       {/* Location */}
+                //       <div className="text-sm flex flex-col ml-2">
+                //         <span className="truncate">
+                //           {event.location_name || "Location not specified"}
+                //         </span>
+                //         {/* Address */}
+                //         {event.location_address && (
+                //           <span className="text-sm text-muted-foreground line-clamp-1 truncate">
+                //             {event.location_address}
+                //           </span>
+                //         )}
+                //       </div>
+                //     </div>
+
+                //     {/* Bottom Buttons */}
+                //     <div className="flex gap-2 w-full mt-auto">
+                //       <Button
+                //         onClick={() => navigate(`/auth`)}
+                //         className="flex-grow px-4 py-4 text-lg font-medium text-black flex items-center gap-2 justify-center"
+                //       >
+                //         RSVP
+                //         <ChevronRight className="w-5 h-5" />
+                //       </Button>
+                //     </div>
+                //   </CardContent>
+                // </Card>
+                <div
                   key={event.id}
-                  className="relative flex flex-col  w-full sm:w-[20rem] lg:w-[25rem] h-[420px] border border-primary overflow-hidden group hover:shadow-xl transition"
+                  className="font-sans rounded-lg overflow-hidden shadow-md border border-gray-200 hover:border-gray-700 hover:bg-white/10 hover:cursor-pointer transition-all duration-300 w-full sm:w-[90%] md:w-[45%] lg:w-[30%] max-w-[420px]"
                 >
-                  {/* Background */}
-                  <div className="relative w-full flex items-center justify-center bg-primary flex-shrink-0 h-48">
+                  <div className="relative">
+                    {/* Image */}
                     <img
-                      src={event.cover_photo_url}
+                      className="w-full object-cover h-[25rem] md:h-[30rem]"
+                      src={"https://posh.vip/cdn-cgi/image/width=1080,quality=75,fit=scale-down,format=auto/https://posh-images-originals-production.s3.amazonaws.com/68cd95ca14a830801c692394"}
                       alt={event.name}
-                      className="max-h-full w-full object-contain"
                     />
-                  </div>
 
-                  {/* Card Content */}
-                  <CardContent className="flex flex-col flex-grow p-4 text-muted-foreground">
-                    {/* Top Section */}
-                    <div className="mb-4">
-                      <h3 className="text-2xl text-black font-bold truncate">
-                        {event.name}
-                      </h3>
-                      {event.description && (
-                        <p className=" text-sm mt-1 line-clamp-1 truncate">
-                          {event.description}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="flex items-center mb-2">
-                      <Calendar className="h-5 w-5 mr-3" />
-                      <span>
-                        {new Date(event.date_time).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                        })}
-                        {" - "}
-                        {new Date(event.date_time).toLocaleTimeString("en-US", {
-                          hour: "numeric",
-                          minute: "2-digit",
-                        })}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center">
-                      <MapPin className="w-5 h-5 " />
-                      {/* Location */}
-                      <div className="text-sm flex flex-col ml-2">
-                        <span className="truncate">
-                          {event.location_name || "Location not specified"}
+                    {/* Title container with black bg + gradient top */}
+                    <div className="absolute inset-x-0 bottom-0">
+                      <div className="relative bg-black">
+                        <div className="absolute -top-[17.5rem] left-0 right-0 h-[17.5rem] bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10"></div>
+                        <span className="absolute -top-12 left-5 border border-white/20 text-white text-sm px-3 py-2 rounded shadow-md z-20">
+                          {/* {event.date_time} */}
+                          {new Date(event.date_time).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                              day: "numeric",
+                            }
+                          )}
                         </span>
-                        {/* Address */}
-                        {event.location_address && (
-                          <span className="text-sm text-muted-foreground line-clamp-1 truncate">
+                        <div className="absolute -top-32 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent"></div>
+
+                        <div className="pl-5 pt-1 flex flex-col gap-2 relative z-10">
+                          <h3 className="text-2xl text-white">{event.name}</h3>
+                          <p className="text-white pb-7 text-sm">
                             {event.location_address}
-                          </span>
-                        )}
+                          </p>
+                        </div>
                       </div>
                     </div>
-
-                    {/* Bottom Buttons */}
-                    <div className="flex gap-2 w-full mt-auto">
-                      <Button
-                        onClick={() => navigate(`/auth`)}
-                        className="flex-grow px-4 py-4 text-lg font-medium text-black flex items-center gap-2 justify-center"
-                      >
-                        RSVP
-                        <ChevronRight className="w-5 h-5" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               ))
             )}
           </div>
@@ -573,7 +618,7 @@ export const ParishUsLanding: React.FC = () => {
       </section>
 
       {/* FAQ Section */}
-      <section id="faq" className="py-20 border-t border-border bg-card/30">
+      <section id="faq" className="py-8 border-t border-border bg-card/30">
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 font-script">
@@ -626,27 +671,15 @@ export const ParishUsLanding: React.FC = () => {
 
             {/* Links */}
             <nav className="flex flex-wrap justify-center gap-6 text-sm text-primary-foreground/80">
-              <Link to="/contact-us">
-                Contact Us
-              </Link>
-              <Link to="/refund-policy">
-                Refund Policy
-              </Link>
-              <Link to="/safety-guidelines">
-                Safety Guidelines
-              </Link>
-              <Link to="/terms-conditions">
-                Terms & Conditions
-              </Link>
-              <Link to="/privacy-policy">
-                Privacy Policy
-              </Link>
+              <Link to="/contact-us">Contact Us</Link>
+              <Link to="/refund-policy">Refund Policy</Link>
+              <Link to="/safety-guidelines">Safety Guidelines</Link>
+              <Link to="/terms-conditions">Terms & Conditions</Link>
+              <Link to="/privacy-policy">Privacy Policy</Link>
             </nav>
 
             {/* Copyright */}
-            <p className="text-center">
-              © {new Date().getFullYear()} Parish
-            </p>
+            <p className="text-center">© {new Date().getFullYear()} Parish</p>
           </div>
         </div>
       </footer>

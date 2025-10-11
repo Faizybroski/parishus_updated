@@ -93,7 +93,7 @@ export const ContactPage: React.FC = () => {
           {/* Contact Card */}
           <Card className="w-full shadow-lg border border-border flex flex-col justify-center">
             <CardContent className="p-10">
-              <h2 className="text-4xl font-extrabold mb-4 text-center bg-gradient-primary bg-clip-text text-transparent">
+              <h2 className="text-4xl font-extrabold mb-4 text-center text-black bg-gradient-primary bg-clip-text">
                 Get in Touch
               </h2>
               <p className="text-foreground/70 text-center mb-10 max-w-md mx-auto">
