@@ -477,7 +477,7 @@ const EventsCarousel = () => {
           <div className="absolute inset-0 rounded-xl z-0 bg-gradient-to-b from-neutral-100/20 via-neutral-200/5 to-transparent backdrop-blur-sm" ></div>
 
           {/* Content */}
-          <div className="relative font-sans z-10 flex flex-col lg:flex-row items-center justify-center w-full px-4 sm:px-8 lg:px-16 py-10 gap-6 sm:gap-10 text-white">
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-center w-full px-4 sm:px-8 lg:px-16 py-10 gap-6 sm:gap-10 text-white">
             {/* Event Image */}
             <div className="w-full sm:w-[80%] md:w-[55%] lg:w-[25%] flex justify-center">
               <img
@@ -490,7 +490,7 @@ const EventsCarousel = () => {
 
             {/* Text Content */}
             <div className="w-full lg:w-[50%] text-center lg:text-left flex flex-col items-center lg:items-start">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 leading-snug text-white line-clamp-2">
+              <h2 className="font-script text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 leading-snug text-white line-clamp-2 pb-2">
                 {event.name}
               </h2>
 
