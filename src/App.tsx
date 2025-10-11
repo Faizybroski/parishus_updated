@@ -56,18 +56,19 @@ import RSVPDetails from "./pages/RSVPDetails";
 import WalletWithdraw from "./pages/WalletWithdraw";
 import AdminWalletRequests from "./pages/admin/AdminWalletRequests";
 import PendingApproval from "./pages/waitingApprovalPage";
-import RejectedRegistration from "./pages/RejectRegistration"
+import RejectedRegistration from "./pages/RejectRegistration";
 import SuspendedAccount from "./pages/SuspendedAccount";
-import {AdminLogin} from "./components/adminLogin/AdminLogin";
+import { AdminLogin } from "./components/adminLogin/AdminLogin";
 import ResetPassword from "./pages/ResetPassword";
 import AuthPage from "@/components/auth/AuthPage";
-import { SocialLinks } from "@/components/SocialMedia/SocialMedia"
+import { SocialLinks } from "@/components/SocialMedia/SocialMedia";
 import AuthLogin from "@/components/authLogin/AuthLogin";
+import { OAuth } from "./components/oAuth/OAuth";
 import { ContactPage } from "@/pages/Contact";
 import RefundPolicyPage from "@/pages/RefundPolicy";
-import SafetyGuidelines from "@/pages/SafetyGIuidelines"
-import TermsAndConditions from "@/pages/Terms&Conditions"
-import PrivacyPolicy from "@/pages/PrivacyPolicy.tsx"
+import SafetyGuidelines from "@/pages/SafetyGIuidelines";
+import TermsAndConditions from "@/pages/Terms&Conditions";
+import PrivacyPolicy from "@/pages/PrivacyPolicy.tsx";
 import Layout from "./components/layout/Layout";
 import UserProfile from "./pages/UserProfile";
 
@@ -86,14 +87,9 @@ const App = () => (
                 path="/auth"
                 element={<div>Auth page rendered by ProtectedRoute</div>}
               /> */}
-              <Route
-                path="/login"
-                element={<AuthLogin />}
-              />
-              <Route
-                path="/auth"
-                element={<AuthPage />}
-              />
+              <Route path="/login" element={<AuthLogin />} />
+              <Route path="/auth" element={<AuthPage />} />
+              <Route path="/o-auth" element={<OAuth />} />
               {/* <Route 
                 path="/social-media"
                 element={<SocialLinks />}
@@ -107,45 +103,36 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-               <Route
+              <Route
                 path="/explore"
                 element={
                   <ProtectedRoute>
-                     <Navigation />
+                    <Navigation />
                     <OurExploreevents />
                   </ProtectedRoute>
                 }
               />
-               <Route
+              <Route
                 path="/events-create"
                 element={
                   <ProtectedRoute>
-                     <Navigation />
+                    <Navigation />
                     <OurEventsCreate />
                   </ProtectedRoute>
                 }
               />
-              <Route element={<Layout /> } >
-                  <Route 
-                    path="contact-us"
-                    element={<ContactPage />}  
-                  />
-                  <Route 
-                    path="/refund-policy"
-                    element={<RefundPolicyPage />}  
-                  />
-                  <Route 
-                    path="/safety-guidelines"
-                    element={<SafetyGuidelines />}  
-                  />
-                  <Route 
-                    path="/terms-conditions"
-                    element={<TermsAndConditions />}  
-                  />   
-                    <Route 
-                    path="/privacy-policy"
-                    element={<PrivacyPolicy />}  
-                  />   
+              <Route element={<Layout />}>
+                <Route path="contact-us" element={<ContactPage />} />
+                <Route path="/refund-policy" element={<RefundPolicyPage />} />
+                <Route
+                  path="/safety-guidelines"
+                  element={<SafetyGuidelines />}
+                />
+                <Route
+                  path="/terms-conditions"
+                  element={<TermsAndConditions />}
+                />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               </Route>
               <Route
                 path="/dashboard"
@@ -170,7 +157,7 @@ const App = () => (
                 element={
                   <ProtectedAdminRoute>
                     <AdminLayout>
-                    <Profile />
+                      <Profile />
                     </AdminLayout>
                   </ProtectedAdminRoute>
                 }
@@ -601,13 +588,13 @@ const App = () => (
                   </ProtectedAdminRoute>
                 }
               />
-              <Route 
+              <Route
                 path="/waiting-approval"
                 element={
                   <ProtectedRoute>
-                    <PendingApproval/>
+                    <PendingApproval />
                   </ProtectedRoute>
-              }
+                }
               />
               <Route
                 path="/admin/manage-subscriptions"
@@ -619,7 +606,7 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              <Route 
+              <Route
                 path="rejected-profile"
                 element={
                   <ProtectedRoute>
@@ -627,7 +614,7 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              <Route 
+              <Route
                 path="suspended-user"
                 element={
                   <ProtectedRoute>
@@ -635,7 +622,7 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              <Route 
+              <Route
                 path="/admin/login"
                 element={
                   <ProtectedRoute>
@@ -643,10 +630,7 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              <Route 
-                path="/reset-password"
-                element={<ResetPassword/>}
-              />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/test-auth" element={<TestAuthSystem />} />
               <Route path="/debug-role" element={<RoleDebugger />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

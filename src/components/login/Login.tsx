@@ -47,15 +47,6 @@ export const Login = ({ startStep = 0 }) => {
         setLoading(false);
         return;
       }
-      // if (!linkedin.trim() && !instagram.trim()) {
-      //   toast({
-      //     title: "Social Media is Required",
-      //     description: "Please enter Instagram or LinkedIn.",
-      //     variant: "destructive",
-      //   });
-      //   return;
-      // }
-
       const { error } = await signIn(email.trim(), password.trim(), "user");
       if (error) throw error;
       toast({
@@ -125,37 +116,6 @@ export const Login = ({ startStep = 0 }) => {
             </button>
           </div>
 
-          <div>
-            <Label htmlFor="linkedin">LinkedIn Profile</Label>
-            <Input
-              id="linkedin"
-              type="text"
-              placeholder="Enter your LinkedIn username*"
-              value={linkedin}
-              onChange={(e) => setLinkedin(e.target.value)}
-              className="mt-2"
-            />
-          </div>
-
-          <div className="flex items-center justify-center">
-            <div className="flex-grow border-t border-primary"></div>
-            <span className="text-primary font-semibold px-2">OR</span>
-            <div className="flex-grow border-t border-primary"></div>
-          </div>
-
-          {/* Instagram */}
-          <div>
-            <Label htmlFor="instagram">Instagram</Label>
-            <Input
-              id="instagram"
-              type="text"
-              placeholder="Enter your Instagram username*"
-              value={instagram}
-              onChange={(e) => setInstagram(e.target.value)}
-              className="mt-2"
-            />
-          </div>
-
           <div className="text-right">
             <Button
               variant="link"
@@ -192,8 +152,9 @@ export const Login = ({ startStep = 0 }) => {
             type="submit"
             className="w-full py-3 font-semibold"
             disabled={
-              // (!linkedin && !instagram) || 
-              loading}
+              // (!linkedin && !instagram) ||
+              loading
+            }
           >
             {loading ? (
               <>
@@ -204,6 +165,17 @@ export const Login = ({ startStep = 0 }) => {
               "Log In"
             )}
           </Button>
+          <div>
+            <Label>
+              New to here?{" "}
+              <Link
+                to="/auth"
+                className="text-[#c4b0a2] underline hover:text-primary"
+              >
+                Sign up
+              </Link>
+            </Label>
+          </div>
         </form>
 
         <div className="mt-6">
@@ -219,53 +191,13 @@ export const Login = ({ startStep = 0 }) => {
           </div>
           <div className="flex gap-3">
             <Button
-              onClick={async () => {
-                if (!linkedin && !instagram) {
-                  toast({
-                    title: "Social Media Required",
-                    description:
-                      "Please enter LinkedIn or Instagram before continuing.",
-                    variant: "destructive",
-                  });
-                  return;
-                }
-
-                if (instagram)
-                  localStorage.setItem("signup_instagram", instagram.trim());
-                if (linkedin)
-                  localStorage.setItem("signup_linkedin", linkedin.trim());
-
-                const { error } = await signInWithGoogle();
-                if (error) {
-                  console.error("Google login error:", error.message);
-                }
-              }}
+              onClick={() => navigate("/o-auth")}
               className="flex-1 py-3 border hover:bg-secondary/40 text-foreground bg-transparent"
             >
               <SiGoogle size={22} color="black" /> Google
             </Button>
             <Button
-              onClick={async () => {
-                if (!linkedin && !instagram) {
-                  toast({
-                    title: "Social Media Required",
-                    description:
-                      "Please enter LinkedIn or Instagram before continuing.",
-                    variant: "destructive",
-                  });
-                  return;
-                }
-
-                if (instagram)
-                  localStorage.setItem("signup_instagram", instagram.trim());
-                if (linkedin)
-                  localStorage.setItem("signup_linkedin", linkedin.trim());
-
-                const { error } = await signInWithApple();
-                if (error) {
-                  console.error("Apple login error:", error.message);
-                }
-              }}
+              onClick={() => navigate("/o-auth")}
               className="flex-1 py-3 text-foreground hover:bg-secondary/40 bg-transparent border"
             >
               <SiApple size={22} color="black" /> Apple

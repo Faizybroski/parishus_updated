@@ -5,7 +5,14 @@ import { Input } from "@/components/OnboardingCarousel/ui/input";
 import { Label } from "@/components/OnboardingCarousel/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
-import { ChevronLeft, ChevronRight, Eye, EyeOff, Loader2 } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  EyeOff,
+  Loader2,
+  Mail,
+} from "lucide-react";
 import { SiGoogle, SiApple } from "react-icons/si";
 import { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
@@ -42,22 +49,16 @@ const onboardingCards = [
     image: "/images/Carousel 3.png",
   },
 ];
-export const OnboardingCarousel = ({ startStep = 0 }) => {
+export const OAuth = ({ startStep = 0 }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const passedStep = location.state?.startStep ?? startStep;
   const [currentStep, setCurrentStep] = useState(passedStep);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
   const [instagram, setInstagram] = useState("");
   const [linkedin, setLinkedin] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { signIn, signUp, resetPassword, signInWithGoogle, signInWithApple } =
-    useAuth();
+  const { signInWithGoogle, signInWithApple } = useAuth();
 
   const handleNext = () => {
     if (currentStep < onboardingCards.length) setCurrentStep(currentStep + 1);
@@ -65,130 +66,6 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
 
   const handleBack = () => {
     if (currentStep > 0) setCurrentStep(currentStep - 1);
-  };
-
-  const handleEmailLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      if (!firstName.trim()) {
-        toast({
-          title: "Missing First Name",
-          description: "Please enter your first name.",
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-      if (!lastName.trim()) {
-        toast({
-          title: "Missing Last Name",
-          description: "Please enter your last name.",
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-      if (!email.trim()) {
-        toast({
-          title: "Missing Email",
-          description: "Please enter your email address.",
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-      if (!password.trim()) {
-        toast({
-          title: "Missing Password",
-          description: "Please enter your password.",
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-      if (firstName.trim().length < 2) {
-        toast({
-          title: "Invalid First Name",
-          description: "First name must be at least 2 characters long.",
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-      if (lastName.trim().length < 2) {
-        toast({
-          title: "Invalid Last Name",
-          description: "Last name must be at least 2 characters long.",
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-      if (email.trim()) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email.trim())) {
-          toast({
-            title: "Invalid Email",
-            description: "Please enter a valid email address.",
-            variant: "destructive",
-          });
-          setLoading(false);
-          return;
-        }
-      }
-      if (password.length < 6) {
-        toast({
-          title: "Weak Password",
-          description: "Password must be at least 6 characters long.",
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-      if (!agreeToTerms) {
-        toast({
-          title: "Terms & Conditions",
-          description: "You must agree to the Terms & Conditions.",
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-      if (!linkedin.trim() && !instagram.trim()) {
-        toast({
-          title: "Social Media is Required",
-          description: "Please enter Instagram or LinkedIn.",
-          variant: "destructive",
-        });
-        return;
-      }
-      const { error } = await signUp(email, password, {
-        first_name: firstName.trim(),
-        last_name: lastName.trim(),
-        instagram_username: instagram.trim(),
-        linkedin_username: linkedin.trim(),
-        role: "user",
-      });
-      if (error) throw error;
-      toast({
-        title: "Account Created!",
-        description: "Check your email for verification.",
-      });
-      if (!error) setEmail("");
-      //  navigate('social-media')
-      setPassword("");
-      setFirstName("");
-      setLastName("");
-    } catch (err) {
-      toast({
-        title: "Error",
-        description: err.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
   };
 
   if (currentStep === onboardingCards.length) {
@@ -217,60 +94,7 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
             <div className="w-6" />
           </div>
 
-          <form onSubmit={handleEmailLogin} className="space-y-5">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <Label htmlFor="firstName">First Name</Label>
-                <Input
-                  id="firstName"
-                  type="text"
-                  placeholder="First name"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="lastName">Last Name</Label>
-                <Input
-                  id="lastName"
-                  type="text"
-                  placeholder="Last name"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email*"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="space-y-1 relative">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter your password*"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-9"
-              >
-                {showPassword ? (
-                  <EyeOff className="w-4 h-4" />
-                ) : (
-                  <Eye className="w-4 h-4" />
-                )}
-              </button>
-            </div>
+          <form className="space-y-5">
             <div>
               <Label htmlFor="linkedin">LinkedIn Profile</Label>
               <Input
@@ -316,30 +140,76 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
                 </Link>
               </Label>
             </div>
-            <Button
-              type="submit"
-              className="w-full py-3 font-semibold"
-              disabled={!agreeToTerms || (!linkedin && !instagram) || loading}
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating account...
-                </>
-              ) : (
-                "Sign Up"
-              )}
-            </Button>
-            <div>
-              <Label>
-                Already have an account?{" "}
-                <Link
-                  to="/login"
-                  className="text-[#c4b0a2] underline hover:text-primary"
-                >
-                  Sign in
-                </Link>
-              </Label>
+            <div className="flex gap-3">
+              <Button
+                onClick={async () => {
+                  if (!linkedin && !instagram) {
+                    toast({
+                      title: "Social Media Required",
+                      description:
+                        "Please enter LinkedIn or Instagram before continuing.",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+                  if (!agreeToTerms) {
+                    toast({
+                      title: "Terms & Conditions",
+                      description: "You must agree to the Terms & Conditions.",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+
+                  if (instagram)
+                    localStorage.setItem("signup_instagram", instagram.trim());
+                  if (linkedin)
+                    localStorage.setItem("signup_linkedin", linkedin.trim());
+
+                  const { error } = await signInWithGoogle();
+                  if (error) {
+                    console.error("Google login error:", error.message);
+                  }
+                }}
+                className="flex-1 py-3 border hover:bg-secondary/40 text-foreground bg-transparent"
+              >
+                <SiGoogle size={22} color="black" /> Google
+              </Button>
+              <Button
+                onClick={async () => {
+                  if (!linkedin && !instagram) {
+                    toast({
+                      title: "Social Media Required",
+                      description:
+                        "Please enter LinkedIn or Instagram before continuing.",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+
+                  if (!agreeToTerms) {
+                    toast({
+                      title: "Terms & Conditions",
+                      description: "You must agree to the Terms & Conditions.",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+
+                  if (instagram)
+                    localStorage.setItem("signup_instagram", instagram.trim());
+                  if (linkedin)
+                    localStorage.setItem("signup_linkedin", linkedin.trim());
+
+                  const { error } = await signInWithApple();
+                  if (error) {
+                    console.error("Apple login error:", error.message);
+                  }
+                }}
+                className="flex-1 py-3 text-foreground hover:bg-secondary/40 bg-transparent border"
+              >
+                <SiApple size={22} color="black" /> Apple
+              </Button>
             </div>
           </form>
 
@@ -349,23 +219,17 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
                 <div className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs">
-                <span className="bg-card px-3 text-muted-foreground">
+                <span className="bg-background px-3 text-muted-foreground">
                   OR CONTINUE WITH
                 </span>
               </div>
             </div>
             <div className="flex gap-3">
               <Button
-                onClick={() => navigate("/o-auth")}
-                className="flex-1 py-3 border hover:bg-secondary/40 text-foreground bg-transparent"
-              >
-                <SiGoogle size={22} color="black" /> Google
-              </Button>
-              <Button
-                onClick={() => navigate("/o-auth")}
+                onClick={() => navigate("/auth")}
                 className="flex-1 py-3 text-foreground hover:bg-secondary/40 bg-transparent border"
               >
-                <SiApple size={22} color="black" /> Apple
+                <Mail size={22} color="black" /> Email
               </Button>
             </div>
           </div>
