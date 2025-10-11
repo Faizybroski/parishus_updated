@@ -311,7 +311,7 @@ const EventsCarousel = () => {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="">
       {/* Header & Controls */}
       <div className="flex justify-between items-center">
         <div>
@@ -439,125 +439,123 @@ const EventsCarousel = () => {
             );
           })}
         </div> */}
-        <div className="pt-6 sm:pt-10 touch-pan-y">
-  <Carousel
-    showThumbs={false}
-    autoPlay
-    infiniteLoop
-    showStatus={false}
-    interval={4000}
-    showArrows={false}
-    onChange={(index) => setCurrentSlide(index)}
-    swipeable
-    emulateTouch
-    className="rounded-xl overflow-hidden"
-  >
-    {events.map((event) => {
-      const rsvpStatus = getRSVPStatus(event.id);
-      const attendeeCount = attendeeCounts[event.id] || 0;
+        <div className="sm:pt-10 touch-pan-y">
+          <Carousel
+            showThumbs={false}
+            autoPlay
+            infiniteLoop
+            showStatus={false}
+            interval={4000}
+            showArrows={false}
+            onChange={(index) => setCurrentSlide(index)}
+            swipeable
+            emulateTouch
+            className="rounded-xl overflow-hidden"
+          >
+            {events.map((event) => {
+              const rsvpStatus = getRSVPStatus(event.id);
+              const attendeeCount = attendeeCounts[event.id] || 0;
 
-      return (
-        <div
-          key={event.id}
-          className="relative rounded-xl overflow-hidden min-h-[75vh] sm:min-h-[70vh] lg:min-h-[80vh] flex items-center justify-center"
-          style={{ touchAction: "pan-y" }}
-        >
-          {/* Background with blur */}
-          <div
-            className="absolute inset-0 z-0"
-            style={{
-              backgroundImage: `url(${event.cover_photo_url})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              filter: "brightness(0.35) blur(8px)",
-            }}
-          ></div>
-
-          {/* Gradient Overlay */}
-          <div className="absolute inset-0 rounded-xl z-0 bg-gradient-to-b from-neutral-100/20 via-neutral-200/5 to-transparent backdrop-blur-sm" ></div>
-
-          {/* Content */}
-          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-center w-full px-4 sm:px-8 lg:px-16 py-10 gap-6 sm:gap-10 text-white">
-            {/* Event Image */}
-            <div className="w-full sm:w-[80%] md:w-[55%] lg:w-[25%] flex justify-center">
-              <img
-                src={event.cover_photo_url}
-                alt={event.name}
-                className="w-full max-w-[400px] h-auto rounded-2xl shadow-2xl object-cover"
-                loading="lazy"
-              />
-            </div>
-
-            {/* Text Content */}
-            <div className="w-full lg:w-[50%] text-center lg:text-left flex flex-col items-center lg:items-start">
-              <h2 className="font-script text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 leading-snug text-white line-clamp-2 pb-2">
-                {event.name}
-              </h2>
-
-              {event.description && (
-                <p className="text-sm sm:text-base md:text-lg text-gray-200 mb-4 line-clamp-4">
-                  {event.description}
-                </p>
-              )}
-
-              {/* Location */}
-              <div className="text-gray-100 mb-2 text-sm sm:text-base">
-                <p className="font-medium truncate">
-                  {event.location_name || "Location not specified"}
-                </p>
-                {event.location_address && (
-                  <p className="text-gray-300 truncate">
-                    {event.location_address}
-                  </p>
-                )}
-              </div>
-
-              {/* Date & Time */}
-              <p className="text-gray-200 text-sm sm:text-base">
-                {new Date(event.date_time).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                })}{" "}
-                -{" "}
-                {new Date(event.date_time).toLocaleTimeString("en-US", {
-                  hour: "numeric",
-                  minute: "2-digit",
-                })}
-              </p>
-
-              {/* Attendees */}
-              <div className="flex items-center justify-center lg:justify-start gap-2 text-gray-300 text-sm mt-2">
-                <Users className="w-4 h-4" />
-                <span>{attendeeCount} attending</span>
-              </div>
-
-              {/* Buttons */}
-              <div className="flex flex-col sm:flex-row items-center lg:justify-start justify-center gap-3 mt-6 w-full">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => navigate(`/event/${event.id}/details`)}
-                  className="bg-white/10 hover:bg-white/20 text-white border-white/30 rounded-full transition"
+              return (
+                <div
+                  key={event.id}
+                  className="relative rounded-xl overflow-hidden min-h-[75vh] sm:min-h-[70vh] lg:min-h-[80vh] flex items-center justify-center"
+                  style={{ touchAction: "pan-y" }}
                 >
-                  <Share2 className="h-5 w-5 text-[#d2bdad]" />
-                </Button>
-                <Button
-                  onClick={() => navigate(`/rsvp/${event.id}/details`)}
-                  className="w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-lg font-semibold bg-white text-black hover:bg-gray-200 rounded-full flex items-center justify-center gap-2 transition-all"
-                >
-                  {rsvpStatus === "yes" ? "Un-RSVP" : "RSVP"}
-                  <ChevronRight className="w-5 h-5" />
-                </Button>
-              </div>
-            </div>
-          </div>
+                  {/* Background with blur */}
+                  <div
+                    className="absolute inset-0 z-0"
+                    style={{
+                      backgroundImage: `url(${event.cover_photo_url})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      filter: "brightness(0.35) blur(8px)",
+                    }}
+                  ></div>
+
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 rounded-xl z-0 bg-gradient-to-b from-neutral-100/20 via-neutral-200/5 to-transparent backdrop-blur-sm"></div>
+
+                  {/* Content */}
+                  <div className="relative z-10 flex flex-col lg:flex-row items-center justify-center w-full px-4 sm:px-8 lg:px-16 py-10 gap-6 sm:gap-10 text-white">
+                    {/* Event Image */}
+                    <div className="w-full sm:w-[80%] md:w-[55%] lg:w-[25%] flex justify-center">
+                      <img
+                        src={event.cover_photo_url}
+                        alt={event.name}
+                        className="w-full max-w-[400px] h-auto rounded-2xl shadow-2xl object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+
+                    {/* Text Content */}
+                    <div className="w-full lg:w-[50%] text-center lg:text-left flex flex-col items-center lg:items-start">
+                      <h2 className="font-script text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 leading-snug text-white line-clamp-2 pb-2">
+                        {event.name}
+                      </h2>
+
+                      {event.description && (
+                        <p className="text-sm sm:text-base md:text-lg text-gray-200 mb-4 line-clamp-4">
+                          {event.description}
+                        </p>
+                      )}
+
+                      {/* Location */}
+                      <div className="text-gray-100 mb-2 text-sm sm:text-base">
+                        <p className="font-medium truncate">
+                          {event.location_name || "Location not specified"}
+                        </p>
+                        {event.location_address && (
+                          <p className="text-gray-300 truncate">
+                            {event.location_address}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Date & Time */}
+                      <p className="text-gray-200 text-sm sm:text-base">
+                        {new Date(event.date_time).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}{" "}
+                        -{" "}
+                        {new Date(event.date_time).toLocaleTimeString("en-US", {
+                          hour: "numeric",
+                          minute: "2-digit",
+                        })}
+                      </p>
+
+                      {/* Attendees */}
+                      <div className="flex items-center justify-center lg:justify-start gap-2 text-gray-300 text-sm mt-2">
+                        <Users className="w-4 h-4" />
+                        <span>{attendeeCount} attending</span>
+                      </div>
+
+                      {/* Buttons */}
+                      <div className="flex flex-col sm:flex-row items-center lg:justify-start justify-center gap-3 mt-6 w-full">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => navigate(`/event/${event.id}/details`)}
+                          className="bg-white/10 hover:bg-white/20 text-white border-white/30 rounded-full transition"
+                        >
+                          <Share2 className="h-5 w-5 text-[#d2bdad]" />
+                        </Button>
+                        <Button
+                          onClick={() => navigate(`/rsvp/${event.id}/details`)}
+                          className="w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-lg font-semibold bg-white text-black hover:bg-gray-200 rounded-full flex items-center justify-center gap-2 transition-all"
+                        >
+                          {rsvpStatus === "yes" ? "Un-RSVP" : "RSVP"}
+                          <ChevronRight className="w-5 h-5" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </Carousel>
         </div>
-      );
-    })}
-  </Carousel>
-</div>
-
-
       </div>
     </div>
   );
