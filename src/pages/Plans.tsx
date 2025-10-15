@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { LoaderText } from "@/components/loader/Loader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,7 +19,9 @@ const Plans = () => {
   const navigate = useNavigate();
 
   const handleDelete = async (planId: number, planName: string) => {
-    const confirmDelete = confirm(`Are you sure you want to delete the plan "${planName}"?`);
+    const confirmDelete = confirm(
+      `Are you sure you want to delete the plan "${planName}"?`
+    );
     if (!confirmDelete) return;
 
     try {
@@ -33,7 +35,9 @@ const Plans = () => {
   };
 
   const filteredPlans = plans
-    .filter((plan) => plan.name.toLowerCase().includes(searchQuery.toLowerCase().trim()))
+    .filter((plan) =>
+      plan.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
+    )
     .filter((plan) =>
       activeTab === "monthly"
         ? plan.interval === "month"
@@ -52,14 +56,20 @@ const Plans = () => {
     <div className="min-h-screen bg-background px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-foreground font-script">Subscription Plans</h1>
-          <p className="text-muted-foreground mt-1">Manage your pricing and subscription tiers</p>
+          <h1 className="text-3xl font-bold text-foreground font-script">
+            Subscription Plans
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Manage your pricing and subscription tiers
+          </p>
         </div>
 
-        <Button onClick={() => navigate("/admin/plans/add")}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Plan
-        </Button>
+        <Link to={"/admin/plans/add"}>
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Plan
+          </Button>
+        </Link>
       </div>
 
       <div className="mb-6 flex items-center gap-4">
@@ -88,9 +98,13 @@ const Plans = () => {
       </div>
 
       {loading ? (
-        <div className="text-center py-10 text-muted-foreground">Loading plans...</div>
+        <div className="text-center py-10 text-muted-foreground">
+          Loading plans...
+        </div>
       ) : filteredPlans.length === 0 ? (
-        <div className="text-center py-10 text-muted-foreground">No plans found.</div>
+        <div className="text-center py-10 text-muted-foreground">
+          No plans found.
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {filteredPlans.map((plan) => (
@@ -108,11 +122,15 @@ const Plans = () => {
               )}
 
               <CardHeader className="pb-4">
-                <CardTitle className="text-xl font-semibold">{plan.name}</CardTitle>
+                <CardTitle className="text-xl font-semibold">
+                  {plan.name}
+                </CardTitle>
               </CardHeader>
 
               <CardContent>
-                <p className="text-muted-foreground mb-2">{plan.description || "No description provided."}</p>
+                <p className="text-muted-foreground mb-2">
+                  {plan.description || "No description provided."}
+                </p>
 
                 <h2 className="text-2xl font-bold mb-2">
                   ${plan.price}
@@ -131,8 +149,11 @@ const Plans = () => {
                 </ul>
 
                 <div className="flex justify-between items-center">
-                  <Button variant="destructive"
-                    onClick={() => handleDelete(plan.id, plan.name)} className="w-full">
+                  <Button
+                    variant="destructive"
+                    onClick={() => handleDelete(plan.id, plan.name)}
+                    className="w-full"
+                  >
                     <Trash2 className="h-4 w-4" /> Delete Plan
                   </Button>
                 </div>

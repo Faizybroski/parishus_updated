@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { useParams } from "react-router-dom";
 import { useRestaurants, Restaurant } from "@/hooks/useRestaurants";
-import {LoaderText} from "@/components/loader/Loader"
+import { LoaderText } from "@/components/loader/Loader";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,7 +30,7 @@ import {
   DollarSign,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { format } from "date-fns";
 const today = format(new Date(), "yyyy-MM-dd");
 import { RestaurantSearchDropdown } from "@/components/restaurants/RestaurantSearchDropdown";
@@ -39,7 +39,7 @@ import { CrossedPathInviteModal } from "@/components/Invitationmodals/CrossedPat
 import { getEmailsFromIds } from "@/lib/getEmailsFromIds";
 import { sendEventInvite } from "@/lib/sendInvite";
 import GooglePlacesEventsForm from "@/components/restaurants/GooglePlacesEventsForm";
-import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
+import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 
 const EventEdit = () => {
   const { eventId } = useParams<{ eventId: string }>();
@@ -77,7 +77,8 @@ const EventEdit = () => {
   const [emailInviteModelOpen, setEmailInviteModelOpen] = useState(false);
   const [invitedGuestIds, setInvitedGuestIds] = useState<string[]>([]);
   const [invitedEmails, setInvitedEmails] = useState<string[]>([]);
-  const [crossedPathInviteModelOpen, setCrossedPathInviteModelOpen] = useState(false);
+  const [crossedPathInviteModelOpen, setCrossedPathInviteModelOpen] =
+    useState(false);
   const navigate = useNavigate();
   const subscriptionStatus = useSubscriptionStatus(profile?.id);
 
@@ -233,86 +234,88 @@ const EventEdit = () => {
     }
 
     if (!formData.name.trim()) {
-          toast({
-            title: "Validation Error",
-            description: "Event name cannot be empty.",
-            variant: "destructive",
-          });
-          return;
-        }
-    
-        if (!formData.description.trim()) {
-          toast({
-            title: "Validation Error",
-            description: "Event description cannot be empty.",
-            variant: "destructive",
-          });
-          return;
-        }
-    
-        if (!formData.date) {
-          toast({
-            title: "Validation Error",
-            description: "Please select an event date.",
-            variant: "destructive",
-          });
-          return;
-        }
-    
-        if (!formData.time) {
-          toast({
-            title: "Validation Error",
-            description: "Please select an event time.",
-            variant: "destructive",
-          });
-          return;
-        }
-    
-        if (!formData.location_name.trim()) {
-          toast({
-            title: "Validation Error",
-            description: "Event location cannot be empty.",
-            variant: "destructive",
-          });
-          return;
-        }
-    
-        if (new Date(`${formData.date}T${formData.time}`) < new Date()) {
-          toast({
-            title: "Validation Error",
-            description: "Event date and time must be in the future.",
-            variant: "destructive",
-          });
-          return;
-        }
+      toast({
+        title: "Validation Error",
+        description: "Event name cannot be empty.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-        
-        if (!formData.max_attendees) {
-          toast({
-            title: "Validation Error",
-            description: "Please specify the maximum number of attendees.",
-            variant: "destructive",
-          });
-          return;
-        }
-        
-        if(!formData.guest_invitation_type) {
-          toast({
-            title: "Validation Error",
-            description: "Please select a guest invitation type.",
-            variant: "destructive",
-          });
-          return;
-        }
+    if (!formData.description.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Event description cannot be empty.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-        if (formData.is_paid && (!formData.event_fee || Number(formData.event_fee) <= 0)) {
-          toast({
-            title: "Validation Error",
-            description: "Please enter a valid event fee for paid events.",
-            variant: "destructive",
-          });
-          return;
-        }
+    if (!formData.date) {
+      toast({
+        title: "Validation Error",
+        description: "Please select an event date.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.time) {
+      toast({
+        title: "Validation Error",
+        description: "Please select an event time.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.location_name.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Event location cannot be empty.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (new Date(`${formData.date}T${formData.time}`) < new Date()) {
+      toast({
+        title: "Validation Error",
+        description: "Event date and time must be in the future.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.max_attendees) {
+      toast({
+        title: "Validation Error",
+        description: "Please specify the maximum number of attendees.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.guest_invitation_type) {
+      toast({
+        title: "Validation Error",
+        description: "Please select a guest invitation type.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (
+      formData.is_paid &&
+      (!formData.event_fee || Number(formData.event_fee) <= 0)
+    ) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter a valid event fee for paid events.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setLoading(true);
 
@@ -356,12 +359,15 @@ const EventEdit = () => {
           event_fee: formData.is_paid ? formData.event_fee : null,
         } as any)
         .eq("id", eventId);
-        
-        if (error) throw error;
-        const eventLink = `${window.location.origin}/event/${eventId}/details`;
-        const emails = invitedEmails;
 
-      if ( (!emails || emails.length === 0) && (!invitedGuestIds || invitedGuestIds.length === 0)) {
+      if (error) throw error;
+      const eventLink = `${window.location.origin}/event/${eventId}/details`;
+      const emails = invitedEmails;
+
+      if (
+        (!emails || emails.length === 0) &&
+        (!invitedGuestIds || invitedGuestIds.length === 0)
+      ) {
         localStorage.setItem("eventUpdated", Date.now().toString());
         window.dispatchEvent(new CustomEvent("eventUpdated"));
 
@@ -437,12 +443,9 @@ const EventEdit = () => {
           <p className="text-muted-foreground">
             Please complete your profile to update events.
           </p>
-          <Button
-            onClick={() => navigate("/profile")}
-            className=""
-          >
-            Complete Profile
-          </Button>
+          <Link to={"/profile"}>
+            <Button className="">Complete Profile</Button>
+          </Link>
         </div>
       </div>
     );
@@ -453,7 +456,9 @@ const EventEdit = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground font-script">Edit Event</h1>
+            <h1 className="text-3xl font-bold text-foreground font-script">
+              Edit Event
+            </h1>
             <p className="text-muted-foreground mt-1">
               Update your dining experience details
             </p>
@@ -574,7 +579,7 @@ const EventEdit = () => {
                   />
                 </div>
 
-               <GooglePlacesEventsForm
+                <GooglePlacesEventsForm
                   formData={formData}
                   onChange={handleInputChange}
                 />
@@ -900,13 +905,11 @@ const EventEdit = () => {
 
             {/* Submit Buttons */}
             <div className="flex justify-end space-x-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => navigate("/dashboard")}
-              >
-                Cancel
-              </Button>
+              <Link to={"/dashboard"}>
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </Link>
               <Button
                 type="submit"
                 disabled={!isFormValid || loading}

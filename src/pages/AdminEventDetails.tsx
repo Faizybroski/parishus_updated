@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import EventAnalyticsDashboard from "@/components/analytics/EventAnalytics";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRestaurants } from "@/hooks/useRestaurants";
 import { supabase } from "@/integrations/supabase/client";
@@ -240,10 +240,12 @@ const AdminEventDetails = () => {
           <p className="text-muted-foreground">
             The event you're looking for doesn't exist or has been removed.
           </p>
-          <Button onClick={() => navigate("/admin/events")}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Events
-          </Button>
+          <Link to={"/admin/events"}>
+            <Button>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Events
+            </Button>
+          </Link>
         </div>
       </div>
     );
@@ -265,14 +267,12 @@ const AdminEventDetails = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/admin/events")}
-            className="mb-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Events
-          </Button>
+          <Link to={"/admin/events"}>
+            <Button variant="ghost" className="mb-4">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Events
+            </Button>
+          </Link>
         </div>
 
         {/* Event Cover Image */}
@@ -313,14 +313,12 @@ const AdminEventDetails = () => {
                     <Button variant="outline" size="sm" onClick={shareEvent}>
                       <Share2 className="h-4 w-4" />
                     </Button>
-                    {!isCreator && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => navigate(`/event/${event.id}/edit`)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
+                    {isCreator && (
+                      <Link to={`/event/${event.id}/edit`}>
+                        <Button variant="outline" size="sm">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </Link>
                     )}
                   </div>
                 </div>
@@ -670,13 +668,12 @@ const AdminEventDetails = () => {
                     >
                       Event Ended
                     </Badge>
-                    <Button
-                      onClick={() => navigate("/feedback")}
-                      className="w-full"
-                    >
-                      <Star className="h-4 w-4 mr-2" />
-                      Leave Review
-                    </Button>
+                    <Link to={"/feedack"}>
+                      <Button className="w-full">
+                        <Star className="h-4 w-4 mr-2" />
+                        Leave Review
+                      </Button>
+                    </Link>
                   </div>
                 )}
 

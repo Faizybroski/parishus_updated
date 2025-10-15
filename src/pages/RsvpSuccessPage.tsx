@@ -1,5 +1,5 @@
 import { Calendar } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 export default function RsvpSuccessPage() {
   const navigate = useNavigate();
   return (
@@ -24,14 +24,12 @@ export default function RsvpSuccessPage() {
           className="w-full rounded-xl"
           height={"360px"}
         />
-
-        <button
-          onClick={() => navigate("/rsvps")}
-          className="w-full flex items-center justify-center gap-2 bg-success border border-black text-black py-3 rounded-xl bg-secondary/90 hover:text-success transition-all duration-300 flex-grow px-4 py-4 text-lg font-medium bg-secondary text-black hover:bg-secondary/90 flex-grow px-4 py-4 text-lg font-medium bg-secondary text-black hover:bg-secondary/90"
-        >
-          <Calendar className="w-5 h-5" />
-          View Reservation
-        </button>
+        <Link to={"/rsvps"}>
+          <button className="w-full flex items-center justify-center gap-2 bg-success border border-black text-black py-3 rounded-xl bg-secondary/90 hover:text-success transition-all duration-300 flex-grow px-4 py-4 text-lg font-medium bg-secondary text-black hover:bg-secondary/90 flex-grow px-4 py-4 text-lg font-medium bg-secondary text-black hover:bg-secondary/90">
+            <Calendar className="w-5 h-5" />
+            View Reservation
+          </button>
+        </Link>
       </div>
     </div>
   );

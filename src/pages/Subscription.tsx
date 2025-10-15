@@ -13,7 +13,7 @@ import {LoaderText} from "@/components/loader/Loader";
 import { Badge } from "@/components/ui/badge";
 import { Check, Crown, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useProfile } from "@/hooks/useProfile";
 
 interface SubscriptionData {
@@ -179,9 +179,11 @@ export default function Subscription() {
                     </p>
                   )}
                 </div>
-                <Button onClick={handleManageSubscription} variant="outline">
+                <Link to={handleManageSubscription}>
+                <Button variant="outline">
                   Manage Subscription
                 </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>

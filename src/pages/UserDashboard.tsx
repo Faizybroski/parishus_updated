@@ -10,9 +10,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Calendar, Users, MapPin, Star, CalendarDays, Search, Users2, MessageSquare } from "lucide-react";
+import {
+  Calendar,
+  Users,
+  MapPin,
+  Star,
+  CalendarDays,
+  Search,
+  Users2,
+  MessageSquare,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const UserDashboard = () => {
   const { user } = useAuth();
@@ -74,77 +83,74 @@ const UserDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card
-          className="cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => navigate("/events")}
-        >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">My Events</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground">
-              Events you've created
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card
-          className="cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => navigate("/explore")}
-        >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Explore</CardTitle>
-            <Search className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">Browse</div>
-            <p className="text-xs text-muted-foreground">Find events to join</p>
-          </CardContent>
-        </Card>
-
-        <Card
-          className="cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => navigate("/crossed-paths")}
-        >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Crossed Paths</CardTitle>
-            <Star className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground">Recent connections</p>
-          </CardContent>
-        </Card>
-
-        <Card
-          className="cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => navigate("/feedback")}
-        >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Feedback</CardTitle>
-            <MessageSquare className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">Share</div>
-            <p className="text-xs text-muted-foreground">
-              Your thoughts matter
-            </p>
-          </CardContent>
-        </Card>
+        <Link to="/events">
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow group">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">My Events</CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground icon-animate" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">0</div>
+              <p className="text-xs text-muted-foreground">
+                Events you've created
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link to="/explore">
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow group">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Explore</CardTitle>
+              <Search className="h-4 w-4 text-muted-foreground icon-animate" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">Browse</div>
+              <p className="text-xs text-muted-foreground">
+                Find events to join
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link to="/crossed-paths">
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow group">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Crossed Paths
+              </CardTitle>
+              <Star className="h-4 w-4 text-muted-foreground icon-animate" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">0</div>
+              <p className="text-xs text-muted-foreground">
+                Recent connections
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link to="/feedback">
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow group">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Feedback</CardTitle>
+              <MessageSquare className="h-4 w-4 text-muted-foreground icon-animate" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">Share</div>
+              <p className="text-xs text-muted-foreground">
+                Your thoughts matter
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
       <Card className="shadow-card border-border mt-6">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             My Wallet
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate("/wallet/withdraw")}
-            >
-              Request Withdrawal
-            </Button>
+            <Link to="/wallet/withdraw">
+              <Button variant="outline" size="sm">
+                Request Withdrawal
+              </Button>
+            </Link>
           </CardTitle>
         </CardHeader>
         <CardContent className="overflow-auto">
@@ -201,20 +207,15 @@ const UserDashboard = () => {
               Get started with your next dining experience
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <Button
-              onClick={() => navigate("/create-event")}
-              className="w-full"
-            >
-              Create New Event
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/explore")}
-              className="w-full"
-            >
-              Browse Events
-            </Button>
+          <CardContent className="flex flex-col gap-5">
+            <Link to="/create-event">
+              <Button className="w-full">Create New Event</Button>
+            </Link>
+            <Link to="/explore">
+              <Button variant="outline" className="w-full">
+                Browse Events
+              </Button>
+            </Link>
           </CardContent>
         </Card>
 
@@ -238,13 +239,11 @@ const UserDashboard = () => {
                 </span>
               </div>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/profile")}
-              className="w-full mt-4"
-            >
-              Update Profile
-            </Button>
+            <Link to="/profile">
+              <Button variant="outline" className="w-full mt-4">
+                Update Profile
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>

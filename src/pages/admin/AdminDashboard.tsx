@@ -35,7 +35,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {LoaderText} from "@/components/loader/Loader";
+import { LoaderText } from "@/components/loader/Loader";
 import { format, subMonths, getMonth, getYear } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
@@ -63,7 +63,7 @@ import {
   Users,
   UserX,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   Bar,
   BarChart,
@@ -776,7 +776,9 @@ const AdminDashboard = () => {
       <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-center space-y-4">
           <AlertTriangle className="h-12 w-12 text-red-500 mx-auto" />
-          <h1 className="text-2xl font-bold text-foreground font-script">Access Denied</h1>
+          <h1 className="text-2xl font-bold text-foreground font-script">
+            Access Denied
+          </h1>
           <p className="text-muted-foreground">
             You don't have permission to access this area.
           </p>
@@ -799,13 +801,12 @@ const AdminDashboard = () => {
             </p>
           </div>
           <div className="flex items-center space-x-4">
-            <Button
-              className="flex items-center space-x-2"
-              onClick={() => navigate("/admin/events")}
-            >
-              <Calendar className="h-4 w-4" />
-              <span>View all Events</span>
-            </Button>
+            <Link to="/admin/events">
+              <Button className="flex items-center space-x-2">
+                <Calendar className="h-4 w-4" />
+                <span>View all Events</span>
+              </Button>
+            </Link>
             <Button variant="outline" className="flex items-center space-x-2">
               <RefreshCw className="h-4 w-4" />
               <span>Refresh Data</span>

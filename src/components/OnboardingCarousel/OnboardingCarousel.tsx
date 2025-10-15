@@ -355,18 +355,16 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
               </div>
             </div>
             <div className="flex gap-3">
-              <Button
-                onClick={() => navigate("/o-auth")}
-                className="flex-1 py-3 border hover:bg-secondary/40 text-foreground bg-transparent"
-              >
-                <SiGoogle size={22} color="black" /> Google
-              </Button>
-              <Button
-                onClick={() => navigate("/o-auth")}
-                className="flex-1 py-3 text-foreground hover:bg-secondary/40 bg-transparent border"
-              >
-                <SiApple size={22} color="black" /> Apple
-              </Button>
+              <Link to={"/o-auth"} className="flex-1">
+                <Button className="w-full py-3 border hover:bg-secondary/40 text-foreground bg-transparent">
+                  <SiGoogle size={22} color="black" /> Google
+                </Button>
+              </Link>
+              <Link to={"/o-auth"} className="flex-1">
+                <Button className="w-full py-3 text-foreground hover:bg-secondary/40 bg-transparent border">
+                  <SiApple size={22} color="black" /> Apple
+                </Button>
+              </Link>
             </div>
           </div>
         </Card>

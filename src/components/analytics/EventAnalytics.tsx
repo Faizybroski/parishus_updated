@@ -11,7 +11,7 @@ import {
   CartesianGrid,
   LabelList,
 } from "recharts";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { LoaderText } from "@/components/loader/Loader";
 import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/useProfile";
@@ -88,12 +88,11 @@ export default function EventAnalyticsDashboard({
           <p className="text-muted-foreground text-base leading-relaxed max-w-md mx-auto mb-6">
             Analytics are only available for Premium users.
           </p>
-          <Button
-            onClick={() => navigate("/subscription")}
-            className="text-surface px-6 py-2 rounded-md font-semibold transition"
-          >
-            Go to Subscription
-          </Button>
+          <Link to={"/subscription"}>
+            <Button className="text-surface px-6 py-2 rounded-md font-semibold transition">
+              Go to Subscription
+            </Button>
+          </Link>
         </CardContent>
       </Card>
     );

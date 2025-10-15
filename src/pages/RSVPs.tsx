@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import {LoaderText} from "@/components/loader/Loader"
+import { LoaderText } from "@/components/loader/Loader";
 import {
   Select,
   SelectContent,
@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 interface RSVP {
   id: string;
@@ -202,10 +202,12 @@ const RSVPs = () => {
   const filteredRsvps = rsvps.filter((rsvp) => {
     const matchesSearch =
       searchTerm === "" ||
-      rsvp.events.name.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-      rsvp.events.description
+      rsvp.events.name
+        .toLowerCase()
         .includes(searchTerm.toLowerCase().trim()) ||
-      rsvp.events.location_name.trim()
+      rsvp.events.description.includes(searchTerm.toLowerCase().trim()) ||
+      rsvp.events.location_name
+        .trim()
         ?.toLowerCase()
         .includes(searchTerm.toLowerCase().trim());
 
@@ -241,7 +243,9 @@ const RSVPs = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground font-script">My RSVPs</h1>
+            <h1 className="text-3xl font-bold text-foreground font-script">
+              My RSVPs
+            </h1>
             <p className="text-muted-foreground mt-1">
               Manage your event reservations and attendance
             </p>
@@ -256,13 +260,11 @@ const RSVPs = () => {
                   You haven't RSVP'd to any events yet. Explore events to find
                   something interesting!
                 </p>
-                <Button
-                  variant="outline"
-                  onClick={() => navigate("/events")}
-                  className=""
-                >
-                  Browse Events
-                </Button>
+                <Link to="/events">
+                  <Button variant="outline" className="">
+                    Browse Events
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           ) : (
@@ -274,9 +276,7 @@ const RSVPs = () => {
                     <CardTitle className="text-lg">Total RSVPs</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-3xl font-bold  ">
-                      {rsvps.length}
-                    </div>
+                    <div className="text-3xl font-bold  ">{rsvps.length}</div>
                   </CardContent>
                 </Card>
                 <Card>
@@ -485,28 +485,25 @@ const RSVPs = () => {
 
                               {/* Actions */}
                               <div className="flex gap-2 pt-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() =>
-                                    navigate(`/event/${rsvp.events.id}/details`)
-                                  }
-                                  className="flex-1"
-                                >
-                                  <Eye className="h-4 w-4 mr-2" />
-                                  View Event
-                                </Button>
-
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() =>
-                                    cancelRSVP(rsvp.id, rsvp.events.id)
-                                  }
-                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
+                                <Link to={`/event/${rsvp.events.id}/details`}>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="flex-1"
+                                  >
+                                    <Eye className="h-4 w-4 mr-2" />
+                                    View Event
+                                  </Button>
+                                </Link>
+                                <Link to={cancelRSVP(rsvp.id, rsvp.events.id)}>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </Link>
                               </div>
                             </CardContent>
                           </Card>
@@ -593,18 +590,12 @@ const RSVPs = () => {
                                 </div>
 
                                 <div className="flex gap-2 ml-4">
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() =>
-                                      navigate(
-                                        `/event/${rsvp.events.id}/details`
-                                      )
-                                    }
-                                  >
-                                    <Eye className="h-4 w-4 mr-2" />
-                                    View
-                                  </Button>
+                                  <Link to={`/event/${rsvp.events.id}/details`}>
+                                    <Button variant="outline" size="sm">
+                                      <Eye className="h-4 w-4 mr-2" />
+                                      View
+                                    </Button>
+                                  </Link>
                                   <Button
                                     variant="outline"
                                     size="sm"

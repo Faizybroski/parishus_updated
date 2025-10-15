@@ -229,15 +229,15 @@ const Dashboard = () => {
     // console.log("Path:===>>", path.matched_user.email, path.matched_user.id,path.matched_user.first_name, path.matched_user.last_name);
 
     navigate("/explore", {
-    state: {
-      invitedUser: {
-        id: path.matched_user.id,
-        first_name: path.matched_user.first_name,
-        last_name: path.matched_user.last_name,
-        email: path.matched_user.email,
+      state: {
+        invitedUser: {
+          id: path.matched_user.id,
+          first_name: path.matched_user.first_name,
+          last_name: path.matched_user.last_name,
+          email: path.matched_user.email,
+        },
       },
-    },
-  });
+    });
     // setSelectedCrossedPath(path);
     // setShowInviteModal(true);
   };
@@ -257,21 +257,18 @@ const Dashboard = () => {
               </p>
             </div>
             <div className="justify-end">
-              <Button
-                className=" mt-4 sm:mt-0 me-2"
-                onClick={() => navigate("/explore")}
-              >
-                {" "}
-                <Calendar className="h-4 w-4 mr-2" />
-                View All Events
-              </Button>
-              <Button
-                onClick={() => navigate("/create-event")}
-                className=" mt-4 sm:mt-0"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Create Event
-              </Button>
+              <Link to={"/explore"}>
+                <Button className=" mt-4 sm:mt-0 me-2 group">
+                  <Calendar className="h-4 w-4 mr-2 icon-animate" />
+                  View All Events
+                </Button>
+              </Link>
+              <Link to={"/create-event"}>
+                <Button className=" mt-4 sm:mt-0 group">
+                  <Plus className="h-4 w-4 mr-2 icon-animate" />
+                  Create Event
+                </Button>
+              </Link>
             </div>
           </div>
 
@@ -281,13 +278,11 @@ const Dashboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 My Wallet
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate("/wallet/withdraw")}
-                >
-                  Request Withdrawal
-                </Button>
+                <Link to={"/wallet/withdraw"}>
+                  <Button variant="outline" size="sm">
+                    Request Withdrawal
+                  </Button>
+                </Link>
               </CardTitle>
             </CardHeader>
             <CardContent className="overflow-auto">
@@ -349,13 +344,11 @@ const Dashboard = () => {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   My Upcoming Events
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => navigate("/events")}
-                  >
-                    View All
-                  </Button>
+                  <Link to={"/events"}>
+                    <Button variant="outline" size="sm">
+                      View All
+                    </Button>
+                  </Link>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -420,13 +413,11 @@ const Dashboard = () => {
                     <Heart className="h-5 w-5 mr-2" />
                     Crossed Paths
                   </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => navigate("/crossed-paths")}
-                  >
-                    View All
-                  </Button>
+                  <Link to={"/crossed-paths"}>
+                    <Button variant="outline" size="sm">
+                      View All
+                    </Button>
+                  </Link>
                 </CardTitle>
                 <CardDescription>
                   People you've encountered at similar places
@@ -479,13 +470,11 @@ const Dashboard = () => {
                       >
                         Invite
                       </Button>
-                      <Button
-                        onClick={() => navigate(`/profile/${path.matched_user.username}`)}
-                        variant="outline"
-                        size="sm"
-                      >
-                        <User className="h-4 w-4" />
-                      </Button>
+                      <Link to={`/profile/${path.matched_user.username}`}>
+                        <Button variant="outline" size="sm">
+                          <User className="h-4 w-4" />
+                        </Button>
+                      </Link>
                     </div>
                   </div>
                 ))}
@@ -495,11 +484,11 @@ const Dashboard = () => {
 
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="shadow-card border-border cursor-pointer hover:shadow-glow transition-shadow">
+            <Card className="shadow-card border-border cursor-pointer hover:shadow-glow transition-shadow group">
               <Link to={`/create-event/`}>
                 <CardContent className="p-6 text-center">
                   <div className="h-12 w-12 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Plus className="h-6 w-6  " />
+                    <Plus className="h-6 w-6 icon-animate" />
                   </div>
                   <h3 className="font-semibold mb-2">Create Event</h3>
                   <p className="text-sm text-muted-foreground">
@@ -509,26 +498,25 @@ const Dashboard = () => {
               </Link>
             </Card>
 
-            <Card
-              className="shadow-card border-border cursor-pointer hover:shadow-glow transition-shadow"
-              onClick={() => navigate("/explore")}
-            >
-              <CardContent className="p-6 text-center">
-                <div className="h-12 w-12 bg rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Search className="h-6 w-6 " />
-                </div>
-                <h3 className="font-semibold mb-2">Explore Events</h3>
-                <p className="text-sm text-muted-foreground">
-                  Find dining events near you
-                </p>
-              </CardContent>
+            <Card className="shadow-card border-border cursor-pointer hover:shadow-glow transition-shadow group">
+              <Link to={`/explore`}>
+                <CardContent className="p-6 text-center">
+                  <div className="h-12 w-12 bg rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Search className="h-6 w-6 icon-animate" />
+                  </div>
+                  <h3 className="font-semibold mb-2">Explore Events</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Find dining events near you
+                  </p>
+                </CardContent>
+              </Link>
             </Card>
 
-            <Card className="shadow-card border-border cursor-pointer hover:shadow-glow transition-shadow">
+            <Card className="shadow-card border-border cursor-pointer hover:shadow-glow transition-shadow group">
               <Link to={`/feedback/`}>
                 <CardContent className="p-6 text-center">
                   <div className="h-12 w-12 bg-mystery-purple/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Star className="h-6 w-6 text-mystery-purple" />
+                    <Star className="h-6 w-6 text-mystery-purple icon-animate" />
                   </div>
                   <h3 className="font-semibold mb-2">Give Feedback</h3>
                   <p className="text-sm text-muted-foreground">

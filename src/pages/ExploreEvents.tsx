@@ -1,8 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
@@ -15,11 +12,11 @@ import {
   Plus,
   Search,
   Share2,
-  Trash2
+  Trash2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import {LoaderText} from "@/components/loader/Loader"
-import { useLocation, useNavigate } from "react-router-dom";
+import { LoaderText } from "@/components/loader/Loader";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 
 interface Event {
   id: string;
@@ -411,8 +408,12 @@ const ExploreEvents = () => {
   const filteredEvents = events.filter(
     (event) =>
       event.name.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-      event.description.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-      event.location_name.toLowerCase().includes(searchTerm.toLowerCase().trim())
+      event.description
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase().trim()) ||
+      event.location_name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase().trim())
   );
 
   const EventCards = ({ events }: { events: Event[] }) => {
@@ -424,13 +425,12 @@ const ExploreEvents = () => {
           <p className="text-muted-foreground mb-4">
             No events available at the moment
           </p>
-          <Button
-            onClick={() => navigate("/create-event")}
-            className="bg-secondary hover:bg-secondary/90"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Create Event
-          </Button>
+          <Link to={"/create-event"}>
+            <Button className="bg-secondary hover:bg-secondary/90">
+              <Plus className="h-4 w-4 mr-2" />
+              Create Event
+            </Button>
+          </Link>
         </div>
       );
     }
@@ -499,26 +499,26 @@ const ExploreEvents = () => {
                 {/* RSVP Count */}
                 {event.max_attendees && (
                   <div className="text-sm font-medium py-4 px-2 border-t-2 border-b-2 border text-white">
-                                      {/* Top content */}
-                                      <div className="flex items-center mb-2">
-                                        <Users className="h-5 w-5 text-secondary/90 mr-3" />
-                                        {event.rsvp_count || 0}/{event.max_attendees} RSVPed
-                                      </div>
-                  
-                                      {/* Progress bar */}
-                                      <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
-                                        <div
-                                          className="h-full bg-primary transition-all duration-300"
-                                          style={{
-                                            width: `${Math.min(
-                                              ((event.rsvp_count || 0) / event.max_attendees) *
-                                                100,
-                                              100
-                                            )}%`,
-                                          }}
-                                        />
-                                      </div>
-                                    </div>
+                    {/* Top content */}
+                    <div className="flex items-center mb-2">
+                      <Users className="h-5 w-5 text-secondary/90 mr-3" />
+                      {event.rsvp_count || 0}/{event.max_attendees} RSVPed
+                    </div>
+
+                    {/* Progress bar */}
+                    <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary transition-all duration-300"
+                        style={{
+                          width: `${Math.min(
+                            ((event.rsvp_count || 0) / event.max_attendees) *
+                              100,
+                            100
+                          )}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
                 )}
                 {typeof event.is_paid !== "undefined" && (
                   <div className="text-sm font-medium py-2 text-white">
@@ -558,25 +558,26 @@ const ExploreEvents = () => {
 
                 <div className="flex space-x-2">
                   {/* Details Button */}
-                  <Button
-                    onClick={() => navigate(`/event/${event.id}/details`, {
-                      state: { invitedUser }
-                    })}
-                    className="flex-1 bg-secondary hover:bg-secondary/80 text-black border border-secondary rounded-sm"
+                  <Link
+                    to={`/event/${event.id}/details`}
+                    state={{ invitedUser }}
                   >
-                    See details
-                  </Button>
+                    <Button className="flex-1 bg-secondary hover:bg-secondary/80 text-black border border-secondary rounded-sm">
+                      See details
+                    </Button>
+                  </Link>
 
                   {/* Edit Button (only for creators) */}
                   {isCreator && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => navigate(`/event/${event.id}/edit`)}
-                      className="text-white"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
+                    <Link to={`/event/${event.id}/edit`}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-white"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    </Link>
                   )}
 
                   {/* Delete Button (only for creators) */}
@@ -649,13 +650,12 @@ const ExploreEvents = () => {
                 Discover and join dining experiences
               </p>
             </div>
-            <Button
-              onClick={() => navigate("/create-event")}
-              className="bg-secondary hover:bg-secondary/90 mt-4 sm:mt-0"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Create Event
-            </Button>
+            <Link to={"/create=event"}>
+              <Button className="bg-secondary hover:bg-secondary/90 mt-4 sm:mt-0">
+                <Plus className="h-4 w-4 mr-2" />
+                Create Event
+              </Button>
+            </Link>
           </div>
 
           <div className="relative">

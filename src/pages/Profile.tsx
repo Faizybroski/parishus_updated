@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "@/index.css";
 
 const Profile = () => {
@@ -386,7 +386,9 @@ const Profile = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-foreground font-script">Profile</h1>
+            <h1 className="text-3xl font-bold text-foreground font-script">
+              Profile
+            </h1>
             <Button onClick={signOut} variant="outline">
               Sign Out
             </Button>
@@ -849,14 +851,15 @@ const Profile = () => {
                     Track your dining history and discover crossed paths
                   </p>
                 </div>
-                <Button
-                  onClick={() => navigate("/my-visits")}
-                  variant="outline"
-                  className="flex items-center space-x-2"
-                >
-                  <MapPin className="h-4 w-4" />
-                  <span>View History</span>
-                </Button>
+                <Link to={"/my-visits"}>
+                  <Button
+                    variant="outline"
+                    className="flex items-center space-x-2"
+                  >
+                    <MapPin className="h-4 w-4" />
+                    <span>View History</span>
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>
@@ -936,14 +939,15 @@ const Profile = () => {
                       View and manage your subscription plan
                     </p>
                   </div>
-                  <Button
-                    onClick={() => navigate("/subscription")}
-                    variant="outline"
-                    className="flex items-center space-x-2"
-                  >
-                    <CreditCard className="h-4 w-4" />
-                    <span>Manage</span>
-                  </Button>
+                  <Link to={"/subscription"}>
+                    <Button
+                      variant="outline"
+                      className="flex items-center space-x-2"
+                    >
+                      <CreditCard className="h-4 w-4" />
+                      <span>Manage</span>
+                    </Button>
+                  </Link>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">

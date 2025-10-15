@@ -225,12 +225,13 @@ export const OAuth = ({ startStep = 0 }) => {
               </div>
             </div>
             <div className="flex gap-3">
+              <Link to={"/auth"} className="flex-1">
               <Button
-                onClick={() => navigate("/auth")}
-                className="flex-1 py-3 text-foreground hover:bg-secondary/40 bg-transparent border"
+                className="w-full py-3 text-foreground hover:bg-secondary/40 bg-transparent border"
               >
                 <Mail size={22} color="black" /> Email
               </Button>
+              </Link>
             </div>
           </div>
         </Card>

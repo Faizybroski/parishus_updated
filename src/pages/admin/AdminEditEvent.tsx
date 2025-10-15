@@ -31,7 +31,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { format } from "date-fns";
 const today = format(new Date(), "yyyy-MM-dd");
 import { RestaurantSearchDropdown } from "@/components/restaurants/RestaurantSearchDropdown";
@@ -231,7 +231,7 @@ const AdminEditEvent = () => {
       return;
     }
 
-        if (!formData.name.trim()) {
+    if (!formData.name.trim()) {
       toast({
         title: "Validation Error",
         description: "Event name cannot be empty.",
@@ -294,7 +294,7 @@ const AdminEditEvent = () => {
       return;
     }
 
-    if(!formData.guest_invitation_type) {
+    if (!formData.guest_invitation_type) {
       toast({
         title: "Validation Error",
         description: "Please select a guest invitation type.",
@@ -303,7 +303,10 @@ const AdminEditEvent = () => {
       return;
     }
 
-    if (formData.is_paid && (!formData.event_fee || Number(formData.event_fee) <= 0)) {
+    if (
+      formData.is_paid &&
+      (!formData.event_fee || Number(formData.event_fee) <= 0)
+    ) {
       toast({
         title: "Validation Error",
         description: "Please enter a valid event fee for paid events.",
@@ -356,10 +359,13 @@ const AdminEditEvent = () => {
         .eq("id", eventId);
 
       if (error) throw error;
-       const eventLink = `${window.location.origin}/event/${eventId}/details`;
-       const emails = invitedEmails;
+      const eventLink = `${window.location.origin}/event/${eventId}/details`;
+      const emails = invitedEmails;
 
-      if ( (!emails || emails.length === 0) && (!invitedGuestIds || invitedGuestIds.length === 0)) {
+      if (
+        (!emails || emails.length === 0) &&
+        (!invitedGuestIds || invitedGuestIds.length === 0)
+      ) {
         localStorage.setItem("eventUpdated", Date.now().toString());
         window.dispatchEvent(new CustomEvent("eventUpdated"));
 
@@ -434,12 +440,9 @@ const AdminEditEvent = () => {
           <p className="text-muted-foreground">
             Please complete your profile to update events.
           </p>
-          <Button
-            onClick={() => navigate("/profile")}
-            className=""
-          >
-            Complete Profile
-          </Button>
+          <Link to="/profile">
+            <Button className="">Complete Profile</Button>
+          </Link>
         </div>
       </div>
     );
@@ -449,17 +452,17 @@ const AdminEditEvent = () => {
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
-         <div className="flex items-center space-x-4">
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/admin/events')}
-              className="flex items-center space-x-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span>Back to Events</span>
-            </Button>
+          <div className="flex items-center space-x-4">
+            <Link to="/admin/events">
+              <Button variant="ghost" className="flex items-center space-x-2">
+                <ArrowLeft className="h-4 w-4" />
+                <span>Back to Events</span>
+              </Button>
+            </Link>
             <div>
-              <h1 className="text-3xl font-bold text-foreground font-script">Edit Event</h1>
+              <h1 className="text-3xl font-bold text-foreground font-script">
+                Edit Event
+              </h1>
               <p className="text-muted-foreground mt-1">
                 Plan your next dining experience and invite others to join
               </p>
@@ -494,7 +497,9 @@ const AdminEditEvent = () => {
                     id="name"
                     placeholder="e.g., Wine Tasting Social"
                     value={formData.name}
-                    onChange={(e) => handleInputChange("name", e.target.value.trim())}
+                    onChange={(e) =>
+                      handleInputChange("name", e.target.value.trim())
+                    }
                   />
                 </div>
 
@@ -614,7 +619,10 @@ const AdminEditEvent = () => {
                       min={today}
                       value={formData.rsvp_deadline_date}
                       onChange={(e) =>
-                        handleInputChange("rsvp_deadline_date", e.target.value.trim())
+                        handleInputChange(
+                          "rsvp_deadline_date",
+                          e.target.value.trim()
+                        )
                       }
                     />
                   </div>
@@ -627,7 +635,10 @@ const AdminEditEvent = () => {
                     type="time"
                     value={formData.rsvp_deadline_time}
                     onChange={(e) =>
-                      handleInputChange("rsvp_deadline_time", e.target.value.trim())
+                      handleInputChange(
+                        "rsvp_deadline_time",
+                        e.target.value.trim()
+                      )
                     }
                   />
                 </div>
@@ -908,13 +919,11 @@ const AdminEditEvent = () => {
 
             {/* Submit Buttons */}
             <div className="flex justify-end space-x-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => navigate("/dashboard")}
-              >
-                Cancel
-              </Button>
+              <Link to="/dashboard">
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </Link>
               <Button
                 type="submit"
                 disabled={!isFormValid || loading}

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {LoaderText} from "@/components/loader/Loader";
+import { LoaderText } from "@/components/loader/Loader";
 import { toast } from "@/hooks/use-toast";
 import {
   Calendar,
@@ -176,8 +176,12 @@ const AdminEvents = () => {
   const filteredEvents = events.filter(
     (event) =>
       event.name.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-      event.description.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-      event.location_name.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
+      event.description
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase().trim()) ||
+      event.location_name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase().trim()) ||
       (event.restaurants?.name &&
         event.restaurants.name
           .toLowerCase()
@@ -210,13 +214,12 @@ const AdminEvents = () => {
               Manage all events in the system
             </p>
           </div>
-          <Button
-            onClick={() => navigate("/admin/events/create")}
-            className="flex items-center space-x-2"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Create Event</span>
-          </Button>
+          <Link to="/admin/events/create">
+            <Button className="flex items-center space-x-2">
+              <Plus className="h-4 w-4" />
+              <span>Create Event</span>
+            </Button>
+          </Link>
         </div>
 
         <div className="relative mb-6">
@@ -329,32 +332,22 @@ const AdminEvents = () => {
                     </div>
 
                     <div className="flex-grow" />
-
                     <div className="flex space-x-2">
-                      <Button
-                        onClick={() =>
-                          navigate(`/admin/event/${event.id}/details`)
-                        }
-                        className="flex-1 bg-primary hover:bg-primary/90 text-black rounded-sm"
-                      >
-                        See details
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          navigate(`/admin/event/${event.id}/edit`)
-                        }
-                        className="\"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-
+                      <Link to={`/admin/event/${event.id}/details`} className="flex-1">
+                        <Button className="w-full bg-primary hover:bg-primary/90 text-black rounded-sm">
+                          See details
+                        </Button>
+                      </Link>
+                      <Link to={`/admin/event/${event.id}/edit`}>
+                        <Button variant="outline" size="sm" className="\">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </Link>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleDeleteEvent(event.id)}
                         className="text-red-500 hover:text-red-600 border-destructive"
+                        onClick={() => handleDeleteEvent(event.id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

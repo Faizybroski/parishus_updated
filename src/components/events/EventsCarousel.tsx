@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { LoaderText } from "@/components/loader/Loader";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
@@ -302,9 +302,9 @@ const EventsCarousel = () => {
       <div className="h-96 flex items-center justify-center text-center text-muted-foreground bg-background rounded-xl">
         <div>
           <h3 className="text-2xl font-semibold mb-2">No Events Found</h3>
-          <Button onClick={() => navigate("/create-event")}>
-            Create Event
-          </Button>
+          <Link to={"/create-event"}>
+            <Button>Create Event</Button>
+          </Link>
         </div>
       </div>
     );
@@ -533,21 +533,23 @@ const EventsCarousel = () => {
 
                       {/* Buttons */}
                       <div className="flex flex-col sm:flex-row items-center lg:justify-start justify-center gap-3 mt-6 w-full">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => navigate(`/event/${event.id}/details`)}
-                          className="bg-white/10 hover:bg-white/20 text-white border-white/30 rounded-full transition"
-                        >
-                          <Share2 className="h-5 w-5 text-[#d2bdad]" />
-                        </Button>
-                        <Button
-                          onClick={() => navigate(`/rsvp/${event.id}/details`)}
-                          className="w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-lg font-semibold bg-white text-black hover:bg-gray-200 rounded-full flex items-center justify-center gap-2 transition-all"
-                        >
-                          {rsvpStatus === "yes" ? "Un-RSVP" : "RSVP"}
-                          <ChevronRight className="w-5 h-5" />
-                        </Button>
+                        <Link to={`/event/${event.id}/details`}>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="bg-white/10 hover:bg-white/20 text-white border-white/30 rounded-full transition group"
+                          >
+                            <Share2 className="h-5 w-5 text-[#d2bdad] icon-animate" />
+                          </Button>
+                        </Link>
+                        <Link to={`/rsvp/${event.id}/details`}>
+                          <Button
+                            className="w-full group sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-lg font-semibold bg-white text-black hover:bg-gray-200 rounded-full flex items-center justify-center gap-2 transition-all"
+                          >
+                            {rsvpStatus === "yes" ? "Un-RSVP" : "RSVP"}
+                            <ChevronRight className="w-5 h-5 icon-animate" />
+                          </Button>
+                        </Link>
                       </div>
                     </div>
                   </div>

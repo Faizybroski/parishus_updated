@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { useRestaurants, Restaurant } from "@/hooks/useRestaurants";
-import {LoaderText} from "@/components/loader/Loader"
+import { LoaderText } from "@/components/loader/Loader";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,7 +29,7 @@ import {
   DollarSign,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { format } from "date-fns";
 const today = format(new Date(), "yyyy-MM-dd");
 import { RestaurantSearchDropdown } from "@/components/restaurants/RestaurantSearchDropdown";
@@ -38,7 +38,7 @@ import { CrossedPathInviteModal } from "@/components/Invitationmodals/CrossedPat
 import { getEmailsFromIds } from "@/lib/getEmailsFromIds";
 import { sendEventInvite } from "@/lib/sendInvite";
 import GooglePlacesEventsForm from "@/components/restaurants/GooglePlacesEventsForm";
-import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
+import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 
 const CreateEvent = () => {
   const [loading, setLoading] = useState(false);
@@ -73,7 +73,8 @@ const CreateEvent = () => {
   const { restaurants, loading: restaurantsLoading } = useRestaurants();
   const [emailInviteModelOpen, setEmailInviteModelOpen] = useState(false);
   const [invitedGuestIds, setInvitedGuestIds] = useState<string[]>([]);
-  const [crossedPathInviteModelOpen, setCrossedPathInviteModelOpen] = useState(false);
+  const [crossedPathInviteModelOpen, setCrossedPathInviteModelOpen] =
+    useState(false);
   const navigate = useNavigate();
   const subscriptionStatus = useSubscriptionStatus(profile?.id);
 
@@ -165,7 +166,7 @@ const CreateEvent = () => {
       });
       return;
     }
-    
+
     if (!formData.name.trim()) {
       toast({
         title: "Validation Error",
@@ -229,7 +230,7 @@ const CreateEvent = () => {
       return;
     }
 
-    if(!formData.guest_invitation_type) {
+    if (!formData.guest_invitation_type) {
       toast({
         title: "Validation Error",
         description: "Please select a guest invitation type.",
@@ -238,7 +239,10 @@ const CreateEvent = () => {
       return;
     }
 
-    if (formData.is_paid && (!formData.event_fee || Number(formData.event_fee) <= 0)) {
+    if (
+      formData.is_paid &&
+      (!formData.event_fee || Number(formData.event_fee) <= 0)
+    ) {
       toast({
         title: "Validation Error",
         description: "Please enter a valid event fee for paid events.",
@@ -267,7 +271,8 @@ const CreateEvent = () => {
         if (count >= 2) {
           toast({
             title: "Event Limit Reached",
-            description: "Free-tier users can only create 2 events per month. Upgrade to Premium to unlock unlimited events.",
+            description:
+              "Free-tier users can only create 2 events per month. Upgrade to Premium to unlock unlimited events.",
             variant: "destructive",
           });
           setTimeout(() => {
@@ -320,11 +325,14 @@ const CreateEvent = () => {
         .select()
         .single();
 
-        if (error) throw error;
-        const eventLink = `${window.location.origin}/event/${data.id}/details`;
-        const emails = invitedEmails;
+      if (error) throw error;
+      const eventLink = `${window.location.origin}/event/${data.id}/details`;
+      const emails = invitedEmails;
 
-      if ( (!emails || emails.length === 0) && (!invitedGuestIds || invitedGuestIds.length === 0)) {
+      if (
+        (!emails || emails.length === 0) &&
+        (!invitedGuestIds || invitedGuestIds.length === 0)
+      ) {
         localStorage.setItem("eventUpdated", Date.now().toString());
         window.dispatchEvent(new CustomEvent("eventUpdated"));
 
@@ -372,7 +380,7 @@ const CreateEvent = () => {
     formData.location_name &&
     formData.cover_photo_url;
   if (authLoading || profileLoading) {
-    return (  
+    return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <LoaderText text="Parish" />
       </div>
@@ -394,12 +402,9 @@ const CreateEvent = () => {
           <p className="text-muted-foreground">
             Please complete your profile to create events.
           </p>
-          <Button
-            onClick={() => navigate("/profile")}
-            className=""
-          >
-            Complete Profile
-          </Button>
+          <Link to={"/profile"}>
+            <Button className="">Complete Profile</Button>
+          </Link>
         </div>
       </div>
     );
@@ -859,13 +864,11 @@ const CreateEvent = () => {
 
             {/* Submit Buttons */}
             <div className="flex justify-end space-x-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => navigate("/dashboard")}
-              >
-                Cancel
-              </Button>
+              <Link to={"/dashboard"}>
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </Link>
               <Button
                 type="submit"
                 disabled={!isFormValid || loading}

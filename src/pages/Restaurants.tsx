@@ -1,22 +1,45 @@
-import React, { useState, useEffect } from 'react';
-import { useRestaurants } from '@/hooks/useRestaurants';
-import { useProfile } from '@/hooks/useProfile';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Plus, MapPin, Edit, Trash2, Search, User } from 'lucide-react';
-import { toast } from 'sonner';
-import {LoaderText} from "@/components/loader/Loader"
+import React, { useState, useEffect } from "react";
+import { useRestaurants } from "@/hooks/useRestaurants";
+import { useProfile } from "@/hooks/useProfile";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Plus, MapPin, Edit, Trash2, Search, User } from "lucide-react";
+import { toast } from "sonner";
+import { LoaderText } from "@/components/loader/Loader";
 
 const Restaurants = () => {
-  const { restaurants, loading, deleteRestaurant, canEdit, canDelete, refetch } = useRestaurants();
+  const {
+    restaurants,
+    loading,
+    deleteRestaurant,
+    canEdit,
+    canDelete,
+    refetch,
+  } = useRestaurants();
   const { profile } = useProfile();
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Add comprehensive refresh mechanism
   useEffect(() => {
@@ -32,10 +55,10 @@ const Restaurants = () => {
 
     // Add storage event listener for cross-tab communication
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'restaurantUpdated') {
+      if (e.key === "restaurantUpdated") {
         refetch();
         // Clear the storage item after handling
-        localStorage.removeItem('restaurantUpdated');
+        localStorage.removeItem("restaurantUpdated");
       }
     };
 
@@ -51,18 +74,18 @@ const Restaurants = () => {
       }, 100);
     };
 
-    window.addEventListener('focus', handleFocus);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('restaurantUpdated', handleRestaurantUpdate);
-    window.addEventListener('popstate', handlePopState);
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("restaurantUpdated", handleRestaurantUpdate);
+    window.addEventListener("popstate", handlePopState);
 
     return () => {
-      window.removeEventListener('focus', handleFocus);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('restaurantUpdated', handleRestaurantUpdate);
-      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("restaurantUpdated", handleRestaurantUpdate);
+      window.removeEventListener("popstate", handlePopState);
     };
   }, [refetch]);
 
@@ -75,26 +98,36 @@ const Restaurants = () => {
     return () => clearInterval(refreshInterval);
   }, [refetch]);
 
-  const filteredRestaurants = restaurants.filter(restaurant =>
-    restaurant.name.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
-    restaurant.city.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
-    restaurant.country.toLowerCase().includes(searchQuery.toLowerCase().trim())
+  const filteredRestaurants = restaurants.filter(
+    (restaurant) =>
+      restaurant.name
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase().trim()) ||
+      restaurant.city
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase().trim()) ||
+      restaurant.country
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase().trim())
   );
 
   const handleDelete = async (id: string) => {
     const { error } = await deleteRestaurant(id);
     if (error) {
-      toast.error('Failed to delete restaurant');
+      toast.error("Failed to delete restaurant");
     } else {
-      toast.success('Restaurant deleted successfully');
+      toast.success("Restaurant deleted successfully");
     }
   };
 
-  const isAdminRoute = location.pathname.startsWith('/admin');
-  const addRestaurantPath = isAdminRoute ? '/admin/restaurants/add' : '/restaurants/add';
-  const getEditPath = (id: string) => isAdminRoute ? `/admin/restaurants/edit/${id}` : `/restaurants/edit/${id}`;
+  const isAdminRoute = location.pathname.startsWith("/admin");
+  const addRestaurantPath = isAdminRoute
+    ? "/admin/restaurants/add"
+    : "/restaurants/add";
+  const getEditPath = (id: string) =>
+    isAdminRoute ? `/admin/restaurants/edit/${id}` : `/restaurants/edit/${id}`;
 
-    if (loading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <LoaderText text="Parish" />
@@ -109,16 +142,19 @@ const Restaurants = () => {
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-foreground font-script">Restaurants</h1>
+              <h1 className="text-3xl font-bold text-foreground font-script">
+                Restaurants
+              </h1>
               <p className="text-muted-foreground mt-1">
                 Manage your restaurant locations for events
               </p>
             </div>
-            
-            <Button onClick={() => navigate(addRestaurantPath)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Restaurant
-            </Button>
+            <Link to={addRestaurantPath}>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Restaurant
+              </Button>
+            </Link>
           </div>
 
           {/* Search */}
@@ -137,25 +173,29 @@ const Restaurants = () => {
             <div className="text-center py-12">
               <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-foreground mb-2">
-                {searchQuery ? 'No restaurants found' : 'No restaurants yet'}
+                {searchQuery ? "No restaurants found" : "No restaurants yet"}
               </h3>
               <p className="text-muted-foreground mb-4">
-                {searchQuery 
-                  ? 'Try adjusting your search terms'
-                  : 'Get started by adding your first restaurant location'
-                }
+                {searchQuery
+                  ? "Try adjusting your search terms"
+                  : "Get started by adding your first restaurant location"}
               </p>
               {!searchQuery && (
-                <Button onClick={() => navigate(addRestaurantPath)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Restaurant
-                </Button>
+                <Link to={addRestaurantPath}>
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Restaurant
+                  </Button>
+                </Link>
               )}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredRestaurants.map((restaurant) => (
-                <Card key={restaurant.id} className="group hover:shadow-lg transition-all duration-200">
+                <Card
+                  key={restaurant.id}
+                  className="group hover:shadow-lg transition-all duration-200"
+                >
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
@@ -167,19 +207,17 @@ const Restaurants = () => {
                           {restaurant.city}, {restaurant.country}
                         </CardDescription>
                       </div>
-                      
+
                       {(canEdit(restaurant) || canDelete(restaurant)) && (
                         <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           {canEdit(restaurant) && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => navigate(getEditPath(restaurant.id))}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
+                            <Link to={getEditPath(restaurant.id)}>
+                              <Button variant="ghost" size="sm">
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </Link>
                           )}
-                          
+
                           {canDelete(restaurant) && (
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
@@ -189,9 +227,13 @@ const Restaurants = () => {
                               </AlertDialogTrigger>
                               <AlertDialogContent>
                                 <AlertDialogHeader>
-                                  <AlertDialogTitle>Delete Restaurant</AlertDialogTitle>
+                                  <AlertDialogTitle>
+                                    Delete Restaurant
+                                  </AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Are you sure you want to delete "{restaurant.name}"? This action cannot be undone.
+                                    Are you sure you want to delete "
+                                    {restaurant.name}"? This action cannot be
+                                    undone.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
@@ -210,30 +252,35 @@ const Restaurants = () => {
                       )}
                     </div>
                   </CardHeader>
-                  
+
                   <CardContent>
                     <div className="space-y-3">
                       <div>
                         <p className="text-sm text-muted-foreground">Address</p>
                         <p className="text-sm">{restaurant.full_address}</p>
                       </div>
-                      
+
                       <div>
-                        <p className="text-sm text-muted-foreground">Added By</p>
+                        <p className="text-sm text-muted-foreground">
+                          Added By
+                        </p>
                         <div className="flex items-center gap-2">
                           <User className="h-3 w-3 text-muted-foreground" />
                           <p className="text-sm">
-                            {restaurant.creator 
-                              ? `${restaurant.creator.first_name || ''} ${restaurant.creator.last_name || ''}`.trim() || restaurant.creator.email
-                              : 'Unknown'
-                            }
+                            {restaurant.creator
+                              ? `${restaurant.creator.first_name || ""} ${
+                                  restaurant.creator.last_name || ""
+                                }`.trim() || restaurant.creator.email
+                              : "Unknown"}
                           </p>
                         </div>
                       </div>
-                      
+
                       <div className="flex gap-2">
-                        <Badge variant="secondary">{restaurant.state_province}</Badge>
-                        {(restaurant.latitude && restaurant.longitude) && (
+                        <Badge variant="secondary">
+                          {restaurant.state_province}
+                        </Badge>
+                        {restaurant.latitude && restaurant.longitude && (
                           <Badge variant="outline">GPS Coordinates</Badge>
                         )}
                       </div>

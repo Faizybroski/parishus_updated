@@ -1,37 +1,36 @@
 @import url("https://fonts.cdnfonts.com/css/sergio-trendy");
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Dancing+Script:wght@400..700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Dancing+Script:wght@400..700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-
-      --parish-stroke: 2px;           /* outline width */
-  --parish-padding: 0.18em;       /* safe padding so stroke never clips */
-  --parish-anim-duration: 2.6s;
-  --parish-ease: cubic-bezier(.22,.9,.28,1); 
+    --parish-stroke: 2px; /* outline width */
+    --parish-padding: 0.18em; /* safe padding so stroke never clips */
+    --parish-anim-duration: 2.6s;
+    --parish-ease: cubic-bezier(0.22, 0.9, 0.28, 1);
 
     --background: 39 33% 96%; /* Warm cream/parchment */
     --foreground: 0 0% 18%; /* Deep charcoal for text */
 
-    --card: 39 33% 98%; 
+    --card: 39 33% 98%;
     --card-foreground: 0 0% 18%;
 
     --popover: 39 33% 98%;
     --popover-foreground: 0 0% 18%;
 
-    --accent: 0 0% 18%; 
+    --accent: 0 0% 18%;
     --accent-foreground: 39 33% 96%;
 
-    --secondary: 39 20% 88%; 
+    --secondary: 39 20% 88%;
     --secondary-foreground: 0 0% 18%;
 
     --muted: 39 20% 88%;
     --muted-foreground: 0 0% 45%;
 
-    --primary: 25 30% 85%; 
+    --primary: 25 30% 85%;
     --primary-foreground: 0 0% 18%;
 
     --destructive: 0 84.2% 60.2%;
@@ -216,6 +215,22 @@
   }
 }
 
+@keyframes spin-slow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.icon-animate {
+  transition: transform 0.3s ease;
+}
+
+.group:hover .icon-animate {
+  animation: spin-slow 1.5s linear infinite;
+}
 
 /* In your CSS file */
 .event-container {
@@ -304,15 +319,15 @@
     @apply bg-background text-foreground;
     @apply font-serif;
   }
-      
+
   body {
-  overflow: auto;
-  -ms-overflow-style: none; /* IE/Edge */
-  scrollbar-width: none; /* Firefox */
-}
-body::-webkit-scrollbar {
-  display: none; /* Chrome, Safari */
-}
+    overflow: auto;
+    -ms-overflow-style: none; /* IE/Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  body::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
 }
 
 /* Line clamp utilities */

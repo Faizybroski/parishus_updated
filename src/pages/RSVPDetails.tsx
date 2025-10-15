@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRestaurants } from "@/hooks/useRestaurants";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronLeft, CreditCard, Loader2 } from "lucide-react";
-import {LoaderText} from "@/components/loader/Loader";
+import { LoaderText } from "@/components/loader/Loader";
 import {
   Calendar,
   Clock,
@@ -447,7 +447,7 @@ const RSVPDetails = () => {
     return () => clearInterval(interval);
   }, [event?.date_time]);
 
-    if (loading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <LoaderText text="Parish" />
@@ -465,10 +465,12 @@ const RSVPDetails = () => {
           <p className="text-muted-foreground">
             The event you're looking for doesn't exist or has been removed.
           </p>
-          <Button onClick={() => navigate("/events")}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Events
-          </Button>
+          <Link to="/events">
+            <Button>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Events
+            </Button>
+          </Link>
         </div>
       </div>
     );
@@ -486,20 +488,21 @@ const RSVPDetails = () => {
   rsvpDeadline.setDate(rsvpDeadline.getDate());
   const isBeforeDeadline = now <= rsvpDeadline;
   const isPastEvent = eventDate < now;
-  
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-secondary p-6 rounded-3xl shadow-lg space-y-6 relative">
-        <button
-          onClick={() => navigate("/")}
-          className="absolute top-4 left-4 text-muted-foreground hover:text-[#c4b0a2]"
-        >
-          <ChevronLeft className="w-6 h-6" />
-        </button>
+        <Link to="/">
+          <button className="absolute top-4 left-4 text-muted-foreground hover:text-[#c4b0a2]">
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+        </Link>
         <div className="text-center mt-6">
           {isPastEvent && (
             <>
-              <h3 className="text-xl font-semibold text-muted-foreground">This event is ended</h3>
+              <h3 className="text-xl font-semibold text-muted-foreground">
+                This event is ended
+              </h3>
               <h2 className="text-xl font-semibold text-[#c4b0a2]">
                 {event.name}
               </h2>
@@ -516,29 +519,37 @@ const RSVPDetails = () => {
           )}
           {!isPastEvent && !isBeforeDeadline && (
             <h2 className="text-xl font-semibold text-[#c4b0a2]">
-                {event.name}
-              </h2>
+              {event.name}
+            </h2>
           )}
         </div>
         <div className="flex justify-center gap-4 text-center text-muted-foreground font-bold text-3xl">
           <div>
             <div className="text-[#c4b0a2]">{timeLeft.days}</div>
-            <span className="text-sm font-normal text-muted-foreground">days</span>
+            <span className="text-sm font-normal text-muted-foreground">
+              days
+            </span>
           </div>
           <div>:</div>
           <div>
             <div className="text-[#c4b0a2]">{timeLeft.hours}</div>
-            <span className="text-sm font-normal text-muted-foreground">hours</span>
+            <span className="text-sm font-normal text-muted-foreground">
+              hours
+            </span>
           </div>
           <div>:</div>
           <div>
             <div className="text-[#c4b0a2]">{timeLeft.minutes}</div>
-            <span className="text-sm font-normal text-muted-foreground">minutes</span>
+            <span className="text-sm font-normal text-muted-foreground">
+              minutes
+            </span>
           </div>
           <div>:</div>
           <div>
             <div className="text-[#c4b0a2]">{timeLeft.seconds}</div>
-            <span className="text-sm font-normal text-muted-foreground">seconds</span>
+            <span className="text-sm font-normal text-muted-foreground">
+              seconds
+            </span>
           </div>
         </div>
         {!isPastEvent && (
@@ -601,11 +612,7 @@ const RSVPDetails = () => {
               !event.event_fee || event.event_fee == 0 ? (
                 <Button
                   onClick={handleRSVP}
-                  className={`w-full ${
-                    hasRSVP
-                      ? ""
-                      : ""
-                  }`}
+                  className={`w-full ${hasRSVP ? "" : ""}`}
                 >
                   {hasRSVP ? (
                     <>

@@ -861,10 +861,12 @@ const EventDetails = () => {
           <p className="text-muted-foreground">
             The event you're looking for doesn't exist or has been removed.
           </p>
-          <Button onClick={() => navigate("/events")}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Events
-          </Button>
+          <Link to={"/events"}>
+            <Button>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Events
+            </Button>
+          </Link>
         </div>
       </div>
     );
@@ -888,26 +890,22 @@ const EventDetails = () => {
         {/* Header */}
         <div className="mb-8 flex justify-between items-center">
           {isCreator && (
-            <Button
-              variant="ghost"
-              onClick={() => navigate("/events")}
-              className="mb-4"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Events
-            </Button>
+            <Link to={"/events"}>
+              <Button variant="ghost" className="mb-4">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Events
+              </Button>
+            </Link>
           )}
           {!isCreator && (
-            <Button
-              variant="ghost"
-              onClick={() => navigate("/explore")}
-              className="mb-4"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Events
-            </Button>
+            <Link to={"/explore"}>
+              <Button variant="ghost" className="mb-4">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Events
+              </Button>
+            </Link>
           )}
-          {!isCreator && isBeforeDeadline && (
+          {/* {!isCreator && isBeforeDeadline && (
             <Button
               onClick={handleInterest}
               disabled={loading}
@@ -919,7 +917,7 @@ const EventDetails = () => {
                 ? "Interested"
                 : "Show Interest"}
             </Button>
-          )}
+          )} */}
         </div>
 
         {showRSVPConfirm && (
@@ -972,7 +970,9 @@ const EventDetails = () => {
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="space-y-2">
-                    <CardTitle className="text-2xl">{event.name}</CardTitle>
+                    <div className="flex items-center gap-3">
+                      <CardTitle className="text-2xl">{event.name}</CardTitle>
+                    </div>
                     <div className="flex items-center space-x-2">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={event.profiles.profile_photo_url} />
@@ -990,6 +990,31 @@ const EventDetails = () => {
                     </div>
                   </div>
                   <div className="flex space-x-2">
+                    {!isCreator && isBeforeDeadline && (
+                      <Button
+                        onClick={handleInterest}
+                        disabled={loading}
+                        variant="ghost"
+                        size="icon"
+                        className={`p-2 rounded-full border transition-colors duration-200 ${
+                          isInterested
+                            ? "bg-red-500/10 border-red-500 text-red-600 hover:bg-red-500/20"
+                            : "bg-background border-foreground/20 hover:bg-muted"
+                        }`}
+                      >
+                        {loading ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Heart
+                            className={`h-5 w-5 transition-all duration-200 ${
+                              isInterested
+                                ? "fill-red-500 text-red-500"
+                                : "fill-background text-black"
+                            }`}
+                          />
+                        )}
+                      </Button>
+                    )}
                     {!event.is_paid && (
                       <Button variant="outline" size="sm" onClick={shareEvent}>
                         <Share2 className="h-4 w-4" />
@@ -997,13 +1022,11 @@ const EventDetails = () => {
                     )}
 
                     {isCreator && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => navigate(`/event/${event.id}/edit`)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
+                      <Link to={`/event/${event.id}/edit`}>
+                        <Button variant="outline" size="sm">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </Link>
                     )}
                   </div>
                 </div>
@@ -1433,13 +1456,12 @@ const EventDetails = () => {
                     >
                       Event Ended
                     </Badge>
-                    <Button
-                      onClick={() => navigate("/feedback")}
-                      className="w-full"
-                    >
-                      <Star className="h-4 w-4 mr-2" />
-                      Leave Review
-                    </Button>
+                    <Link to={"/feedback"}>
+                      <Button className="w-full">
+                        <Star className="h-4 w-4 mr-2" />
+                        Leave Review
+                      </Button>
+                    </Link>
                   </div>
                 )}
 

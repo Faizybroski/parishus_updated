@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {LoaderText} from "@/components/loader/Loader"
+import { LoaderText } from "@/components/loader/Loader";
 import {
   Calendar,
   Clock,
@@ -23,7 +23,7 @@ import {
   Share2,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 interface Event {
   id: string;
@@ -552,8 +552,12 @@ const Events = () => {
   const filteredEvents = events.filter(
     (event) =>
       event.name.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-      event.description.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-      event.location_name.toLowerCase().includes(searchTerm.toLowerCase().trim())
+      event.description
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase().trim()) ||
+      event.location_name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase().trim())
   );
 
   const EventCards = ({
@@ -573,20 +577,19 @@ const Events = () => {
               ? "You haven't created or joined any events yet"
               : "No events available at the moment"}
           </p>
-          <Button
-            variant="outline"
-            onClick={() => navigate("/create-event")}
-            className=""
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            {showActions ? "Create Your First Event" : "Create Event"}
-          </Button>
+          <Link to={"/create-event"}>
+            <Button variant="outline" className="group">
+              <Plus className="h-4 w-4 mr-2 icon-animate" />
+              {showActions ? "Create Your First Event" : "Create Event"}
+            </Button>
+          </Link>
         </div>
       );
     }
 
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      // <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="flex flex-wrap justify-start gap-5 my-5">
         {events.map((event) => {
           const eventDate = new Date(event.date_time);
           const isCreator = event.creator_id === userProfileId;
@@ -599,173 +602,252 @@ const Events = () => {
           const isUpcoming = eventDate > new Date();
 
           return (
-            <Card
+            // <Card
+            //   key={event.id}
+            //   className="flex flex-col h-full border border-primary rounded-sm overflow-hidden shadow-sm"
+            // >
+            //   <div className="relative w-full flex items-center justify-center bg-primary flex-shrink-0 h-48">
+            //     <img
+            //       src={event.cover_photo_url}
+            //       alt={event.name}
+            //       className="w-full h-full object-contain"
+            //     />
+            //   </div>
+
+            //   <CardContent className="flex flex-col flex-grow space-y-3 p-4">
+            //     <div className="inset-0 pl-2 flex flex-col justify-end">
+            //       <h3 className="text-primary text-xl font-bold line-clamp-1">
+            //         {event.name}
+            //       </h3>
+            //       {event.description && (
+            //         <p className="text-primary/90 text-sm mt-1 line-clamp-1">
+            //           {event.description}
+            //         </p>
+            //       )}
+            //     </div>
+
+            //     <div className="text-sm flex items-center text-white pl-2 pt-4 pb-1 border-t-2 border">
+            //       <Calendar className="h-5 w-5 text-primary/90 mr-3" />
+            //       <span>
+            //         {new Date(event.date_time).toLocaleDateString("en-US", {
+            //           month: "short",
+            //           day: "numeric",
+            //         })}
+            //         {" - "}
+            //         {new Date(event.date_time).toLocaleTimeString("en-US", {
+            //           hour: "numeric",
+            //           minute: "2-digit",
+            //         })}
+            //       </span>
+            //     </div>
+
+            //     {event.max_attendees && (
+            //       // <div className="flex text-sm font-medium py-4 pl-2 border-t-2 border-b-2 border-[#1E1E1E] text-white">
+            //       //   <Users className="h-5 w-5 text-muted-foreground mr-3" />
+            //       //   {event.rsvp_count || 0}/{event.max_attendees} RSVPed
+            //       // </div>
+            //       <div className="text-sm font-medium py-4 px-2 border-t-2 border-b-2 border text-white">
+            //         <div className="flex items-center mb-2">
+            //           <Users className="h-5 w-5 text-primary/90 mr-3" />
+            //           {event.rsvp_count || 0}/{event.max_attendees} RSVPed
+            //         </div>
+
+            //         <div className="w-full h-2 rounded-full overflow-hidden">
+            //           <div
+            //             className="h-full bg-primary transition-all duration-300"
+            //             style={{
+            //               width: `${Math.min(
+            //                 ((event.rsvp_count || 0) / event.max_attendees) *
+            //                   100,
+            //                 100
+            //               )}%`,
+            //             }}
+            //           />
+            //         </div>
+            //       </div>
+            //     )}
+            //     {typeof event.is_paid !== "undefined" && (
+            //       <div className="text-sm font-medium py-2 text-white">
+            //         {event.is_paid
+            //           ? `💵 Paid Event – $${event.event_fee}`
+            //           : "🆓 Free Event"}
+            //       </div>
+            //     )}
+            //     <div className="flex items-center">
+            //       <MapPin className="h-5 w-5 text-primary/90 mr-3" />
+
+            //       <div className="text-sm flex flex-col text-white">
+            //         <span className="">
+            //           {event.location_name || "Location not specified"}
+            //         </span>
+            //         {event.restaurants && (
+            //           <span className="text-sm text-gray-400 line-clamp-1">
+            //             {event.restaurants.name} - {event.restaurants.city}
+            //           </span>
+            //         )}
+            //       </div>
+            //     </div>
+
+            //     <div className="flex-grow" />
+
+            // <div className="flex space-x-2">
+            //   <Link to={`/event/${event.id}/details`}>
+            //     <Button className="flex-1 bg-primary hover:bg-primary/90 text-black rounded-sm">
+            //       See details
+            //     </Button>
+            //   </Link>
+
+            //   {isCreator && (
+            //     <Link to={`/event/${event.id}/edit`}>
+            //       <Button variant="outline" size="sm" className="">
+            //         <Edit className="h-4 w-4" />
+            //       </Button>
+            //     </Link>
+            //   )}
+
+            //   {isCreator && (
+            //     <Button
+            //       variant="outline"
+            //       size="sm"
+            //       onClick={() => deleteEvent && deleteEvent(event.id)}
+            //       className="text-red-500 hover:text-red-600"
+            //     >
+            //       <Trash2 className="h-4 w-4" />
+            //     </Button>
+            //   )}
+            //   {!event.is_paid && (
+            //     <Button
+            //       variant="outline"
+            //       size="sm"
+            //       onClick={() =>
+            //         shareEvent(event.name, event.description, event.id)
+            //       }
+            //     >
+            //       <Share2 className="h-4 w-4" />
+            //     </Button>
+            //   )}
+
+            // </div>
+            //   </CardContent>
+            // </Card>
+            <div
               key={event.id}
-              className="flex flex-col h-full border border-primary rounded-sm overflow-hidden shadow-sm"
+              className="font-sans rounded-lg overflow-hidden shadow-md border border-gray-200 hover:border-gray-700 hover:bg-white/10 hover:cursor-pointer transition-all duration-300 w-full sm:w-[90%] md:w-[45%] lg:w-[30%] max-w-[420px]"
             >
-              {/* Image with Overlay */}
-              <div className="relative w-full flex items-center justify-center bg-primary flex-shrink-0 h-48">
-                {/* Image or Fallback */}
+              <div className="relative">
+                {/* Image */}
                 <img
+                  className="w-full object-cover"
+                  style={{ height: "35rem" }}
                   src={event.cover_photo_url}
                   alt={event.name}
-                  className="w-full h-full object-contain"
                 />
 
-                {/* Black Overlay */}
-                {/* <div className="absolute inset-0 bg-black/70 z-10" /> */}
-              </div>
-
-              {/* Footer Section */}
-              <CardContent className="flex flex-col flex-grow space-y-3 p-4">
-                {/* Text Content */}
-                <div className="inset-0 pl-2 flex flex-col justify-end">
-                  <h3 className="text-primary text-xl font-bold line-clamp-1">
-                    {event.name}
-                  </h3>
-                  {event.description && (
-                    <p className="text-primary/90 text-sm mt-1 line-clamp-1">
-                      {event.description}
-                    </p>
-                  )}
-                </div>
-
-                {/* Date & Time */}
-                <div className="text-sm flex items-center text-white pl-2 pt-4 pb-1 border-t-2 border">
-                  <Calendar className="h-5 w-5 text-primary/90 mr-3" />
-                  <span>
-                    {new Date(event.date_time).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })}
-                    {" - "}
-                    {new Date(event.date_time).toLocaleTimeString("en-US", {
-                      hour: "numeric",
-                      minute: "2-digit",
-                    })}
-                  </span>
-                </div>
-
-                {/* RSVP Count */}
-                {event.max_attendees && (
-                  // <div className="flex text-sm font-medium py-4 pl-2 border-t-2 border-b-2 border-[#1E1E1E] text-white">
-                  //   <Users className="h-5 w-5 text-muted-foreground mr-3" />
-                  //   {event.rsvp_count || 0}/{event.max_attendees} RSVPed
-                  // </div>
-                  <div className="text-sm font-medium py-4 px-2 border-t-2 border-b-2 border text-white">
-                    {/* Top content */}
-                    <div className="flex items-center mb-2">
-                      <Users className="h-5 w-5 text-primary/90 mr-3" />
-                      {event.rsvp_count || 0}/{event.max_attendees} RSVPed
-                    </div>
-
-                    {/* Progress bar */}
-                    <div className="w-full h-2 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-primary transition-all duration-300"
-                        style={{
-                          width: `${Math.min(
-                            ((event.rsvp_count || 0) / event.max_attendees) *
-                              100,
-                            100
-                          )}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                )}
-                {typeof event.is_paid !== "undefined" && (
-                  <div className="text-sm font-medium py-2 text-white">
-                    {event.is_paid
-                      ? `💵 Paid Event – $${event.event_fee}`
-                      : "🆓 Free Event"}
-                  </div>
-                )}
-                <div className="flex items-center">
-                  <MapPin className="h-5 w-5 text-primary/90 mr-3" />
-
-                  {/* Location */}
-                  <div className="text-sm flex flex-col text-white">
-                    <span className="">
-                      {event.location_name || "Location not specified"}
+                {/* Title container with black bg + gradient top */}
+                <div className="absolute inset-x-0 bottom-0">
+                  <div className="relative bg-black pr-4">
+                    <div className="absolute -top-[17.5rem] left-0 right-0 h-[17.5rem] bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10"></div>
+                    <span className="absolute -top-12 left-5 border border-white/20 text-white text-sm px-3 py-2 rounded shadow-md z-20">
+                      {new Date(event.date_time).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                      })}
+                      {" - "}
+                      {new Date(event.date_time).toLocaleTimeString("en-US", {
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
                     </span>
-                    {event.restaurants && (
-                      <span className="text-sm text-gray-400 line-clamp-1">
-                        {event.restaurants.name} - {event.restaurants.city}
-                      </span>
-                    )}
+                    <div className="absolute -top-32 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent"></div>
+
+                    <div className="pl-5 pr-2 pt-1 flex flex-col gap-2 relative z-10">
+                      <h3 className="text-2xl text-white">{event.name}</h3>
+                      {event.description && (
+                        <p className="text-white text-sm mt-1 line-clamp-1">
+                          {event.description}
+                        </p>
+                      )}
+                      {event.max_attendees && (
+                        <div className="text-sm font-medium py-2 text-white box-border">
+                          <div className="flex items-center mb-2">
+                            <Users className="h-5 w-5 text-white mr-3" />
+                            {event.rsvp_count || 0}/{event.max_attendees} RSVPed
+                          </div>
+
+                          <div className="w-full h-2 rounded-full overflow-hidden bg-secondary min-w-0 box-border">
+                            <div
+                              className="h-full bg-primary transition-all duration-300"
+                              style={{
+                                width: `${Math.min(
+                                  ((event.rsvp_count || 0) /
+                                    event.max_attendees) *
+                                    100,
+                                  100
+                                )}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      <p className="text-sm flex flex-col text-white pb-2">
+                        <span className="">
+                          {event.location_name || "Location not specified"}
+                        </span>
+                        {event.restaurants && (
+                          <span className="text-sm text-gray-400 line-clamp-1">
+                            {event.restaurants.name} - {event.restaurants.city}
+                          </span>
+                        )}
+                      </p>
+                      <div className="flex space-x-2 pb-3">
+                        <Link
+                          to={`/event/${event.id}/details`}
+                          className="flex-1"
+                        >
+                          <Button className="w-full bg-primary hover:bg-primary/90 text-black rounded-sm">
+                            See details
+                          </Button>
+                        </Link>
+
+                        {isCreator && (
+                          <Link to={`/event/${event.id}/edit`}>
+                            <Button variant="outline" size="sm" className="">
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                        )}
+
+                        {isCreator && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => deleteEvent && deleteEvent(event.id)}
+                            className="text-red-500 hover:text-red-600"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {!event.is_paid && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              shareEvent(
+                                event.name,
+                                event.description,
+                                event.id
+                              )
+                            }
+                          >
+                            <Share2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
-
-                {/* Spacer and Button */}
-                <div className="flex-grow" />
-
-                <div className="flex space-x-2">
-                  {/* Details Button */}
-                  <Button
-                    onClick={() => navigate(`/event/${event.id}/details`)}
-                    className="flex-1 bg-primary hover:bg-primary/90 text-black rounded-sm"
-                  >
-                    See details
-                  </Button>
-
-                  {/* Edit Button (only for creators) */}
-                  {isCreator && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => navigate(`/event/${event.id}/edit`)}
-                      className=""
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                  )}
-
-                  {/* Delete Button (only for creators) */}
-                  {isCreator && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => deleteEvent && deleteEvent(event.id)}
-                      className="text-red-500 hover:text-red-600"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                  {!event.is_paid && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        shareEvent(event.name, event.description, event.id)
-                      }
-                    >
-                      <Share2 className="h-4 w-4" />
-                    </Button>
-                  )}
-
-                  {/* RSVP Button (for all events with available spots) */}
-                  {/* {spotsLeft > 0 && !isCreator && (
-            <Button
-              onClick={() => handleRSVP(event.id)}
-              variant={hasRSVP ? "default" : "outline"}
-              size="sm"
-              className={
-                hasRSVP 
-                  ? "bg-green-600 hover:bg-green-600/90" 
-                  : "text-white border-[#1E1E1E]"
-              }
-            >
-              {hasRSVP ? (
-                <UserCheck className="h-4 w-4" />
-              ) : (
-                <Heart className="h-4 w-4" />
-              )}
-            </Button>
-          )} */}
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           );
         })}
       </div>
@@ -786,24 +868,24 @@ const Events = () => {
         <div className="space-y-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-foreground font-script">My Events</h1>
+              <h1 className="text-3xl font-bold text-foreground font-script">
+                My Events
+              </h1>
               <p className="text-muted-foreground mt-1">
                 Manage your created events
               </p>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/create-event")}
-              className=""
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Create Event
-            </Button>
+            <Link to={"/create-event"}>
+              <Button variant="outline" className="group">
+                <Plus className="h-4 w-4 mr-2 icon-animate" />
+                Create Event
+              </Button>
+            </Link>
           </div>
 
           <div className="space-y-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <div className="relative group">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground icon-animate" />
               <Input
                 placeholder="Search my events..."
                 value={searchTerm}

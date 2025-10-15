@@ -148,29 +148,20 @@ export const ParishUsLanding: React.FC = () => {
             <a href="#how">How it works</a>
             <a href="#events">Events</a>
             <a href="#faq">FAQ</a>
-            <a
-              onClick={() => navigate("contact-us")}
-              className="cursor-pointer"
-            >
-              Contact Us
-            </a>
+            <Link to={"/contact-us"}>Contact Us</Link>
           </nav>
 
           <div className="flex flex-wrap items-center gap-3 justify-end">
-            <Button
-              variant="outline"
-              size="default"
-              onClick={() => setShowLogin(true)}
-            >
-              Sign In
-            </Button>
-            <Button
-              variant="default"
-              size="default"
-              onClick={() => setShowAuth(true)}
-            >
-              Sign Up
-            </Button>
+            <Link to={"/login"}>
+              <Button variant="outline" size="default">
+                Sign In
+              </Button>
+            </Link>
+            <Link to={"/auth"}>
+              <Button variant="default" size="default">
+                Sign Up
+              </Button>
+            </Link>
           </div>
         </div>
       </header>
@@ -222,21 +213,16 @@ export const ParishUsLanding: React.FC = () => {
               </p>
 
               <div className="flex flex-wrap mt-5 gap-4 mb-8">
-                <Button
-                  variant="default"
-                  size="default"
-                  onClick={() => setShowAuth(true)}
-                >
-                  Reserve My Spot
-                </Button>
-                <Button
-                  variant="outline"
-                  size="default"
-                  className="border "
-                  onClick={() => setShowAuth(true)}
-                >
-                  Host a Table
-                </Button>
+                <Link to={"/auth"}>
+                  <Button variant="default" size="default">
+                    Reserve My Spot
+                  </Button>
+                </Link>
+                <Link to={"/auth"}>
+                  <Button variant="outline" size="default" className="border ">
+                    Host a Table
+                  </Button>
+                </Link>
               </div>
 
               <div className="flex flex-wrap gap-3">
@@ -337,13 +323,11 @@ export const ParishUsLanding: React.FC = () => {
                 Choose your perfect gathering
               </p>
             </div>
-            <Button
-              variant="outline"
-              className="hidden sm:flex"
-              onClick={() => setShowAuth(true)}
-            >
-              See Full Calendar →
-            </Button>
+            <Link to={"/auth"}>
+              <Button variant="outline" className="hidden sm:flex">
+                See Full Calendar →
+              </Button>
+            </Link>
           </div>
 
           <div className="flex flex-wrap  gap-5 px-4 my-5">
@@ -446,7 +430,9 @@ export const ParishUsLanding: React.FC = () => {
                     {/* Image */}
                     <img
                       className="w-full object-cover h-[25rem] md:h-[30rem]"
-                      src={"https://posh.vip/cdn-cgi/image/width=1080,quality=75,fit=scale-down,format=auto/https://posh-images-originals-production.s3.amazonaws.com/68cd95ca14a830801c692394"}
+                      src={
+                        "https://posh.vip/cdn-cgi/image/width=1080,quality=75,fit=scale-down,format=auto/https://posh-images-originals-production.s3.amazonaws.com/68cd95ca14a830801c692394"
+                      }
                       alt={event.name}
                     />
 
@@ -481,13 +467,11 @@ export const ParishUsLanding: React.FC = () => {
           </div>
 
           <div className="text-center">
-            <Button
-              variant="default"
-              size="default"
-              onClick={() => setShowAuth(true)}
-            >
-              Create Your Event
-            </Button>
+            <Link to={"/auth"}>
+              <Button variant="default" size="default">
+                Create Your Event
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -517,13 +501,11 @@ export const ParishUsLanding: React.FC = () => {
                 ))}
               </div>
               <div className="flex gap-4">
-                <Button
-                  variant="default"
-                  size="default"
-                  onClick={() => setShowAuth(true)}
-                >
-                  Start Hosting
-                </Button>
+                <Link to={"/auth"}>
+                  <Button variant="default" size="default">
+                    Start Hosting
+                  </Button>
+                </Link>
               </div>
             </div>
 
@@ -592,13 +574,11 @@ export const ParishUsLanding: React.FC = () => {
                   </div>
                 ))}
               </div>
-              <Button
-                variant="default"
-                size="default"
-                onClick={() => setShowAuth(true)}
-              >
-                Join Your First Parish
-              </Button>
+              <Link to={"/auth"}>
+                <Button variant="default" size="default">
+                  Join Your First Parish
+                </Button>
+              </Link>
             </div>
 
             <div className="relative">
@@ -642,20 +622,16 @@ export const ParishUsLanding: React.FC = () => {
             We're happy to help you get started
           </p>
           <div className="flex items-center justify-center gap-4">
-            <Button
-              variant="default"
-              size="default"
-              onClick={() => navigate("contact-us")}
-            >
-              Contact Support
-            </Button>
-            <Button
-              variant="outline"
-              size="default"
-              onClick={() => setShowAuth(true)}
-            >
-              Browse Events
-            </Button>
+            <Link to={"/contact-us"}>
+              <Button variant="default" size="default">
+                Contact Support
+              </Button>
+            </Link>
+            <Link to={"/auth"}>
+              <Button variant="outline" size="default">
+                Browse Events
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

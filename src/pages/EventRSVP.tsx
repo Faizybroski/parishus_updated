@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  useParams,
+  useNavigate,
+  useSearchParams,
+  Link,
+} from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {LoaderText} from "@/components/loader/loader"
+import { LoaderText } from "@/components/loader/loader";
 import {
   Calendar,
   MapPin,
@@ -122,7 +127,11 @@ const EventRSVP = () => {
     }
   };
 
-  const shareEvent = async (name: string, description: string, eventId: string) => {
+  const shareEvent = async (
+    name: string,
+    description: string,
+    eventId: string
+  ) => {
     try {
       await navigator.share({
         title: name,
@@ -130,7 +139,9 @@ const EventRSVP = () => {
         url: window.location.origin + `/event/${eventId}/details`,
       });
     } catch (error) {
-      navigator.clipboard.writeText(window.location.origin + `/event/${eventId}/details`);
+      navigator.clipboard.writeText(
+        window.location.origin + `/event/${eventId}/details`
+      );
       toast({
         title: "Link copied!",
         description: "Event link copied to clipboard",
@@ -208,7 +219,9 @@ const EventRSVP = () => {
           <p className="text-muted-foreground">
             The event you're looking for doesn't exist or has been removed.
           </p>
-          <Button onClick={() => navigate("/")}>Go Home</Button>
+          <Link to={"/"}>
+            <Button>Go Home</Button>
+          </Link>
         </div>
       </div>
     );
@@ -238,14 +251,12 @@ const EventRSVP = () => {
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-6 py-8">
         {/* Back Button */}
-        <Button
-          variant="ghost"
-          onClick={() => navigate(-1)}
-          className="mb-6 flex items-center space-x-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span>Back</span>
-        </Button>
+        <Link to={-1}>
+          <Button variant="ghost" className="mb-6 flex items-center space-x-2">
+            <ArrowLeft className="h-4 w-4" />
+            <span>Back</span>
+          </Button>
+        </Link>
 
         {/* Event Header */}
         <Card className="mb-8">
@@ -404,12 +415,14 @@ const EventRSVP = () => {
             )}
             {!event.is_paid && (
               <Button
-              variant="outline"
-              size="sm"
-              onClick={() => shareEvent(event.name, event.description, event.id)}
-            >
-              <Share2 className="h-4 w-4" />
-            </Button>
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  shareEvent(event.name, event.description, event.id)
+                }
+              >
+                <Share2 className="h-4 w-4" />
+              </Button>
             )}
             {/* RSVP Buttons */}
             {/* {canRSVP && (

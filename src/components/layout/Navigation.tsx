@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useLocation, useNavigate } from "react-router-dom";
+import GlobalSearchBar from "@/components/searchBar/GlobalSearchBar";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -33,6 +34,8 @@ const Navigation = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [searchVisible, setSearchVisible] = useState(false);
+  const searchButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const handleSignOut = async () => {
     await signOut();
@@ -67,8 +70,8 @@ const Navigation = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
-          <div
-            onClick={() => navigate("/")}
+          <Link
+            to={"/"}
             className="cursor-pointer flex items-center space-x-1 shrink-0"
           >
             <img
@@ -76,11 +79,13 @@ const Navigation = () => {
               src="/Parishus logo.png"
               alt="Logo"
             />
-            <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-black whitespace-nowrap font-script"
-              style={{ fontSize: "30px", }}>
+            <h1
+              className="text-2xl font-bold bg-gradient-primary bg-clip-text text-black whitespace-nowrap font-script"
+              style={{ fontSize: "30px" }}
+            >
               Parish
             </h1>
-          </div>
+          </Link>
           {!user ? (
             <div className="flex items-center space-x-4">
               <Button onClick={() => navigate("/")} variant="outline">
@@ -95,24 +100,39 @@ const Navigation = () => {
                   const Icon = item.icon;
                   const isActive = location.pathname === item.path;
                   return (
-                    <Button
+                    <Link
                       key={item.path}
-                      variant="ghost"
-                      className={`flex items-center space-x-1 ${isActive
-                          ? ""
-                          : "text-muted-foreground hover:text-foreground"
-                        }`}
-                      onClick={() => navigate(item.path)}
+                      to={item.path}
+                      className="flex items-center"
                     >
-                      <Icon className="h-5 w-5" />
-                      <span>{item.label}</span>
-                    </Button>
+                      <Button
+                        variant="ghost"
+                        className={`flex items-center group space-x-1 ${
+                          isActive
+                            ? ""
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        <Icon className="h-5 w-5 icon-animate" />
+                        <span>{item.label}</span>
+                      </Button>
+                    </Link>
                   );
                 })}
               </div>
 
               {/* Right Side */}
               <div className="flex items-center space-x-4">
+                <Button
+                  ref={searchButtonRef}
+                  className="group"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setSearchVisible((prev) => !prev)}
+                  aria-label="Search"
+                >
+                  <Search className="h-5 w-5 icon-animate" />
+                </Button>
                 <NotificationCenter />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -129,21 +149,40 @@ const Navigation = () => {
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56 font-serif " align="end" forceMount>
-                    <DropdownMenuItem onClick={() => navigate("/profile")}>
-                      <User className="mr-2 h-4 w-4" />
-                      Profile
+                  <DropdownMenuContent
+                    className="w-56 font-serif "
+                    align="end"
+                    forceMount
+                  >
+                    <DropdownMenuItem asChild>
+                      <Link
+                        to={"/profile"}
+                        className="flex items-center w-full group"
+                      >
+                        <User className="mr-2 h-4 w-4 icon-animate" />
+                        Profile
+                      </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate("/subscription")}>
-                      <Receipt className="mr-2 h-4 w-4" />
-                      Subscription
+                    <DropdownMenuItem asChild>
+                      <Link
+                        to={"/subscription"}
+                        className="flex items-center group w-full"
+                      >
+                        <Receipt className="mr-2 h-4 w-4 icon-animate" />
+                        Subscription
+                      </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate("/user/dashboard")}>
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
-                      Dashboard
+                    <DropdownMenuItem asChild>
+                      <Link
+                        to={"/user/dashboard"}
+                        className="flex items-center w-full group"
+                      >
+                        <LayoutDashboard className="mr-2 h-4 w-4 icon-animate" />
+                        Dashboard
+                      </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleSignOut}>
-                      <LogOut className="mr-2 h-4 w-4" />
+                    <DropdownMenuItem onClick={handleSignOut} className="group">
+                      <LogOut className="mr-2 h-4 w-4 icon-animate" />
                       Sign Out
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -152,14 +191,15 @@ const Navigation = () => {
                 {/* Hamburger Icon */}
                 <div className="nav:hidden">
                   <Button
+                  className="group"
                     variant="ghost"
                     size="icon"
                     onClick={() => setIsOpen(!isOpen)}
                   >
                     {isOpen ? (
-                      <X className="h-6 w-6" />
+                      <X className="h-6 w-6 icon-animate" />
                     ) : (
-                      <Menu className="h-6 w-6" />
+                      <Menu className="h-6 w-6 icon-animate" />
                     )}
                   </Button>
                 </div>
@@ -176,25 +216,43 @@ const Navigation = () => {
               const isActive = location.pathname === item.path;
 
               return (
-                <Button
+                <Link
                   key={item.path}
-                  onClick={() => {
-                    navigate(item.path);
-                    setIsOpen(false);
-                  }}
-                  className={`w-full flex justify-start items-center px-4 py-2 text-left ${isActive
-                      ? ""
-                      : "text-muted-foreground hover:text-foreground"
-                    }`}
+                  to={item.path}
+                  className="flex items-center"
                 >
-                  <Icon className="mr-2 h-5 w-5" />
-                  {item.label}
-                </Button>
+                  <Button
+                    onClick={() => {
+                      setIsOpen(false);
+                    }}
+                    className={`w-full flex justify-start items-center px-4 py-2 text-left ${
+                      isActive
+                        ? ""
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <Icon className="mr-2 h-5 w-5" />
+                    {item.label}
+                  </Button>
+                </Link>
               );
             })}
           </div>
         )}
       </div>
+      {searchVisible && (
+        <GlobalSearchBar
+          isVisible={searchVisible}
+          onClose={() => setSearchVisible(false)}
+          navItems={navItems.map((i) => ({
+            label: i.label,
+            path: i.path,
+            type: "page",
+            icon: i.icon,
+          }))}
+          searchButtonRef={searchButtonRef} // 👈 pass this down
+        />
+      )}
     </nav>
   );
 };

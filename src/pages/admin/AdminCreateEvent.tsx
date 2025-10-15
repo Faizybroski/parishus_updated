@@ -30,7 +30,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { format } from "date-fns";
 const today = format(new Date(), "yyyy-MM-dd");
 import { RestaurantSearchDropdown } from "@/components/restaurants/RestaurantSearchDropdown";
@@ -376,12 +376,13 @@ const AdminCreateEvent = () => {
           <p className="text-muted-foreground">
             Please complete your profile to create events.
           </p>
+          <Link to="/profile">
           <Button
-            onClick={() => navigate("/profile")}
             className=""
           >
             Complete Profile
           </Button>
+          </Link>
         </div>
       </div>
     );
@@ -392,14 +393,15 @@ const AdminCreateEvent = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
            <div className="flex items-center space-x-4">
+            <Link to="/admin/events">
             <Button 
               variant="ghost" 
-              onClick={() => navigate('/admin/events')}
               className="flex items-center space-x-2"
             >
               <ArrowLeft className="h-4 w-4" />
               <span>Back to Events</span>
             </Button>
+            </Link>
             <div>
               <h1 className="text-3xl font-bold text-foreground font-script">Create New Event</h1>
               <p className="text-muted-foreground mt-1">
@@ -875,13 +877,14 @@ const AdminCreateEvent = () => {
 
             {/* Submit Buttons */}
             <div className="flex justify-end space-x-4">
+              <Link to="/dashboard">
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => navigate("/dashboard")}
               >
                 Cancel
               </Button>
+              </Link>
               <Button
                 type="submit"
                 disabled={!isFormValid || loading}
