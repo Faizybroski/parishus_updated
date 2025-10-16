@@ -70,6 +70,53 @@ const RSVPs = () => {
     }
   }, [user]);
 
+  function generateDummyRsvp(id, name, location, status, host) {
+    const randomDaysOffset = host.length * 3;
+    return {
+      id,
+      status,
+      created_at: new Date(
+        Date.now() - randomDaysOffset * 86400000
+      ).toISOString(),
+      events: {
+        id: id,
+        name,
+        description: `Join us for ${name.toLowerCase()} at ${location}. Expect fun and good vibes.`,
+        date_time: new Date(
+          Date.now() - randomDaysOffset * 86400000
+        ).toISOString(),
+        location_name: location,
+        cover_photo_url: `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=1000&q=80`,
+        profiles: {
+          first_name: host.split(" ")[0],
+          last_name: host.split(" ")[1],
+        },
+      },
+    };
+  }
+  const filteredRsvps = [
+    generateDummyRsvp(
+      "1504674900247-0877df9cc836",
+      "Tech Leaders Summit",
+      "Ottawa Convention Centre",
+      "Confirmed",
+      "Emily Carter"
+    ),
+    generateDummyRsvp(
+      "1528605248644-14dd04022da1",
+      "Sushi Night Social",
+      "Downtown Vancouver",
+      "Pending",
+      "Lucas Wang"
+    ),
+    generateDummyRsvp(
+      "1551782450-a2132b4ba21d",
+      "Startup Mixer",
+      "Toronto Innovation Hub",
+      "Cancelled",
+      "Ava Patel"
+    ),
+  ];
   const fetchRSVPs = async () => {
     if (!user) return;
 
@@ -198,31 +245,31 @@ const RSVPs = () => {
     }
   };
 
-  // Filter RSVPs based on search term, status, and date
-  const filteredRsvps = rsvps.filter((rsvp) => {
-    const matchesSearch =
-      searchTerm === "" ||
-      rsvp.events.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase().trim()) ||
-      rsvp.events.description.includes(searchTerm.toLowerCase().trim()) ||
-      rsvp.events.location_name
-        .trim()
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase().trim());
+  // -----------------------DEVELOPMENT DUMMY COMMENTS, SHOULD BE UMCOMMENTED ON LIVE ---------------------------------------------------
+  // const filteredRsvps = rsvps.filter((rsvp) => {
+  //   const matchesSearch =
+  //     searchTerm === "" ||
+  //     rsvp.events.name
+  //       .toLowerCase()
+  //       .includes(searchTerm.toLowerCase().trim()) ||
+  //     rsvp.events.description.includes(searchTerm.toLowerCase().trim()) ||
+  //     rsvp.events.location_name
+  //       .trim()
+  //       ?.toLowerCase()
+  //       .includes(searchTerm.toLowerCase().trim());
 
-    const matchesStatus =
-      statusFilter === "all" || rsvp.status === statusFilter;
+  //   const matchesStatus =
+  //     statusFilter === "all" || rsvp.status === statusFilter;
 
-    const eventDate = new Date(rsvp.events.date_time);
-    const now = new Date();
-    const matchesDate =
-      dateFilter === "all" ||
-      (dateFilter === "upcoming" && eventDate > now) ||
-      (dateFilter === "past" && eventDate <= now);
+  //   const eventDate = new Date(rsvp.events.date_time);
+  //   const now = new Date();
+  //   const matchesDate =
+  //     dateFilter === "all" ||
+  //     (dateFilter === "upcoming" && eventDate > now) ||
+  //     (dateFilter === "past" && eventDate <= now);
 
-    return matchesSearch && matchesStatus && matchesDate;
-  });
+  //   return matchesSearch && matchesStatus && matchesDate;
+  // });
 
   const clearFilters = () => {
     setSearchTerm("");
@@ -251,7 +298,8 @@ const RSVPs = () => {
             </p>
           </div>
 
-          {rsvps.length === 0 ? (
+          {filteredRsvps.length === 0 ? (
+            // rsvps.length === 0 ? (
             <Card>
               <CardContent className="text-center py-12">
                 <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -388,125 +436,298 @@ const RSVPs = () => {
                   </TabsList>
 
                   <TabsContent value="grid">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="flex flex-wrap justify-center gap-5 my-5">
                       {filteredRsvps.map((rsvp) => {
                         const eventDate = new Date(rsvp.events.date_time);
                         const isUpcoming = eventDate > new Date();
 
                         return (
-                          <Card
+                          // <Card
+                          //   key={rsvp.id}
+                          //   className="overflow-hidden hover:shadow-lg transition-shadow"
+                          // >
+                          //   {/* Event Image */}
+                          //   {rsvp.events.cover_photo_url && (
+                          //     <div className="h-48 overflow-hidden">
+                          //       <img
+                          //         src={rsvp.events.cover_photo_url}
+                          //         alt={rsvp.events.name}
+                          //         className="w-full h-full object-cover"
+                          //       />
+                          //     </div>
+                          //   )}
+
+                          //   <CardHeader className="pb-3">
+                          //     <div className="flex flex-wrap items-center gap-4">
+                          //       <CardTitle className="text-lg leading-tight">
+                          //         {rsvp.events.name}
+                          //       </CardTitle>
+                          //       <div className="flex gap-1 ml-2">
+                          //         <Badge
+                          //           variant={
+                          //             isUpcoming ? "default" : "secondary"
+                          //           }
+                          //           className="text-xs"
+                          //         >
+                          //           {isUpcoming ? "Upcoming" : "Past"}
+                          //         </Badge>
+                          //         <Badge
+                          //           className={`text-xs ${getStatusColor(
+                          //             rsvp.status
+                          //           )}`}
+                          //         >
+                          //           {rsvp.status}
+                          //         </Badge>
+                          //       </div>
+                          //     </div>
+
+                          //     <p className="text-sm text-muted-foreground line-clamp-2 mt-2">
+                          //       {rsvp.events.description}
+                          //     </p>
+                          //   </CardHeader>
+
+                          //   <CardContent className="pt-0 space-y-4">
+                          //     {/* Date & Time */}
+                          //     <div className="space-y-2">
+                          //       <div className="flex items-center space-x-2">
+                          //         <Calendar className="h-4 w-4 text-muted-foreground" />
+                          //         <span className="text-sm">
+                          //           {format(eventDate, "PPP")}
+                          //         </span>
+                          //       </div>
+                          //       <div className="flex items-center space-x-2">
+                          //         <Clock className="h-4 w-4 text-muted-foreground" />
+                          //         <span className="text-sm">
+                          //           {format(eventDate, "p")}
+                          //         </span>
+                          //       </div>
+                          //     </div>
+
+                          //     {/* Location */}
+                          //     <div className="flex items-center space-x-2">
+                          //       <MapPin className="h-4 w-4 text-muted-foreground" />
+                          //       <span className="text-sm truncate">
+                          //         {rsvp.events.location_name}
+                          //       </span>
+                          //     </div>
+
+                          //     {/* Host */}
+                          //     <div className="flex items-center space-x-2">
+                          //       <Avatar className="h-6 w-6">
+                          //         <AvatarFallback className="text-xs">
+                          //           {rsvp.events.profiles?.first_name?.[0] ||
+                          //             "H"}
+                          //         </AvatarFallback>
+                          //       </Avatar>
+                          //       <span className="text-sm truncate">
+                          //         {rsvp.events.profiles?.first_name}{" "}
+                          //         {rsvp.events.profiles?.last_name}
+                          //       </span>
+                          //     </div>
+
+                          //     {/* RSVP Date */}
+                          //     <div className="text-xs text-muted-foreground">
+                          //       RSVP'd on{" "}
+                          //       {format(new Date(rsvp.created_at), "PPP")}
+                          //     </div>
+
+                          //     {/* Actions */}
+                          //     <div className="flex gap-2 pt-2">
+                          //       <Link to={`/event/${rsvp.events.id}/details`}>
+                          //         <Button
+                          //           variant="outline"
+                          //           size="sm"
+                          //           className="flex-1"
+                          //         >
+                          //           <Eye className="h-4 w-4 mr-2" />
+                          //           View Event
+                          //         </Button>
+                          //       </Link>
+                          //       <Button
+                          //         variant="outline"
+                          //         size="sm"
+                          //         className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          //         onClick={() => cancelRSVP(rsvp.id, rsvp.events.id)}
+                          //       >
+                          //         <Trash2 className="h-4 w-4" />
+                          //       </Button>
+                          //     </div>
+                          //   </CardContent>
+                          // </Card>
+                          <div
                             key={rsvp.id}
-                            className="overflow-hidden hover:shadow-lg transition-shadow"
+                            className=" rounded-lg overflow-hidden shadow-md border border-gray-200 hover:border-gray-700 hover:bg-white/10 hover:cursor-pointer transition-all duration-300 w-full sm:w-[90%] md:w-[45%] lg:w-[30%] max-w-[420px]"
                           >
-                            {/* Event Image */}
-                            {rsvp.events.cover_photo_url && (
-                              <div className="h-48 overflow-hidden">
-                                <img
-                                  src={rsvp.events.cover_photo_url}
-                                  alt={rsvp.events.name}
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                            )}
+                            <div className="relative">
+                              {/* Image */}
+                              <img
+                                className="w-full object-cover"
+                                style={{ height: "35rem" }}
+                                src={rsvp.events.cover_photo_url}
+                                alt={rsvp.events.name}
+                              />
 
-                            <CardHeader className="pb-3">
-                              <div className="flex flex-wrap items-center gap-4">
-                                <CardTitle className="text-lg leading-tight">
-                                  {rsvp.events.name}
-                                </CardTitle>
-                                <div className="flex gap-1 ml-2">
-                                  <Badge
-                                    variant={
-                                      isUpcoming ? "default" : "secondary"
-                                    }
-                                    className="text-xs"
-                                  >
-                                    {isUpcoming ? "Upcoming" : "Past"}
-                                  </Badge>
-                                  <Badge
-                                    className={`text-xs ${getStatusColor(
-                                      rsvp.status
-                                    )}`}
-                                  >
-                                    {rsvp.status}
-                                  </Badge>
+                              {/* Title container with black bg + gradient top */}
+                              <div className="absolute inset-x-0 bottom-0">
+                                <div className="relative bg-black pr-4">
+                                  <div className="absolute -top-[17.5rem] left-0 right-0 h-[17.5rem] bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10"></div>
+                                  {/* <div className="flex gap-2 absolute -top-12 left-5 text-white text-sm z-20">
+                                    <div className="border border-white/20 rounded shadow-md flex-1">
+                                      <span className="px-3 py-2">
+                                        {new Date(eventDate).toLocaleDateString(
+                                          "en-US",
+                                          {
+                                            month: "short",
+                                            day: "numeric",
+                                          }
+                                        )}
+                                        {" - "}
+                                        {new Date(eventDate).toLocaleTimeString(
+                                          "en-US",
+                                          {
+                                            hour: "numeric",
+                                            minute: "2-digit",
+                                          }
+                                        )}
+                                      </span>
+                                    </div>
+                                    <div className="flex gap-1 ml-2">
+                                      <Badge
+                                        variant={
+                                          isUpcoming ? "default" : "secondary"
+                                        }
+                                        className="text-xs"
+                                      >
+                                        {isUpcoming ? "Upcoming" : "Past"}
+                                      </Badge>
+                                      <Badge
+                                        className={`text-xs ${getStatusColor(
+                                          rsvp.status
+                                        )}`}
+                                      >
+                                        {rsvp.status}
+                                      </Badge>
+                                    </div>
+                                  </div> */}
+                                  <div className="flex items-center justify-between  gap-2 absolute -top-12 left-5 right-5 z-20 text-white text-sm">
+                                    {/* Date & Time Box */}
+                                    <div className="border border-white/25 bg-black/40 backdrop-blur-sm rounded px-3 py-1.5 shadow-md">
+                                      <span className="tracking-wide">
+                                        {new Date(eventDate).toLocaleDateString(
+                                          "en-US",
+                                          {
+                                            month: "short",
+                                            day: "numeric",
+                                          }
+                                        )}
+                                        {" • "}
+                                        {new Date(eventDate).toLocaleTimeString(
+                                          "en-US",
+                                          {
+                                            hour: "numeric",
+                                            minute: "2-digit",
+                                          }
+                                        )}
+                                      </span>
+                                    </div>
+
+                                    {/* Status Badges */}
+                                    <div className="flex items-center gap-1.5 ml-1">
+                                      <Badge
+                                        variant={
+                                          isUpcoming ? "default" : "secondary"
+                                        }
+                                        className="text-md px-2 py-0.5 rounded-full"
+                                      >
+                                        {isUpcoming ? "Upcoming" : "Ended"}
+                                      </Badge>
+                                      <Badge
+                                        className={`text-md px-2 py-0.5 rounded-full ${getStatusColor(
+                                          rsvp.status
+                                        )}`}
+                                      >
+                                        {rsvp.status}
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                  <div className="absolute -top-32 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent"></div>
+
+                                  <div className="pl-5 pr-2 pt-1 flex flex-col gap-2 relative z-10">
+                                    <h3 className="text-2xl text-white font-script">
+                                      {rsvp.events.name}
+                                    </h3>
+                                    {rsvp.events.description && (
+                                      <p className="text-white text-sm mt-1 line-clamp-1">
+                                        {rsvp.events.description}
+                                      </p>
+                                    )}
+                                    <div className="flex items-center space-x-2">
+                                      <Avatar className="h-6 w-6">
+                                        <AvatarFallback className="text-xs">
+                                          {rsvp.events.profiles
+                                            ?.first_name?.[0] || "H"}
+                                        </AvatarFallback>
+                                      </Avatar>
+                                      <span className="text-sm truncate text-primary">
+                                        {rsvp.events.profiles?.first_name}{" "}
+                                        {rsvp.events.profiles?.last_name}
+                                      </span>
+                                    </div>
+                                    <div className="text-xs text-secondary">
+                                      RSVP'd on{" "}
+                                      {format(new Date(rsvp.created_at), "PPP")}
+                                    </div>
+                                    <p className="text-sm flex flex-col text-secondary pb-2">
+                                      <span className="">
+                                        {rsvp.events.location_name ||
+                                          "Location not specified"}
+                                      </span>
+                                    </p>
+                                    <div className="flex space-x-2 pb-3">
+                                      <Link
+                                        to={`/event/${rsvp.events.id}/details`}
+                                        className="flex-1"
+                                      >
+                                        <Button className="w-full bg-primary hover:bg-primary/90 text-black rounded-sm">
+                                          See details
+                                        </Button>
+                                      </Link>
+                                      {/* DEVELOPER COMMENTS THIS. WILL BE UNCOMMENT IN LIVE */}
+                                      {/* {isCreator && (
+                                        <Link to={`/event/${event.id}/edit`}>
+                                          <Button variant="outline" size="icon" className="">
+                                            <Edit className="h-4 w-4" />
+                                          </Button>
+                                        </Link>
+                                      )}
+
+                                      {isCreator && (
+                                        <Button
+                                          variant="outline"
+                                          size="icon"
+                                          onClick={() => deleteEvent && deleteEvent(event.id)}
+                                          className="text-red-500 hover:text-red-600"
+                                        >
+                                          <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                      )} */}
+
+                                      <Button
+                                        variant="outline"
+                                        size="icon"
+                                        onClick={() =>
+                                          cancelRSVP(rsvp.id, rsvp.events.id)
+                                        }
+                                        className="text-red-500 hover:text-red-600"
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
-
-                              <p className="text-sm text-muted-foreground line-clamp-2 mt-2">
-                                {rsvp.events.description}
-                              </p>
-                            </CardHeader>
-
-                            <CardContent className="pt-0 space-y-4">
-                              {/* Date & Time */}
-                              <div className="space-y-2">
-                                <div className="flex items-center space-x-2">
-                                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                                  <span className="text-sm">
-                                    {format(eventDate, "PPP")}
-                                  </span>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <Clock className="h-4 w-4 text-muted-foreground" />
-                                  <span className="text-sm">
-                                    {format(eventDate, "p")}
-                                  </span>
-                                </div>
-                              </div>
-
-                              {/* Location */}
-                              <div className="flex items-center space-x-2">
-                                <MapPin className="h-4 w-4 text-muted-foreground" />
-                                <span className="text-sm truncate">
-                                  {rsvp.events.location_name}
-                                </span>
-                              </div>
-
-                              {/* Host */}
-                              <div className="flex items-center space-x-2">
-                                <Avatar className="h-6 w-6">
-                                  <AvatarFallback className="text-xs">
-                                    {rsvp.events.profiles?.first_name?.[0] ||
-                                      "H"}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <span className="text-sm truncate">
-                                  {rsvp.events.profiles?.first_name}{" "}
-                                  {rsvp.events.profiles?.last_name}
-                                </span>
-                              </div>
-
-                              {/* RSVP Date */}
-                              <div className="text-xs text-muted-foreground">
-                                RSVP'd on{" "}
-                                {format(new Date(rsvp.created_at), "PPP")}
-                              </div>
-
-                              {/* Actions */}
-                              <div className="flex gap-2 pt-2">
-                                <Link to={`/event/${rsvp.events.id}/details`}>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="flex-1"
-                                  >
-                                    <Eye className="h-4 w-4 mr-2" />
-                                    View Event
-                                  </Button>
-                                </Link>
-                                <Link to={cancelRSVP(rsvp.id, rsvp.events.id)}>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </Link>
-                              </div>
-                            </CardContent>
-                          </Card>
+                            </div>
+                          </div>
                         );
                       })}
                     </div>
@@ -521,7 +742,7 @@ const RSVPs = () => {
                         return (
                           <Card
                             key={rsvp.id}
-                            className="hover:shadow-lg transition-shadow"
+                            className="hover:shadow-lg transition-shadow hover:bg-secondary transition-all duration-300"
                           >
                             <CardContent className="p-6">
                               <div className="flex flex-wrap items-center gap-4">
@@ -539,7 +760,7 @@ const RSVPs = () => {
                                   <div className="flex-1 min-w-0">
                                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                                       <div className="min-w-0">
-                                        <h3 className="font-semibold text-lg mb-1">
+                                        <h3 className="font-semibold text-lg mb-1 font-script">
                                           {rsvp.events.name}
                                         </h3>
                                         <p className="text-sm text-muted-foreground mb-2 line-clamp-1">
@@ -567,32 +788,31 @@ const RSVPs = () => {
                                           </div>
                                         </div>
                                       </div>
-
-                                      <div className="flex items-center gap-2">
-                                        <Badge
-                                          variant={
-                                            isUpcoming ? "default" : "secondary"
-                                          }
-                                          className="text-xs"
-                                        >
-                                          {isUpcoming ? "Upcoming" : "Past"}
-                                        </Badge>
-                                        <Badge
-                                          className={`text-xs ${getStatusColor(
-                                            rsvp.status
-                                          )}`}
-                                        >
-                                          {rsvp.status}
-                                        </Badge>
-                                      </div>
                                     </div>
                                   </div>
                                 </div>
 
                                 <div className="flex gap-2 ml-4">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <Badge
+                                      variant={
+                                        isUpcoming ? "default" : "secondary"
+                                      }
+                                      className="text-sm bg-secondary/70"
+                                    >
+                                      {isUpcoming ? "Upcoming" : "Ended"}
+                                    </Badge>
+                                    <Badge
+                                      className={`text-sm ${getStatusColor(
+                                        rsvp.status
+                                      )}`}
+                                    >
+                                      {rsvp.status}
+                                    </Badge>
+                                  </div>
                                   <Link to={`/event/${rsvp.events.id}/details`}>
-                                    <Button variant="outline" size="sm">
-                                      <Eye className="h-4 w-4 mr-2" />
+                                    <Button variant="default" size="sm" className="hover:bg-secondary-700">
+                                      <Eye className="h-4 w-4 " />
                                       View
                                     </Button>
                                   </Link>

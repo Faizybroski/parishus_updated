@@ -120,7 +120,7 @@ const UserProfile = () => {
                   </Avatar>
                 </div>
                 <div>
-                  <h3 className="text-xl text-primary font-semibold text-foreground py-1 ">
+                  <h3 className="text-xl font-script font-semibold text-foreground py-1 ">
                     {user_profile.first_name} {user_profile.last_name}
                   </h3>
                   {user_profile.job_title && (
@@ -162,7 +162,7 @@ const UserProfile = () => {
             <CardContent className="space-y-4">
               <div>
                 <Label>Dining Style:</Label>
-                <span className="p-2 mt-1 text-primary ">
+                <span className="p-2 mt-1 text-primary/100">
                   {user_profile.dining_style
                     ? user_profile.dining_style.replace("_", " ")
                     : "Not set"}

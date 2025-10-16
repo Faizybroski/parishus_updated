@@ -458,7 +458,7 @@ const Profile = () => {
                   </label>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-foreground">
+                  <h3 className="text-xl font-semibold text-foreground font-script">
                     {profile.first_name} {profile.last_name}
                   </h3>
                   <p className="text-muted-foreground">{profile.email}</p>

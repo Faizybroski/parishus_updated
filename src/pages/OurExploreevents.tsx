@@ -40,10 +40,17 @@ const OurExploreEvents = () => {
     },
     {
       image:
+        "https://posh.vip/cdn-cgi/image/quality=85,fit=scale-down,format=webp,width=1920/https://posh-images-alts-production.s3.amazonaws.com/68bf6213ee6cfb687a56c36a/1400x1750.webp",
+      title: "Dionysus: Casino Royale Night",
+      location: "Luxury Hall, NYC",
+      dateTime: "Saturday September 27, 10:00 PM",
+    },
+    {
+      image:
         "https://posh.vip/cdn-cgi/image/quality=85,fit=scale-down,format=webp,width=1920/https://posh-images-originals-production.s3.amazonaws.com/68c1cc6c01a7df1c857f9cee",
-      title: "High Status Saturday's CBC Edition",
-      location: "Club XYZ, Manhattan, NY",
-      dateTime: "Saturday September 27, 8:00 PM",
+      title: "Wheels of NYC - Fall Edition",
+      location: "63 Flushing Ave, Brooklyn, NY",
+      dateTime: "Saturday September 27, 11:00 AM",
     },
     {
       image:
@@ -61,13 +68,6 @@ const OurExploreEvents = () => {
     },
     {
       image:
-        "https://posh.vip/cdn-cgi/image/quality=85,fit=scale-down,format=webp,width=1920/https://posh-images-originals-production.s3.amazonaws.com/68c1cc6c01a7df1c857f9cee",
-      title: "High Status Saturday's CBC Edition",
-      location: "Club XYZ, Manhattan, NY",
-      dateTime: "Saturday September 27, 8:00 PM",
-    },
-    {
-      image:
         "https://posh.vip/cdn-cgi/image/quality=85,fit=scale-down,format=webp,width=1920/https://posh-images-alts-production.s3.amazonaws.com/68bf6213ee6cfb687a56c36a/1400x1750.webp",
       title: "Dionysus: Casino Royale Night",
       location: "Luxury Hall, NYC",
@@ -79,34 +79,6 @@ const OurExploreEvents = () => {
       title: "Wheels of NYC - Fall Edition",
       location: "63 Flushing Ave, Brooklyn, NY",
       dateTime: "Saturday September 27, 11:00 AM",
-    },
-    {
-      image:
-        "https://posh.vip/cdn-cgi/image/quality=85,fit=scale-down,format=webp,width=1920/https://posh-images-originals-production.s3.amazonaws.com/68c1cc6c01a7df1c857f9cee",
-      title: "High Status Saturday's CBC Edition",
-      location: "Club XYZ, Manhattan, NY",
-      dateTime: "Saturday September 27, 8:00 PM",
-    },
-    {
-      image:
-        "https://posh.vip/cdn-cgi/image/quality=85,fit=scale-down,format=webp,width=1920/https://posh-images-alts-production.s3.amazonaws.com/68bf6213ee6cfb687a56c36a/1400x1750.webp",
-      title: "Dionysus: Casino Royale Night",
-      location: "Luxury Hall, NYC",
-      dateTime: "Saturday September 27, 10:00 PM",
-    },
-    {
-      image:
-        "https://posh.vip/cdn-cgi/image/quality=85,fit=scale-down,format=webp,width=1920/https://posh-images-originals-production.s3.amazonaws.com/68c1cc6c01a7df1c857f9cee",
-      title: "Wheels of NYC - Fall Edition",
-      location: "63 Flushing Ave, Brooklyn, NY",
-      dateTime: "Saturday September 27, 11:00 AM",
-    },
-    {
-      image:
-        "https://posh.vip/cdn-cgi/image/quality=85,fit=scale-down,format=webp,width=1920/https://posh-images-originals-production.s3.amazonaws.com/68c1cc6c01a7df1c857f9cee",
-      title: "High Status Saturday's CBC Edition",
-      location: "Club XYZ, Manhattan, NY",
-      dateTime: "Saturday September 27, 8:00 PM",
     },
     {
       image:
@@ -264,22 +236,23 @@ const OurExploreEvents = () => {
         </nav>
 
         {/* Carousel BELOW nav */}
-        <div className="sm:pt-[80px] touch-pan-y">
+        <div className="sm:pt-[80px] touch-pan-y" style={{ touchAction: "pan-y" }}>
           <Carousel
-            showThumbs={false}
+            showThumbs
             autoPlay
             infiniteLoop
             showStatus={false}
-            interval={3000}
-            showArrows={true}
+            interval={4000}
+            showArrows
             onChange={(index) => setCurrentSlide(index)}
             swipeable={false}
-            emulateTouch
+            emulateTouch={false}
+            className="rounded-b-xl overflow-hidden"
           >
             {sliderData.map((item, index) => (
               <div
                 key={index}
-                className="relative flex flex-col font-sans lg:flex-row items-center justify-center px-4 sm:px-8 lg:px-12 py-6 sm:py-10 gap-6 lg:gap-10 min-h-[60vh] sm:min-h-[70vh] lg:min-h-[80vh]"
+                className="relative rounded-xl flex flex-col font-sans lg:flex-row items-center justify-center px-4 sm:px-8 lg:px-12 py-6 sm:py-10 gap-6 lg:gap-10 min-h-[60vh] sm:min-h-[70vh] lg:min-h-[80vh]"
                 style={{ touchAction: "pan-y" }}
               >
                 {/* Matte background */}
@@ -289,9 +262,11 @@ const OurExploreEvents = () => {
                     backgroundImage: `url(${item.image})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
-                    filter: "brightness(0.4) blur(10px)",
+                    // filter: "brightness(0.4) blur(10px)",
+                    filter: "brightness(0.35) blur(8px)",
                   }}
                 ></div>
+                <div className="absolute inset-0 rounded-xl z-0 bg-gradient-to-b from-neutral-100/20 via-neutral-200/5 to-transparent backdrop-blur-lg"></div>
 
                 {/* Content wrapper */}
                 <div className="relative z-10 flex flex-col lg:flex-row items-center justify-center w-full p-7 gap-8">

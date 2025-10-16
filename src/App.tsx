@@ -70,6 +70,7 @@ import SafetyGuidelines from "@/pages/SafetyGIuidelines";
 import TermsAndConditions from "@/pages/Terms&Conditions";
 import PrivacyPolicy from "@/pages/PrivacyPolicy.tsx";
 import Layout from "./components/layout/Layout";
+import ConditionalWrapper from "./components/layout/DualLayout";
 import UserProfile from "./pages/UserProfile";
 
 const queryClient = new QueryClient();
@@ -121,19 +122,66 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              <Route element={<Layout />}>
-                <Route path="contact-us" element={<ContactPage />} />
-                <Route path="/refund-policy" element={<RefundPolicyPage />} />
+              {/* <Route element={<Layout />}> */}
+                <Route path="contact-us" element={<ConditionalWrapper><ContactPage /></ConditionalWrapper>} />
+                <Route path="/refund-policy" element={<ConditionalWrapper><RefundPolicyPage /></ConditionalWrapper>} />
                 <Route
                   path="/safety-guidelines"
-                  element={<SafetyGuidelines />}
+                  element={
+                    <ConditionalWrapper><SafetyGuidelines /></ConditionalWrapper>
+                  }
                 />
                 <Route
                   path="/terms-conditions"
-                  element={<TermsAndConditions />}
+                  element={<ConditionalWrapper><TermsAndConditions /></ConditionalWrapper>}
                 />
-                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              </Route>
+                <Route path="/privacy-policy" element={<ConditionalWrapper><PrivacyPolicy /></ConditionalWrapper>} />
+              {/* </Route> */}
+              {/* <Route
+                path="contact-us"
+                element={
+                  <ProtectedRoute>
+                    <Navigation />
+                    <ContactPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/refund-policy"
+                element={
+                  <ProtectedRoute>
+                    <Navigation />
+                    <RefundPolicyPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/safety-guidelines"
+                element={
+                  <ProtectedRoute>
+                    <Navigation />
+                    <SafetyGuidelines />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/terms-conditions"
+                element={
+                  <ProtectedRoute>
+                    <Navigation />
+                    <TermsAndConditions />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/privacy-policy"
+                element={
+                  <ProtectedRoute>
+                    <Navigation />
+                    <PrivacyPolicy />
+                  </ProtectedRoute>
+                }
+              /> */}
               <Route
                 path="/dashboard"
                 element={

@@ -79,6 +79,7 @@ interface Event {
       first_name: string;
       last_name: string;
       profile_photo_url: string;
+      username: string;
     };
   }>;
 }
@@ -241,6 +242,7 @@ const EventDetails = () => {
             first_name,
             user_id,
             last_name,
+            username,
             profile_photo_url,
             email,
             payments:payments_user_id_fkey (
@@ -283,6 +285,7 @@ const EventDetails = () => {
           profiles:user_id (
             first_name,
             last_name,
+            username,
             profile_photo_url
           )
         `
@@ -1287,8 +1290,12 @@ const EventDetails = () => {
                           <div className="flex-1 space-y-1">
                             <div className="flex items-center justify-between">
                               <span className="text-sm font-medium">
-                                {review.profiles?.first_name || "Anonymous"}{" "}
-                                {review.profiles?.last_name || "User"}
+                                <Link
+                                  to={`/profile/${review.profiles.username}`}
+                                >
+                                  {review.profiles.first_name}{" "}
+                                  {review.profiles.last_name}
+                                </Link>
                               </span>
                               <div className="flex items-center space-x-1">
                                 {[1, 2, 3, 4, 5].map((star) => (
@@ -1535,8 +1542,10 @@ const EventDetails = () => {
                           </Avatar>
                           <div className="flex flex-col">
                             <span className="text-sm font-medium">
-                              {rsvp.profiles?.first_name || "Unknown"}{" "}
-                              {rsvp.profiles?.last_name || "User"}
+                              <Link to={`/profile/${rsvp.profiles?.username}`}>
+                                {rsvp.profiles?.first_name || "Unknown"}{" "}
+                                {rsvp.profiles?.last_name || "User"}
+                              </Link>
                               {rsvp.profiles.payments?.[0]?.status ===
                               "completed" ? (
                                 <span className="px-2 py-1 text-xs font-semibold text-black bg-yellow-400 rounded-full ml-2">

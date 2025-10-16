@@ -503,7 +503,7 @@ const RSVPDetails = () => {
               <h3 className="text-xl font-semibold text-muted-foreground">
                 This event is ended
               </h3>
-              <h2 className="text-xl font-semibold text-[#c4b0a2]">
+              <h2 className="text-xl font-semibold text-[#c4b0a2] font-script">
                 {event.name}
               </h2>
             </>

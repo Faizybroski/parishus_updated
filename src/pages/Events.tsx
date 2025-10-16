@@ -62,6 +62,7 @@ interface Event {
 const Events = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [myEvents, setMyEvents] = useState<Event[]>([]);
+  const [dummyEvents, setDummyevents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("upcoming");
@@ -261,15 +262,84 @@ const Events = () => {
 
       console.log("User events:", userEvents);
 
-      const eventsWithCounts = (userEvents || []).map((event) => ({
-        ...event,
-        rsvp_count:
-          event.rsvps?.filter((r) => r.status === "confirmed").length || 0,
-        user_rsvp:
-          event.rsvps?.filter((r) => r.user_id === currentProfileId) || [],
-      }));
+      // const eventsWithCounts = (userEvents || []).map((event) => ({
+      //   ...event,
+      //   rsvp_count:
+      //     event.rsvps?.filter((r) => r.status === "confirmed").length || 0,
+      //   user_rsvp:
+      //     event.rsvps?.filter((r) => r.user_id === currentProfileId) || [],
+      // }));
 
-      setMyEvents(eventsWithCounts);
+      // setMyEvents(eventsWithCounts);
+      const myevents = [
+        {
+          id: 1,
+          name: "Maple Leaf Charity Dinner",
+          description:
+            "An elegant night of fine dining to raise funds for local shelters.",
+          date_time: "2025-10-22T19:30:00Z",
+          location_name: "Canoe Restaurant, Toronto",
+          restaurants: {
+            name: "Canoe Restaurant",
+            city: "Toronto",
+          },
+          cover_photo_url:
+            "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=1000&q=80",
+          creator_id: 101,
+          rsvp_count: 18,
+          max_attendees: 40,
+          is_paid: false,
+          rsvps: [
+            { user_id: 102, status: "confirmed" },
+            { user_id: 103, status: "confirmed" },
+          ],
+        },
+        {
+          id: 2,
+          name: "Vancouver Rooftop Mixer",
+          description:
+            "Meet professionals from across the city under the Vancouver skyline.",
+          date_time: "2025-10-25T18:00:00Z",
+          location_name: "The Roof Lounge, Vancouver",
+          restaurants: {
+            name: "The Roof Lounge",
+            city: "Vancouver",
+          },
+          cover_photo_url:
+            "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1000&q=80",
+          creator_id: 102,
+          rsvp_count: 32,
+          max_attendees: 50,
+          is_paid: true,
+          rsvps: [
+            { user_id: 101, status: "confirmed" },
+            { user_id: 104, status: "pending" },
+          ],
+        },
+        {
+          id: 3,
+          name: "Montreal Coffee & Conversations",
+          description:
+            "A cozy evening to connect with fellow creatives over freshly brewed coffee.",
+          date_time: "2025-10-28T20:00:00Z",
+          location_name: "Café Olimpico, Montreal",
+          restaurants: {
+            name: "Café Olimpico",
+            city: "Montreal",
+          },
+          cover_photo_url:
+            "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=1000&q=80",
+          creator_id: 101,
+          rsvp_count: 10,
+          max_attendees: 20,
+          is_paid: false,
+          rsvps: [
+            { user_id: 102, status: "confirmed" },
+            { user_id: 105, status: "confirmed" },
+          ],
+        },
+      ];
+      setDummyevents(myevents);
     } catch (error: any) {
       console.error("Error fetching my events:", error);
     }
@@ -567,30 +637,30 @@ const Events = () => {
     events: Event[];
     showActions?: boolean;
   }) => {
-    if (events.length === 0) {
-      return (
-        <div className="text-center py-12">
-          <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No events found</h3>
-          <p className="text-muted-foreground mb-4">
-            {showActions
-              ? "You haven't created or joined any events yet"
-              : "No events available at the moment"}
-          </p>
-          <Link to={"/create-event"}>
-            <Button variant="outline" className="group">
-              <Plus className="h-4 w-4 mr-2 icon-animate" />
-              {showActions ? "Create Your First Event" : "Create Event"}
-            </Button>
-          </Link>
-        </div>
-      );
-    }
+    // if (events.length === 0) {
+    //   return (
+    //     <div className="text-center py-12">
+    //       <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+    //       <h3 className="text-lg font-semibold mb-2">No events found</h3>
+    //       <p className="text-muted-foreground mb-4">
+    //         {showActions
+    //           ? "You haven't created or joined any events yet"
+    //           : "No events available at the moment"}
+    //       </p>
+    //       <Link to={"/create-event"}>
+    //         <Button variant="outline" className="group">
+    //           <Plus className="h-4 w-4 mr-2 icon-animate" />
+    //           {showActions ? "Create Your First Event" : "Create Event"}
+    //         </Button>
+    //       </Link>
+    //     </div>
+    //   );
+    // }
 
     return (
       // <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div className="flex flex-wrap justify-start gap-5 my-5">
-        {events.map((event) => {
+      <div className="flex flex-wrap justify-center gap-5 my-5">
+        {dummyEvents.map((event) => {
           const eventDate = new Date(event.date_time);
           const isCreator = event.creator_id === userProfileId;
           const rsvps = event.rsvps || [];
@@ -732,7 +802,7 @@ const Events = () => {
             // </Card>
             <div
               key={event.id}
-              className="font-sans rounded-lg overflow-hidden shadow-md border border-gray-200 hover:border-gray-700 hover:bg-white/10 hover:cursor-pointer transition-all duration-300 w-full sm:w-[90%] md:w-[45%] lg:w-[30%] max-w-[420px]"
+              className="rounded-lg overflow-hidden shadow-md border border-gray-200 hover:border-gray-700 hover:bg-white/10 hover:cursor-pointer transition-all duration-300 w-full sm:w-[90%] md:w-[45%] lg:w-[30%] max-w-[420px]"
             >
               <div className="relative">
                 {/* Image */}
@@ -752,7 +822,7 @@ const Events = () => {
                         month: "short",
                         day: "numeric",
                       })}
-                      {" - "}
+                      {" • "}
                       {new Date(event.date_time).toLocaleTimeString("en-US", {
                         hour: "numeric",
                         minute: "2-digit",
@@ -761,7 +831,7 @@ const Events = () => {
                     <div className="absolute -top-32 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent"></div>
 
                     <div className="pl-5 pr-2 pt-1 flex flex-col gap-2 relative z-10">
-                      <h3 className="text-2xl text-white">{event.name}</h3>
+                      <h3 className="text-2xl text-white font-script">{event.name}</h3>
                       {event.description && (
                         <p className="text-white text-sm mt-1 line-clamp-1">
                           {event.description}
@@ -774,7 +844,7 @@ const Events = () => {
                             {event.rsvp_count || 0}/{event.max_attendees} RSVPed
                           </div>
 
-                          <div className="w-full h-2 rounded-full overflow-hidden bg-secondary min-w-0 box-border">
+                          <div className="w-full h-2 rounded-full overflow-hidden bg-muted-foreground min-w-0 box-border">
                             <div
                               className="h-full bg-primary transition-all duration-300"
                               style={{
@@ -808,10 +878,10 @@ const Events = () => {
                             See details
                           </Button>
                         </Link>
-
-                        {isCreator && (
+                        {/* DEVELOPER COMMENTS THIS. WILL BE UNCOMMENT IN LIVE */}
+                        {/* {isCreator && (
                           <Link to={`/event/${event.id}/edit`}>
-                            <Button variant="outline" size="sm" className="">
+                            <Button variant="outline" size="icon" className="">
                               <Edit className="h-4 w-4" />
                             </Button>
                           </Link>
@@ -820,17 +890,30 @@ const Events = () => {
                         {isCreator && (
                           <Button
                             variant="outline"
-                            size="sm"
+                            size="icon"
                             onClick={() => deleteEvent && deleteEvent(event.id)}
                             className="text-red-500 hover:text-red-600"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
-                        )}
+                        )} */}
+                        <Link to={`/event/${event.id}/edit`}>
+                          <Button variant="outline" size="icon" className="">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => deleteEvent && deleteEvent(event.id)}
+                          className="text-red-500 hover:text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                         {!event.is_paid && (
                           <Button
                             variant="outline"
-                            size="sm"
+                            size="icon"
                             onClick={() =>
                               shareEvent(
                                 event.name,

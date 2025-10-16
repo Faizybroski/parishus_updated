@@ -72,6 +72,7 @@ const Dashboard = () => {
   const [crossedLoading, setCrossedLoading] = useState(true);
   const { user } = useAuth();
   const [crossedPaths, setCrossedPaths] = useState<CrossedPath[]>([]);
+  const [dummyEvents, setDummyEvents] = useState([]);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [selectedUserProfile, setSelectedUserProfile] = useState<
     CrossedPath["matched_user"] | null
@@ -158,60 +159,123 @@ const Dashboard = () => {
       }
 
       // Now get aggregated data from crossed_paths_log for each pair
-      const enrichedPaths = await Promise.all(
-        (crossedPathsData || []).map(async (path: any) => {
-          const otherUserId =
-            path.user1_id === profile.user_id
-              ? path.user2.user_id
-              : path.user1.user_id;
-          const userAId =
-            profile.user_id < otherUserId ? profile.user_id : otherUserId;
-          const userBId =
-            profile.user_id < otherUserId ? otherUserId : profile.user_id;
+      // const enrichedPaths = await Promise.all(
+      //   (crossedPathsData || []).map(async (path: any) => {
+      //     const otherUserId =
+      //       path.user1_id === profile.user_id
+      //         ? path.user2.user_id
+      //         : path.user1.user_id;
+      //     const userAId =
+      //       profile.user_id < otherUserId ? profile.user_id : otherUserId;
+      //     const userBId =
+      //       profile.user_id < otherUserId ? otherUserId : profile.user_id;
 
-          // Get all crossed path logs for this user pair
-          const { data: logData } = await supabase
-            .from("crossed_paths_log")
-            .select("restaurant_name, cross_count")
-            .eq("user_a_id", userAId)
-            .eq("user_b_id", userBId);
+      //     // Get all crossed path logs for this user pair
+      //     const { data: logData } = await supabase
+      //       .from("crossed_paths_log")
+      //       .select("restaurant_name, cross_count")
+      //       .eq("user_a_id", userAId)
+      //       .eq("user_b_id", userBId);
 
-          const locations =
-            logData?.map((log) => log.restaurant_name).filter(Boolean) || [];
-          const totalCrosses =
-            logData?.reduce((sum, log) => sum + (log.cross_count || 1), 0) || 1;
+      //     const locations =
+      //       logData?.map((log) => log.restaurant_name).filter(Boolean) || [];
+      //     const totalCrosses =
+      //       logData?.reduce((sum, log) => sum + (log.cross_count || 1), 0) || 1;
 
-          // Create location_details array with proper structure
-          const locationDetails =
-            logData?.reduce((acc, log) => {
-              if (!log.restaurant_name) return acc;
+      //     // Create location_details array with proper structure
+      //     const locationDetails =
+      //       logData?.reduce((acc, log) => {
+      //         if (!log.restaurant_name) return acc;
 
-              const existing = acc.find(
-                (item) => item.name === log.restaurant_name
-              );
-              if (existing) {
-                existing.cross_count += log.cross_count || 1;
-              } else {
-                acc.push({
-                  name: log.restaurant_name,
-                  cross_count: log.cross_count || 1,
-                });
-              }
-              return acc;
-            }, [] as Array<{ name: string; cross_count: number }>) || [];
+      //         const existing = acc.find(
+      //           (item) => item.name === log.restaurant_name
+      //         );
+      //         if (existing) {
+      //           existing.cross_count += log.cross_count || 1;
+      //         } else {
+      //           acc.push({
+      //             name: log.restaurant_name,
+      //             cross_count: log.cross_count || 1,
+      //           });
+      //         }
+      //         return acc;
+      //       }, [] as Array<{ name: string; cross_count: number }>) || [];
 
-          return {
-            ...path,
-            matched_user:
-              path.user1_id === profile.user_id ? path.user2 : path.user1,
-            total_crosses: totalCrosses,
-            locations: [...new Set(locations)], // Remove duplicates
-            location_details: locationDetails,
-          };
-        })
-      );
+      //     return {
+      //       ...path,
+      //       matched_user:
+      //         path.user1_id === profile.user_id ? path.user2 : path.user1,
+      //       total_crosses: totalCrosses,
+      //       locations: [...new Set(locations)], // Remove duplicates
+      //       location_details: locationDetails,
+      //     };
+      //   })
+      // );
 
-      setCrossedPaths(enrichedPaths);
+const crossedPaths = [
+  {
+    id: 1,
+    matched_user: {
+      first_name: "Sophie",
+      last_name: "Nguyen",
+      username: "sophie_n",
+    },
+    locations: ["Toronto", "Tim Hortons, Queen St"],
+    total_crosses: 3,
+    matched_at: "2025-10-12T14:20:00Z",
+  },
+  {
+    id: 2,
+    matched_user: {
+      first_name: "Ethan",
+      last_name: "Patel",
+      username: "ethan_p",
+    },
+    locations: ["Vancouver", "Stanley Park Café"],
+    total_crosses: 5,
+    matched_at: "2025-10-10T09:45:00Z",
+  },
+  {
+    id: 3,
+    matched_user: {
+      first_name: "Amelia",
+      last_name: "Johnson",
+      username: "ameliaj",
+    },
+    locations: ["Montreal", "Old Port Market"],
+    total_crosses: 2,
+    matched_at: "2025-10-15T18:30:00Z",
+  },
+];
+const myUpcomingEvents = [
+  {
+    id: 1,
+    name: "Maple Leaf Gala Dinner",
+    date_time: "2025-10-20T19:30:00Z",
+    location_name: "Canoe Restaurant, Toronto",
+    creator_id: 101, // you’re the creator
+    rsvp_count: 18,
+  },
+  {
+    id: 2,
+    name: "Vancouver Sunset Social",
+    date_time: "2025-10-22T17:00:00Z",
+    location_name: "English Bay Beach, Vancouver",
+    creator_id: 102,
+    rsvp_count: 26,
+  },
+  {
+    id: 3,
+    name: "Montreal Midnight Coffee Circle",
+    date_time: "2025-10-25T23:00:00Z",
+    location_name: "Café Olimpico, Montreal",
+    creator_id: 101, // your user id
+    rsvp_count: 9,
+  },
+];
+
+      setCrossedPaths(crossedPaths);
+      setDummyEvents(myUpcomingEvents);
     } catch (error: any) {
       console.error("Error in fetchCrossedPaths:", error);
       setCrossedPaths([]);
@@ -243,7 +307,13 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    // <div className="min-h-screen bg-background">
+    // <div className="min-h-screen bg-transparent">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+  <div
+    className="absolute inset-0 bg-[url('/parishus-logo.png')] bg-no-repeat bg-center bg-[length:300px] opacity-10 pointer-events-none"
+  ></div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           {/* Header */}
@@ -264,7 +334,7 @@ const Dashboard = () => {
                 </Button>
               </Link>
               <Link to={"/create-event"}>
-                <Button className=" mt-4 sm:mt-0 group">
+                <Button variant="outline" className=" mt-4 sm:mt-0 group">
                   <Plus className="h-4 w-4 mr-2 icon-animate" />
                   Create Event
                 </Button>
@@ -345,25 +415,31 @@ const Dashboard = () => {
                 <CardTitle className="flex items-center justify-between">
                   My Upcoming Events
                   <Link to={"/events"}>
-                    <Button variant="outline" size="sm">
+                    <Button 
+                    // variant="outline" size="sm"
+                                        size="lg"
+                    className="h-9"
+                    >
                       View All
                     </Button>
                   </Link>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {loading ? (
+                {/* {loading ? (
                   <p className="text-muted-foreground">
                     Loading your events...
                   </p>
-                ) : myUpcomingEvents.length === 0 ? (
+                ) : dummyEvents.length === 0 ? (
                   <p className="text-muted-foreground">
                     No upcoming events found.
                   </p>
-                ) : (
-                  myUpcomingEvents.map((event) => (
+                ) : ( */}
+                  {
+                  // myUpcomingEvents.map((event) => (
+                  dummyEvents.map((event) => (
                     <Link to={`/event/${event.id}/details`} key={event.id}>
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 bg-dark-surface rounded-lg hover:bg-muted transition-colors duration-200">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 py-4 px-2 bg-dark-surface rounded-lg hover:bg-muted transition-colors duration-200">
                         <div className="flex flex-col space-y-1 min-w-0">
                           <h3 className="font-semibold text-lg text-foreground truncate">
                             {event.name}
@@ -383,8 +459,8 @@ const Dashboard = () => {
                             </span>
                           </div>
                         </div>
-                        <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
-                          <Badge
+                        <div className="flex flex-wrap items-center gap-3 sm:shrink-0">
+                          {/* <Badge
                             variant={
                               event.creator_id === user?.id
                                 ? "default"
@@ -394,15 +470,22 @@ const Dashboard = () => {
                             {event.creator_id === user?.id
                               ? "Creator"
                               : "Attending"}
-                          </Badge>
-                          <span className="text-sm text-muted-foreground">
+                          </Badge> */}
+                          <span className="text-md"
+                          >
+                            {event.creator_id === user?.id
+                              ? "Creator"
+                              : "Attending"}
+                          </span>
+                          <span className="text-[0.75rem] text-black/60">
                             {event.rsvp_count || 0} attending
                           </span>
                         </div>
                       </div>
                     </Link>
                   ))
-                )}
+                // )
+                }
               </CardContent>
             </Card>
 
@@ -410,24 +493,29 @@ const Dashboard = () => {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <span className="flex items-center">
-                    <Heart className="h-5 w-5 mr-2" />
+                    {/* <Heart className="h-5 w-5 mr-2" /> */}
                     Crossed Paths
                   </span>
                   <Link to={"/crossed-paths"}>
-                    <Button variant="outline" size="sm">
+                    <Button 
+                    // variant="outline" 
+                    // size="sm"
+                    size="lg"
+                    className="h-9"
+                    >
                       View All
                     </Button>
                   </Link>
                 </CardTitle>
-                <CardDescription>
+                {/* <CardDescription>
                   People you've encountered at similar places
-                </CardDescription>
+                </CardDescription> */}
               </CardHeader>
               <CardContent className="space-y-4">
                 {crossedPaths.map((path) => (
                   <div
                     key={path.id}
-                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-2 bg-dark-surface rounded-lg"
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 py-2 bg-dark-surface rounded-lg"
                   >
                     <div className="flex items-center space-x-4 min-w-0">
                       <div className="h-10 w-10 rounded-full flex items-center justify-center">
@@ -471,7 +559,9 @@ const Dashboard = () => {
                         Invite
                       </Button>
                       <Link to={`/profile/${path.matched_user.username}`}>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                        // variant="outline" 
+                        size="sm">
                           <User className="h-4 w-4" />
                         </Button>
                       </Link>
@@ -484,42 +574,42 @@ const Dashboard = () => {
 
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="shadow-card border-border cursor-pointer hover:shadow-glow transition-shadow group">
+            <Card className="shadow-card border-border cursor-pointer hover:shadow-glow group hover:bg-secondary transition-all duration-300 hover:shadow-glow">
               <Link to={`/create-event/`}>
                 <CardContent className="p-6 text-center">
-                  <div className="h-12 w-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="h-12 w-12 rounded-full flex items-center justify-center mx-auto mb-2">
                     <Plus className="h-6 w-6 icon-animate" />
                   </div>
-                  <h3 className="font-semibold mb-2">Create Event</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className="font-semibold text-lg mb-2">Create Event</h3>
+                  <p className="text-md text-muted-foreground">
                     Host your own dining experience
                   </p>
                 </CardContent>
               </Link>
             </Card>
 
-            <Card className="shadow-card border-border cursor-pointer hover:shadow-glow transition-shadow group">
+            <Card className="shadow-card border-border cursor-pointer hover:shadow-glow hover:bg-secondary transition-all duration-500 hover:shadow-glow group">
               <Link to={`/explore`}>
                 <CardContent className="p-6 text-center">
-                  <div className="h-12 w-12 bg rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="h-12 w-12 bg rounded-full flex items-center justify-center mx-auto mb-2">
                     <Search className="h-6 w-6 icon-animate" />
                   </div>
-                  <h3 className="font-semibold mb-2">Explore Events</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className="font-semibold text-lg mb-2">Explore Events</h3>
+                  <p className="text-md text-muted-foreground">
                     Find dining events near you
                   </p>
                 </CardContent>
               </Link>
             </Card>
 
-            <Card className="shadow-card border-border cursor-pointer hover:shadow-glow transition-shadow group">
+            <Card className="shadow-card border-border cursor-pointer hover:shadow-glow hover:bg-secondary transition-all duration-500 hover:shadow-glow group">
               <Link to={`/feedback/`}>
                 <CardContent className="p-6 text-center">
-                  <div className="h-12 w-12 bg-mystery-purple/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="h-12 w-12 bg-mystery-purple/20 rounded-full flex items-center justify-center mx-auto mb-2">
                     <Star className="h-6 w-6 text-mystery-purple icon-animate" />
                   </div>
-                  <h3 className="font-semibold mb-2">Give Feedback</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className="font-semibold text-lg mb-2">Give Feedback</h3>
+                  <p className="text-md text-muted-foreground">
                     Rate your recent experiences
                   </p>
                 </CardContent>

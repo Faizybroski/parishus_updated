@@ -30,7 +30,8 @@ const EventsCarousel = () => {
     slidesToScroll: 1,
   });
   const [isDragging, setIsDragging] = useState(false);
-  const [events, setEvents] = useState([]);
+  // const [events, setEvents] = useState([]);
+  const [dummyEvents, setDummyEvents] = useState([]);
   const [rsvps, setRsvps] = useState([]);
   const [attendeeCounts, setAttendeeCounts] = useState({});
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -97,7 +98,55 @@ const EventsCarousel = () => {
 
       if (error) throw error;
 
-      setEvents(eventData || []);
+      const dummyEvents = [
+        {
+          id: 1,
+          name: "The Fifth Seat Dinner",
+          description:
+            "A private fine dining experience featuring Toronto’s best chefs. Join us for an evening of conversation and creativity.",
+          date_time: "2025-10-22T19:00:00Z",
+          location_name: "Canoe Restaurant, Toronto",
+          location_address: "66 Wellington St W, Toronto, ON",
+          cover_photo_url:
+            "https://images.unsplash.com/photo-1551782450-a2132b4ba21d?auto=format&fit=crop&w=1000&q=80",
+        },
+        {
+          id: 2,
+          name: "Sunset Rooftop Meetup",
+          description:
+            "A golden-hour networking event with a skyline view of Vancouver. Drinks, jazz, and connection await.",
+          date_time: "2025-10-25T18:30:00Z",
+          location_name: "The Roof, Vancouver",
+          location_address: "123 Granville St, Vancouver, BC",
+          cover_photo_url:
+            "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1000&q=80",
+        },
+        {
+          id: 3,
+          name: "Midnight Coffee Circle",
+          description:
+            "A cozy night for creatives and thinkers. Bring your ideas, stories, and favorite blend — inspiration guaranteed.",
+          date_time: "2025-10-28T23:00:00Z",
+          location_name: "Pilot Coffee Roasters, Ottawa",
+          location_address: "150 Elgin St, Ottawa, ON",
+          cover_photo_url:
+            "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1000&q=80",
+        },
+        {
+          id: 5,
+          name: "Art & Soul Gala",
+          description:
+            "An evening celebrating local artists, live performances, and a touch of glamour. Dress code: creative formal.",
+          date_time: "2025-11-10T20:00:00Z",
+          location_name: "Art Gallery of Alberta, Edmonton",
+          location_address: "2 Sir Winston Churchill Square, Edmonton, AB",
+          cover_photo_url:
+            "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1000&q=80",
+        },
+      ];
+
+      // setEvents(eventData || []);
+      setDummyEvents(dummyEvents);
 
       const counts = {};
       for (const event of eventData || []) {
@@ -128,10 +177,17 @@ const EventsCarousel = () => {
     else setRsvps(data || []);
   };
 
+  // TESTING/DEVELOPMENT/DUMMY-----------------------------------------------------
+
   const getRSVPStatus = (eventId) => {
-    const rsvp = rsvps.find((r) => r.event_id === eventId);
-    return rsvp?.response_status || null;
+    const statuses = ["yes", "no", "yes", "pending", "yes"];
+    return statuses[eventId - 1];
   };
+  // -------------------TESTING/DEVELOPMENT/DUMMY---------------------------------------------------------------------------------------------
+  // const getRSVPStatus = (eventId) => {
+  //   const rsvp = rsvps.find((r) => r.event_id === eventId);
+  //   return rsvp?.response_status || null;
+  // };
 
   const isEventCreator = (event) => {
     return user && event.creator_id === user.id;
@@ -297,7 +353,8 @@ const EventsCarousel = () => {
     );
   }
 
-  if (events.length === 0) {
+  // if (events.length === 0) {
+  if (dummyEvents.length === 0) {
     return (
       <div className="h-96 flex items-center justify-center text-center text-muted-foreground bg-background rounded-xl">
         <div>
@@ -439,22 +496,31 @@ const EventsCarousel = () => {
             );
           })}
         </div> */}
-        <div className="sm:pt-10 touch-pan-y">
+        <div className="sm:pt-10 touch-pan-y" style={{ touchAction: "pan-y" }}>
           <Carousel
-            showThumbs={false}
+            showThumbs
             autoPlay
             infiniteLoop
             showStatus={false}
             interval={4000}
-            showArrows={false}
+            showArrows
             onChange={(index) => setCurrentSlide(index)}
-            swipeable
-            emulateTouch
+            swipeable={false}
+            emulateTouch={false}
             className="rounded-xl overflow-hidden"
           >
-            {events.map((event) => {
+            {/* {events.map((event) => { */}
+            {dummyEvents.map((event) => {
               const rsvpStatus = getRSVPStatus(event.id);
+              // DEVELOPMENT/DUMMY/TESTING---------------------------
               const attendeeCount = attendeeCounts[event.id] || 0;
+              // const attendeeCount = {
+              //   1: 24,
+              //   2: 48,
+              //   3: 12,
+              //   4: 36,
+              //   5: 60,
+              // };
 
               return (
                 <div
@@ -474,7 +540,7 @@ const EventsCarousel = () => {
                   ></div>
 
                   {/* Gradient Overlay */}
-                  <div className="absolute inset-0 rounded-xl z-0 bg-gradient-to-b from-neutral-100/20 via-neutral-200/5 to-transparent backdrop-blur-sm"></div>
+                  <div className="absolute inset-0 rounded-xl z-0 bg-gradient-to-b from-neutral-100/20 via-neutral-200/5 to-transparent backdrop-blur-lg"></div>
 
                   {/* Content */}
                   <div className="relative z-10 flex flex-col lg:flex-row items-center justify-center w-full px-4 sm:px-8 lg:px-16 py-10 gap-6 sm:gap-10 text-white">
@@ -488,51 +554,64 @@ const EventsCarousel = () => {
                       />
                     </div>
 
-                    {/* Text Content */}
+                    {/* Text Content - Fixed Height Container */}
                     <div className="w-full lg:w-[50%] text-center lg:text-left flex flex-col items-center lg:items-start">
+                      {/* Title */}
                       <h2 className="font-script text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 leading-snug text-white line-clamp-2 pb-2">
                         {event.name}
                       </h2>
 
-                      {event.description && (
-                        <p className="text-sm sm:text-base md:text-lg text-gray-200 mb-4 line-clamp-4">
-                          {event.description}
-                        </p>
-                      )}
-
-                      {/* Location */}
-                      <div className="text-gray-100 mb-2 text-sm sm:text-base">
-                        <p className="font-medium truncate">
-                          {event.location_name || "Location not specified"}
-                        </p>
-                        {event.location_address && (
-                          <p className="text-gray-300 truncate">
-                            {event.location_address}
+                      {/* Description Container with Fixed Height */}
+                      <div className="w-full mb-4 min-h-[80px] sm:min-h-[90px] md:min-h-[100px] max-h-[120px] overflow-hidden">
+                        {event.description && (
+                          <p className="text-sm sm:text-base md:text-lg text-gray-200 line-clamp-3 sm:line-clamp-4">
+                            {event.description}
                           </p>
                         )}
                       </div>
 
-                      {/* Date & Time */}
-                      <p className="text-gray-200 text-sm sm:text-base">
-                        {new Date(event.date_time).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                        })}{" "}
-                        -{" "}
-                        {new Date(event.date_time).toLocaleTimeString("en-US", {
-                          hour: "numeric",
-                          minute: "2-digit",
-                        })}
-                      </p>
+                      {/* Event Details */}
+                      <div className="w-full space-y-2 mb-4">
+                        {/* Location */}
+                        <div className="text-gray-100 text-sm sm:text-base">
+                          <p className="font-medium truncate">
+                            {event.location_name || "Location not specified"}
+                          </p>
+                          {event.location_address && (
+                            <p className="text-gray-300 truncate">
+                              {event.location_address}
+                            </p>
+                          )}
+                        </div>
 
-                      {/* Attendees */}
-                      <div className="flex items-center justify-center lg:justify-start gap-2 text-gray-300 text-sm mt-2">
-                        <Users className="w-4 h-4" />
-                        <span>{attendeeCount} attending</span>
+                        {/* Date & Time */}
+                        <p className="text-gray-200 text-sm sm:text-base">
+                          {new Date(event.date_time).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                              day: "numeric",
+                            }
+                          )}{" "}
+                          -{" "}
+                          {new Date(event.date_time).toLocaleTimeString(
+                            "en-US",
+                            {
+                              hour: "numeric",
+                              minute: "2-digit",
+                            }
+                          )}
+                        </p>
+
+                        {/* Attendees */}
+                        <div className="flex items-center justify-center lg:justify-start gap-2 text-gray-300 text-sm">
+                          <Users className="w-4 h-4" />
+                          <span>{attendeeCount} attending</span>
+                        </div>
                       </div>
 
-                      {/* Buttons */}
-                      <div className="flex flex-col sm:flex-row items-center lg:justify-start justify-center gap-3 mt-6 w-full">
+                      {/* Buttons - Always at bottom */}
+                      <div className="flex flex-col sm:flex-row items-center lg:justify-start justify-center gap-3 mt-4 w-full">
                         <Link to={`/event/${event.id}/details`}>
                           <Button
                             variant="outline"
@@ -543,10 +622,8 @@ const EventsCarousel = () => {
                           </Button>
                         </Link>
                         <Link to={`/rsvp/${event.id}/details`}>
-                          <Button
-                            className="w-full group sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-lg font-semibold bg-white text-black hover:bg-gray-200 rounded-full flex items-center justify-center gap-2 transition-all"
-                          >
-                            {rsvpStatus === "yes" ? "Un-RSVP" : "RSVP"}
+                          <Button className="w-full group sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-lg font-semibold bg-white text-black hover:bg-gray-200 rounded-full flex items-center justify-center gap-2 transition-all">
+                            {rsvpStatus === "yes" ? "Cancel RSVP" : "RSVP"}
                             <ChevronRight className="w-5 h-5 icon-animate" />
                           </Button>
                         </Link>
