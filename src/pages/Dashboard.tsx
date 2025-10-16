@@ -212,67 +212,67 @@ const Dashboard = () => {
       //   })
       // );
 
-const crossedPaths = [
-  {
-    id: 1,
-    matched_user: {
-      first_name: "Sophie",
-      last_name: "Nguyen",
-      username: "sophie_n",
-    },
-    locations: ["Toronto", "Tim Hortons, Queen St"],
-    total_crosses: 3,
-    matched_at: "2025-10-12T14:20:00Z",
-  },
-  {
-    id: 2,
-    matched_user: {
-      first_name: "Ethan",
-      last_name: "Patel",
-      username: "ethan_p",
-    },
-    locations: ["Vancouver", "Stanley Park Café"],
-    total_crosses: 5,
-    matched_at: "2025-10-10T09:45:00Z",
-  },
-  {
-    id: 3,
-    matched_user: {
-      first_name: "Amelia",
-      last_name: "Johnson",
-      username: "ameliaj",
-    },
-    locations: ["Montreal", "Old Port Market"],
-    total_crosses: 2,
-    matched_at: "2025-10-15T18:30:00Z",
-  },
-];
-const myUpcomingEvents = [
-  {
-    id: 1,
-    name: "Maple Leaf Gala Dinner",
-    date_time: "2025-10-20T19:30:00Z",
-    location_name: "Canoe Restaurant, Toronto",
-    creator_id: 101, // you’re the creator
-    rsvp_count: 18,
-  },
-  {
-    id: 2,
-    name: "Vancouver Sunset Social",
-    date_time: "2025-10-22T17:00:00Z",
-    location_name: "English Bay Beach, Vancouver",
-    creator_id: 102,
-    rsvp_count: 26,
-  },
-  {
-    id: 3,
-    name: "Montreal Midnight Coffee Circle",
-    date_time: "2025-10-25T23:00:00Z",
-    location_name: "Café Olimpico, Montreal",
-    creator_id: 101, // your user id
-    rsvp_count: 9,
-  },
-];
+      const crossedPaths = [
+        {
+          id: 1,
+          matched_user: {
+            first_name: "Sophie",
+            last_name: "Nguyen",
+            username: "sophie_n",
+          },
+          locations: ["Toronto", "Tim Hortons, Queen St"],
+          total_crosses: 3,
+          matched_at: "2025-10-12T14:20:00Z",
+        },
+        {
+          id: 2,
+          matched_user: {
+            first_name: "Ethan",
+            last_name: "Patel",
+            username: "ethan_p",
+          },
+          locations: ["Vancouver", "Stanley Park Café"],
+          total_crosses: 5,
+          matched_at: "2025-10-10T09:45:00Z",
+        },
+        {
+          id: 3,
+          matched_user: {
+            first_name: "Amelia",
+            last_name: "Johnson",
+            username: "ameliaj",
+          },
+          locations: ["Montreal", "Old Port Market"],
+          total_crosses: 2,
+          matched_at: "2025-10-15T18:30:00Z",
+        },
+      ];
+      const myUpcomingEvents = [
+        {
+          id: 1,
+          name: "Maple Leaf Gala Dinner",
+          date_time: "2025-10-20T19:30:00Z",
+          location_name: "Canoe Restaurant, Toronto",
+          creator_id: 101, // you’re the creator
+          rsvp_count: 18,
+        },
+        {
+          id: 2,
+          name: "Vancouver Sunset Social",
+          date_time: "2025-10-22T17:00:00Z",
+          location_name: "English Bay Beach, Vancouver",
+          creator_id: 102,
+          rsvp_count: 26,
+        },
+        {
+          id: 3,
+          name: "Montreal Midnight Coffee Circle",
+          date_time: "2025-10-25T23:00:00Z",
+          location_name: "Café Olimpico, Montreal",
+          creator_id: 101, // your user id
+          rsvp_count: 9,
+        },
+      ];
 
       setCrossedPaths(crossedPaths);
       setDummyEvents(myUpcomingEvents);
@@ -307,13 +307,7 @@ const myUpcomingEvents = [
   };
 
   return (
-    // <div className="min-h-screen bg-background">
-    // <div className="min-h-screen bg-transparent">
-    <div className="min-h-screen bg-background relative overflow-hidden">
-  <div
-    className="absolute inset-0 bg-[url('/parishus-logo.png')] bg-no-repeat bg-center bg-[length:300px] opacity-10 pointer-events-none"
-  ></div>
-
+    <div className="min-h-screen bg-transparent">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           {/* Header */}
@@ -415,10 +409,10 @@ const myUpcomingEvents = [
                 <CardTitle className="flex items-center justify-between">
                   My Upcoming Events
                   <Link to={"/events"}>
-                    <Button 
-                    // variant="outline" size="sm"
-                                        size="lg"
-                    className="h-9"
+                    <Button
+                      // variant="outline" size="sm"
+                      size="lg"
+                      className="h-9"
                     >
                       View All
                     </Button>
@@ -435,7 +429,7 @@ const myUpcomingEvents = [
                     No upcoming events found.
                   </p>
                 ) : ( */}
-                  {
+                {
                   // myUpcomingEvents.map((event) => (
                   dummyEvents.map((event) => (
                     <Link to={`/event/${event.id}/details`} key={event.id}>
@@ -471,8 +465,7 @@ const myUpcomingEvents = [
                               ? "Creator"
                               : "Attending"}
                           </Badge> */}
-                          <span className="text-md"
-                          >
+                          <span className="text-md">
                             {event.creator_id === user?.id
                               ? "Creator"
                               : "Attending"}
@@ -484,7 +477,7 @@ const myUpcomingEvents = [
                       </div>
                     </Link>
                   ))
-                // )
+                  // )
                 }
               </CardContent>
             </Card>
@@ -497,11 +490,11 @@ const myUpcomingEvents = [
                     Crossed Paths
                   </span>
                   <Link to={"/crossed-paths"}>
-                    <Button 
-                    // variant="outline" 
-                    // size="sm"
-                    size="lg"
-                    className="h-9"
+                    <Button
+                      // variant="outline"
+                      // size="sm"
+                      size="lg"
+                      className="h-9"
                     >
                       View All
                     </Button>
@@ -559,9 +552,10 @@ const myUpcomingEvents = [
                         Invite
                       </Button>
                       <Link to={`/profile/${path.matched_user.username}`}>
-                        <Button 
-                        // variant="outline" 
-                        size="sm">
+                        <Button
+                          // variant="outline"
+                          size="sm"
+                        >
                           <User className="h-4 w-4" />
                         </Button>
                       </Link>
