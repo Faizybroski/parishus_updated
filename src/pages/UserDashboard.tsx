@@ -75,7 +75,7 @@ const UserDashboard = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground font-script">
-          Welcome back, {profile?.first_name || user?.email}!
+          Welcome back, {profile?.first_name}!
         </h1>
         <p className="text-muted-foreground mt-2">
           Ready to connect over a great meal?

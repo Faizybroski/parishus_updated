@@ -330,16 +330,16 @@ export const ParishUsLanding: React.FC = () => {
             </Link>
           </div>
 
-          <div className="flex flex-wrap  gap-5 px-4 my-5">
+          <div className="flex flex-wrap gap-5 px-4 my-5">
             {loading ? (
               Array.from({ length: 3 }).map((_, i) => (
                 <div
                   key={i}
-                  className="h-[420px] w-full sm:w-[20rem] lg:w-[25rem] rounded-xl animate-pulse bg-muted"
+                  className=" h-[420px] w-full sm:w-[90%] md:w-[45%] lg:w-[30%] max-w-[420px] rounded-xl animate-pulse bg-muted "
                 />
               ))
             ) : events.length === 0 ? (
-              <Card className="flex flex-col items-center justify-center h-[420px] border border-dashed border-secondary bg-muted/20 text-center">
+              <Card className="flex flex-col items-center justify-center h-[420px] w-full sm:w-[90%] md:w-[45%] lg:w-[30%] max-w-[420px] border border-dashed border-secondary bg-muted/20 text-center">
                 <div className="text-secondary mb-3">
                   <Calendar className="w-12 h-12" />
                 </div>
