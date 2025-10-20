@@ -300,7 +300,7 @@ const OurEventsCreate = () => {
     }
 
     if (
-      formData.is_paid &&
+      mode === "sell" &&
       (!formData.event_fee || Number(formData.event_fee) <= 0)
     ) {
       toast({
@@ -799,6 +799,7 @@ const OurEventsCreate = () => {
                           )
                         }
                         className="pl-10"
+                        required={mode==="sell"}
                       />
                     </div>
                   </div>
