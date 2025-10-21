@@ -1,12 +1,16 @@
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { useDropzone } from "react-dropzone";
 import Cropper from "react-easy-crop";
 import { cn } from "@/lib/utils";
-
 
 export default function FlyerUpload({
   value,
@@ -33,38 +37,43 @@ export default function FlyerUpload({
   }, []);
 
   // --- DROPZONE HANDLER ---
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    const file = acceptedFiles[0];
-    if (!file) return;
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
+      if (!file) return;
 
-    if (mode === "gif") {
-      // Direct upload for GIFs (no cropping)
-      uploadToSupabase(file);
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const image = new Image();
-      image.onload = () => {
-        const aspect = image.width / image.height;
-        if (Math.abs(aspect - 0.8) < 0.05) {
-          // already roughly 4:5, no crop needed
-          uploadToSupabase(file);
-        } else {
-          setImageSrc(e.target?.result as string);
-          setCropDialogOpen(true);
-        }
+      if (mode === "gif") {
+        setUploading(true); // 👈 immediate state update before async starts
+        uploadToSupabase(file).finally(() => setUploading(false));
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const image = new Image();
+        image.onload = () => {
+          const aspect = image.width / image.height;
+          if (Math.abs(aspect - 0.8) < 0.05) {
+            // already roughly 4:5, no crop needed
+            uploadToSupabase(file);
+          } else {
+            setImageSrc(e.target?.result as string);
+            setCropDialogOpen(true);
+          }
+        };
+        image.src = e.target?.result as string;
       };
-      image.src = e.target?.result as string;
-    };
-    reader.readAsDataURL(file);
-    setFiles(acceptedFiles);
-  }, [mode]);
+      reader.readAsDataURL(file);
+      setFiles(acceptedFiles);
+    },
+    [mode]
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: mode === "picture" ? { "image/*": [] } : { "image/gif": [] },
+    accept:
+      mode === "picture"
+        ? { "image/*": [] }
+        : { "image/gif": [], "image/*": [] },
     multiple: false,
   });
 
@@ -162,7 +171,9 @@ export default function FlyerUpload({
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Upload {mode === "picture" ? "Picture" : "GIF"}</DialogTitle>
+            <DialogTitle>
+              Upload {mode === "picture" ? "Picture" : "GIF"}
+            </DialogTitle>
           </DialogHeader>
 
           {/* MODE TOGGLE */}
@@ -192,7 +203,9 @@ export default function FlyerUpload({
             )}
           >
             <input {...getInputProps()} />
-            {isDragActive ? (
+            {uploading ? (
+              <p className="text-primary font-medium">Uploading...</p>
+            ) : isDragActive ? (
               <p className="text-primary font-medium">Drop files here...</p>
             ) : (
               <p className="text-muted-foreground">

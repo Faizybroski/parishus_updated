@@ -59,6 +59,7 @@ import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 import { RestaurantSearchDropdown } from "@/components/restaurants/RestaurantSearchDropdown";
 import GooglePlacesEventsForm from "@/components/restaurants/GooglePlacesEventsForm";
 import FlyerUpload from "@/components/flyer/Flyerupload";
+import ImageGalleryUpload from "@/components/imageGallery/ImageGalleryUpload";
 
 const OurEventsCreate = () => {
   const [loading, setLoading] = useState(false);
@@ -84,7 +85,7 @@ const OurEventsCreate = () => {
     cover_photo_url: "",
     is_mystery_dinner: false,
     guest_invitation_type: "",
-    guestList: false,
+    guestList: true,
     features: false,
     is_paid: false,
     is_password_protected: false,
@@ -95,6 +96,7 @@ const OurEventsCreate = () => {
     imageGallery: false,
     event_fee: "",
     flyer_url: "",
+    imageGalleryLinks: [] as string[],
   });
   const [newTag, setNewTag] = useState("");
   const { user, loading: authLoading } = useAuth();
@@ -311,6 +313,28 @@ const OurEventsCreate = () => {
       return;
     }
 
+    if (formData.tiktok) {
+      if (!formData.tiktokLink) {
+        toast({
+          title: "Validation Error",
+          description: "Please give URL for TikTok video.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    if (formData.imageGallery) {
+      if (formData.imageGalleryLinks.length <= 0) {
+        toast({
+          title: "Validation Error",
+          description: "Please give atleast one image for image gallery.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
@@ -404,6 +428,13 @@ const OurEventsCreate = () => {
             formData.guest_invitation_type === "crossed_paths",
           is_paid: mode === "sell" ? true : false,
           event_fee: mode === "sell" ? formData.event_fee : null,
+          guest_list: formData.guestList,
+          tiktok: formData.tiktok,
+          tiktok_Link: formData.tiktok ? formData.tiktokLink : null,
+          imageGallery: formData.imageGallery,
+          imageGalleryLinks: formData.imageGallery
+            ? formData.imageGalleryLinks
+            : [],
         } as any)
         .select()
         .single();
@@ -546,24 +577,7 @@ const OurEventsCreate = () => {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6 p-6">
-          <div className="flex-1 space-y-6">
-            {/* <h1
-            ref={ref}
-            contentEditable
-            suppressContentEditableWarning
-            value={formData.name}
-            onInput={(e) => handleInputChange("name", e.target.value)}
-            data-placeholder="My Event Name"
-            className="m-3 p-0 text-4xl font-semibold font-script focus:outline-none
-                 empty:before:content-[attr(data-placeholder)]
-                 empty:before:text-gray-400
-                 empty:before:select-none"
-            style={{ direction: "ltr" }}
-          />
-          <Button className="px-4 py-2  text-gray-400 rounded-md">
-            Short Summary
-          </Button> */}
-
+          <div className="flex-1 space-y-6 min-w-0">
             <Card className="space-y-2">
               <CardHeader>
                 <CardTitle>Name & Description</CardTitle>
@@ -755,23 +769,6 @@ const OurEventsCreate = () => {
                   formData={formData}
                   onChange={handleInputChange}
                 />
-
-                {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="max_attendees">Maximum Attendees *</Label>
-                  <Input id="max_attendees" type="number" min="2" max="50" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="rsvp_deadline_date">RSVP Deadline Date</Label>
-                  <Input id="rsvp_deadline_date" type="date" />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="rsvp_deadline_time">RSVP Deadline Time</Label>
-                <Input id="rsvp_deadline_time" type="time" />
-              </div> */}
               </CardContent>
             </Card>
 
@@ -799,7 +796,7 @@ const OurEventsCreate = () => {
                           )
                         }
                         className="pl-10"
-                        required={mode==="sell"}
+                        required={mode === "sell"}
                       />
                     </div>
                   </div>
@@ -869,8 +866,8 @@ const OurEventsCreate = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="border px-4 py-2 rounded-md">
-                  <div className="flex justify-between items-center">
+                <div className="border  py-2 rounded-md">
+                  <div className="flex justify-between items-center px-4">
                     <Label htmlFor="guestList">Guestlist</Label>
                     <Checkbox
                       id="guestList"
@@ -882,10 +879,9 @@ const OurEventsCreate = () => {
                   </div>
 
                   {formData.guestList && (
-                    // <div className="bg-primary rounded-md mt-2 px-4 py-3">
                     <>
-                      <p className="mt-2">David and 09 others going</p>
-                      <div className="flex gap-2 mt-2 overflow-x-auto">
+                      <p className="mt-2 px-4">David and 09 others going</p>
+                      <div className="flex gap-2 mt-2 overflow-x-auto px-3.5">
                         {dummyPictures.map((i, idx) => (
                           <Avatar
                             key={idx}
@@ -896,7 +892,6 @@ const OurEventsCreate = () => {
                         ))}
                       </div>
                     </>
-                    // </div>
                   )}
                 </div>
 
@@ -943,7 +938,7 @@ const OurEventsCreate = () => {
                   )}
                 </div>
 
-                <div className="border px-4 py-2 rounded-md">
+                <div className="border px-4 py-2 rounded-md w-full min-w-0">
                   <div className="flex justify-between items-center">
                     <Label htmlFor="imageGallery">Image Gallery</Label>
                     <Checkbox
@@ -956,112 +951,16 @@ const OurEventsCreate = () => {
                   </div>
 
                   {formData.imageGallery && (
-                    <div className="space-y-4 min-w-0 mt-2">
-                      <div className="overflow-x-auto w-full">
-                        <div className="grid grid-flow-col auto-cols-[6rem] gap-3">
-                          {Array.from({ length: 7 }).map((_, i) => (
-                            <div
-                              key={i}
-                              className="h-24 bg-primary rounded-md flex items-center justify-center text-gray-500 flex-shrink-0"
-                            >
-                              {i + 1}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
+                    <ImageGalleryUpload
+                      onImagesUploaded={(urls) => {
+                        handleInputChange("imageGalleryLinks", urls);
+                      }}
+                      existingImages={formData.imageGalleryLinks}
+                    />
                   )}
                 </div>
               </CardContent>
             </Card>
-
-            {/* <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2 space-y-1 relative">
-                  Guestlist
-                  <button
-                    type="button"
-                    className="absolute right-3 top-2"
-                    onClick={() => setShowGuestList(!showGuestList)}
-                  >
-                    {showGuestList ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
-                  </button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="bg-primary rounded-md px-4 py-3">
-                  <span className="flex mb-2 text-sm relative">
-                    David and 09 others going
-                    <button
-                      type="button"
-                      className="absolute -right-[0.1rem] top-1"
-                      onClick={() => setShowGuestList(!showGuestList)}
-                    >
-                      {showGuestList ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
-                    </button>
-                  </span>
-                  <div className="flex space-x-2 justify-center gap-2">
-                    {dummyPictures.map((i) => (
-                      <Avatar className="h-14 w-14 sm:h-16 sm:w-16">
-                        <AvatarImage src={i} />
-                      </Avatar>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card> */}
-
-            {/* <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  Event Features
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Button className="w-full">Add Feature</Button>
-              </CardContent>
-            </Card> */}
-
-            {/* <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  YouTube Video
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Input className="" placeholder="Add video from YouTube" />
-              </CardContent>
-            </Card> */}
-
-            {/* <Card className="w-full">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  Image Gallery
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 min-w-0">
-                <div className="overflow-x-auto w-full [display:block]">
-                  <div className="grid grid-flow-col auto-cols-[6rem] gap-3 w-max">
-                    {Array.from({ length: 7 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="h-24 bg-primary rounded-md flex items-center justify-center text-gray-500"
-                      >
-                        {i + 1}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card> */}
 
             <Card>
               <CardHeader>
@@ -1185,74 +1084,51 @@ const OurEventsCreate = () => {
                     }
                   />
                 </div>
-                <div className="flex justify-between items-center border px-4 py-2 rounded-md">
-                  <Label htmlFor="is_password_protected">
-                    Password Protected Event
-                  </Label>
-                  <Checkbox
-                    id="is_password_protected"
-                    checked={formData.is_password_protected}
-                    onCheckedChange={(checked) =>
-                      handleInputChange("is_password_protected", checked)
-                    }
-                  />
-                </div>
-                {formData.is_password_protected && (
-                  <div className="space-y-2">
-                    <Label htmlFor="event_password">Password *</Label>
-                    <div className="relative">
-                      <Input
-                        id="event_password"
-                        type="password"
-                        value={formData.event_password ?? ""}
-                        onChange={(e) =>
-                          handleInputChange("event_password", e.target.value)
-                        }
-                        placeholder="Enter event password *"
-                      />
-                    </div>
+                <div className="border px-4 py-2 rounded-md">
+                  <div className="flex justify-between items-center">
+                    <Label htmlFor="is_password_protected">
+                      Password Protected Event
+                    </Label>
+                    <Checkbox
+                      id="is_password_protected"
+                      checked={formData.is_password_protected}
+                      onCheckedChange={(checked) =>
+                        handleInputChange("is_password_protected", checked)
+                      }
+                    />
                   </div>
-                )}
+
+                  {formData.is_password_protected && (
+                    <div className="bg-primary rounded-md mt-2 px-4 py-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="event_password">Password *</Label>
+                        <div className="relative">
+                          <Input
+                            id="event_password"
+                            type="password"
+                            value={formData.event_password ?? ""}
+                            onChange={(e) =>
+                              handleInputChange(
+                                "event_password",
+                                e.target.value
+                              )
+                            }
+                            placeholder="Enter event password *"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </div>
 
           <div className="lg:w-1/3 flex flex-col space-y-4 lg:sticky lg:top-1 lg:translate-y-[1%] self-start">
-            {/* <div
-              className="bg-primary rounded-md flex items-center justify-center h-64 relative overflow-hidden cursor-pointer group"
-              onClick={() =>
-                !uploading && document.getElementById("flyer-upload")?.click()
-              }
-            >
-              <input
-                id="flyer-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-                disabled={uploading}
-              />
-
-              {!formData.cover_photo_url ? (
-                <span className="text-secondary-foreground/80 group-hover:opacity-70 transition">
-                  {uploading ? "Uploading..." : "Click to upload your flyer"}
-                </span>
-              ) : (
-                <>
-                  <img
-                    src={formData.cover_photo_url}
-                    alt="Event flyer"
-                    className="w-full h-full object-cover rounded-md"
-                  />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
-                    <span className="text-white text-sm font-medium">
-                      Change flyer
-                    </span>
-                  </div>
-                </>
-              )}
-            </div> */}
-             <FlyerUpload value={formData.flyer_url} onChange={handleFlyerChange} />
+            <FlyerUpload
+              value={formData.flyer_url}
+              onChange={handleFlyerChange}
+            />
 
             <Button className="rounded-md px-4 py-2 text-left">
               Add song from Spotify
