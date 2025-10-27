@@ -15,6 +15,7 @@ import {
   Users,
   Search,
   Plus,
+  MoreVertical,
   Heart,
   UserCheck,
   Edit,
@@ -22,6 +23,13 @@ import {
   Eye,
   Share2,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate, Link } from "react-router-dom";
 
@@ -37,6 +45,10 @@ interface Event {
   max_attendees: number;
   creator_id: string;
   is_mystery_dinner: boolean;
+  title_font: string;
+  accent_bg: string;
+  is_paid: boolean;
+  accent_color: string;
   profiles?: {
     first_name?: string;
     last_name?: string;
@@ -62,7 +74,7 @@ interface Event {
 const Events = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [myEvents, setMyEvents] = useState<Event[]>([]);
-  const [dummyEvents, setDummyevents] = useState([]);
+  // const [dummyEvents, setDummyevents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("upcoming");
@@ -169,7 +181,7 @@ const Events = () => {
 
     try {
       const { data, error } = await supabase
-        .from("events")
+        .from("dummyevents")
         .select(
           `
           *,
@@ -177,11 +189,6 @@ const Events = () => {
             first_name,
             last_name,
             profile_photo_url
-          ),
-          rsvps (
-            id,
-            status,
-            user_id
           ),
           restaurants:restaurant_id (
             name,
@@ -193,6 +200,12 @@ const Events = () => {
         .eq("status", "active")
         .neq("creator_id", currentProfileId)
         .order("created_at", { ascending: false });
+
+      //         rsvps (
+      //   id,
+      //   status,
+      //   user_id
+      // ),
 
       if (error) throw error;
       const eventsWithCounts =
@@ -230,7 +243,7 @@ const Events = () => {
 
       // Fetch events created by the user
       const { data: userEvents, error: userError } = await supabase
-        .from("events")
+        .from("dummyevents")
         .select(
           `
           *,
@@ -238,11 +251,6 @@ const Events = () => {
             first_name,
             last_name,
             profile_photo_url
-          ),
-          rsvps (
-            id,
-            status,
-            user_id
           ),
           restaurants:restaurant_id (
             name,
@@ -255,6 +263,12 @@ const Events = () => {
         .eq("status", "active")
         .order("created_at", { ascending: false });
 
+      //         rsvps (
+      //   id,
+      //   status,
+      //   user_id
+      // ),
+
       if (userError) {
         console.error("User events error:", userError);
         throw userError;
@@ -262,84 +276,85 @@ const Events = () => {
 
       console.log("User events:", userEvents);
 
-      // const eventsWithCounts = (userEvents || []).map((event) => ({
-      //   ...event,
-      //   rsvp_count:
-      //     event.rsvps?.filter((r) => r.status === "confirmed").length || 0,
-      //   user_rsvp:
-      //     event.rsvps?.filter((r) => r.user_id === currentProfileId) || [],
-      // }));
+      const eventsWithCounts = (userEvents || []).map((event) => ({
+        ...event,
+        rsvp_count:
+          event.rsvps?.filter((r) => r.status === "confirmed").length || 0,
+        user_rsvp:
+          event.rsvps?.filter((r) => r.user_id === currentProfileId) || [],
+      }));
 
-      // setMyEvents(eventsWithCounts);
-      const myevents = [
-        {
-          id: 1,
-          name: "Maple Leaf Charity Dinner",
-          description:
-            "An elegant night of fine dining to raise funds for local shelters.",
-          date_time: "2025-10-22T19:30:00Z",
-          location_name: "Canoe Restaurant, Toronto",
-          restaurants: {
-            name: "Canoe Restaurant",
-            city: "Toronto",
-          },
-          cover_photo_url:
-            "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=1000&q=80",
-          creator_id: 101,
-          rsvp_count: 18,
-          max_attendees: 40,
-          is_paid: false,
-          rsvps: [
-            { user_id: 102, status: "confirmed" },
-            { user_id: 103, status: "confirmed" },
-          ],
-        },
-        {
-          id: 2,
-          name: "Vancouver Rooftop Mixer",
-          description:
-            "Meet professionals from across the city under the Vancouver skyline.",
-          date_time: "2025-10-25T18:00:00Z",
-          location_name: "The Roof Lounge, Vancouver",
-          restaurants: {
-            name: "The Roof Lounge",
-            city: "Vancouver",
-          },
-          cover_photo_url:
-            "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1000&q=80",
-          creator_id: 102,
-          rsvp_count: 32,
-          max_attendees: 50,
-          is_paid: true,
-          rsvps: [
-            { user_id: 101, status: "confirmed" },
-            { user_id: 104, status: "pending" },
-          ],
-        },
-        {
-          id: 3,
-          name: "Montreal Coffee & Conversations",
-          description:
-            "A cozy evening to connect with fellow creatives over freshly brewed coffee.",
-          date_time: "2025-10-28T20:00:00Z",
-          location_name: "Café Olimpico, Montreal",
-          restaurants: {
-            name: "Café Olimpico",
-            city: "Montreal",
-          },
-          cover_photo_url:
-            "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=1000&q=80",
-          creator_id: 101,
-          rsvp_count: 10,
-          max_attendees: 20,
-          is_paid: false,
-          rsvps: [
-            { user_id: 102, status: "confirmed" },
-            { user_id: 105, status: "confirmed" },
-          ],
-        },
-      ];
-      setDummyevents(myevents);
+      setMyEvents(eventsWithCounts);
+
+      // const myevents = [
+      //   {
+      //     id: 1,
+      //     name: "Maple Leaf Charity Dinner",
+      //     description:
+      //       "An elegant night of fine dining to raise funds for local shelters.",
+      //     date_time: "2025-10-22T19:30:00Z",
+      //     location_name: "Canoe Restaurant, Toronto",
+      //     restaurants: {
+      //       name: "Canoe Restaurant",
+      //       city: "Toronto",
+      //     },
+      //     cover_photo_url:
+      //       "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=1000&q=80",
+      //     creator_id: 101,
+      //     rsvp_count: 18,
+      //     max_attendees: 40,
+      //     is_paid: false,
+      //     rsvps: [
+      //       { user_id: 102, status: "confirmed" },
+      //       { user_id: 103, status: "confirmed" },
+      //     ],
+      //   },
+      //   {
+      //     id: 2,
+      //     name: "Vancouver Rooftop Mixer",
+      //     description:
+      //       "Meet professionals from across the city under the Vancouver skyline.",
+      //     date_time: "2025-10-25T18:00:00Z",
+      //     location_name: "The Roof Lounge, Vancouver",
+      //     restaurants: {
+      //       name: "The Roof Lounge",
+      //       city: "Vancouver",
+      //     },
+      //     cover_photo_url:
+      //       "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1000&q=80",
+      //     creator_id: 102,
+      //     rsvp_count: 32,
+      //     max_attendees: 50,
+      //     is_paid: true,
+      //     rsvps: [
+      //       { user_id: 101, status: "confirmed" },
+      //       { user_id: 104, status: "pending" },
+      //     ],
+      //   },
+      //   {
+      //     id: 3,
+      //     name: "Montreal Coffee & Conversations",
+      //     description:
+      //       "A cozy evening to connect with fellow creatives over freshly brewed coffee.",
+      //     date_time: "2025-10-28T20:00:00Z",
+      //     location_name: "Café Olimpico, Montreal",
+      //     restaurants: {
+      //       name: "Café Olimpico",
+      //       city: "Montreal",
+      //     },
+      //     cover_photo_url:
+      //       "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=1000&q=80",
+      //     creator_id: 101,
+      //     rsvp_count: 10,
+      //     max_attendees: 20,
+      //     is_paid: false,
+      //     rsvps: [
+      //       { user_id: 102, status: "confirmed" },
+      //       { user_id: 105, status: "confirmed" },
+      //     ],
+      //   },
+      // ];
+      // setDummyevents(myevents);
     } catch (error: any) {
       console.error("Error fetching my events:", error);
     }
@@ -660,7 +675,7 @@ const Events = () => {
     return (
       // <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div className="flex flex-wrap justify-center gap-5 my-5">
-        {dummyEvents.map((event) => {
+        {events.map((event) => {
           const eventDate = new Date(event.date_time);
           const isCreator = event.creator_id === userProfileId;
           const rsvps = event.rsvps || [];
@@ -800,12 +815,271 @@ const Events = () => {
             // </div>
             //   </CardContent>
             // </Card>
-            <div
+
+            // <Link
+            //   key={event.id}
+            //   to={`/event/${event.id}/details`}
+            //   className="block rounded-lg overflow-hidden shadow-md border border-gray-200 hover:border-gray-700 hover:bg-white/10 hover:cursor-pointer transition-all duration-300 w-full sm:w-[90%] md:w-[45%] lg:w-[30%] max-w-[420px] no-underline"
+            // >
+            //     <div className="relative">
+            //   <div className="flex justify-end pb-3">
+            //     <DropdownMenu>
+            //       <DropdownMenuTrigger asChild>
+            //         <Button
+            //           variant="outline"
+            //           size="icon"
+            //           className="hover:bg-primary/10 transition-colors"
+            //           onClick={(e) => e.stopPropagation()} // prevent parent link click
+            //         >
+            //           <MoreVertical className="h-5 w-5" />
+            //         </Button>
+            //       </DropdownMenuTrigger>
+
+            //       <DropdownMenuContent align="end" className="w-40">
+            //         <DropdownMenuItem
+            //           onClick={(e) => {
+            //             // navigate to edit
+            //             window.location.href = `/event/${event.id}/edit`;
+            //           }}
+            //         >
+            //           <Edit className="mr-2 h-4 w-4" />
+            //           Edit Event
+            //         </DropdownMenuItem>
+
+            //         <DropdownMenuSeparator />
+
+            //         <DropdownMenuItem
+            //           onClick={() => deleteEvent && deleteEvent(event.id)}
+            //           className="text-red-500 focus:text-red-600"
+            //         >
+            //           <Trash2 className="mr-2 h-4 w-4" />
+            //           Delete
+            //         </DropdownMenuItem>
+
+            //         {!event.is_paid && (
+            //           <>
+            //             <DropdownMenuSeparator />
+            //             <DropdownMenuItem
+            //               onClick={(e) => {
+            //                 e.stopPropagation();
+            //                 shareEvent(event.name, event.description, event.id);
+            //               }}
+            //             >
+            //               <Share2 className="mr-2 h-4 w-4" />
+            //               Share
+            //             </DropdownMenuItem>
+            //           </>
+            //         )}
+            //       </DropdownMenuContent>
+            //     </DropdownMenu>
+            //   </div>
+            //   <div className="relative">
+            //     {/* Image */}
+            //     <img
+            //       className="w-full object-cover"
+            //       style={{ height: "35rem" }}
+            //       src={event.cover_photo_url}
+            //       alt={event.name}
+            //     />
+
+            //     {/* Title container with black bg + gradient top */}
+            //     <div className="absolute inset-x-0 bottom-0">
+            //       <div className="relative bg-black pr-4">
+            //         <div className="absolute -top-[17.5rem] left-0 right-0 h-[17.5rem] bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10"></div>
+            //         <span className="absolute -top-12 left-5 border border-white/20 text-white text-sm px-3 py-2 rounded shadow-md z-20">
+            //           {new Date(event.date_time).toLocaleDateString("en-US", {
+            //             month: "short",
+            //             day: "numeric",
+            //           })}
+            //           {" • "}
+            //           {new Date(event.date_time).toLocaleTimeString("en-US", {
+            //             hour: "numeric",
+            //             minute: "2-digit",
+            //           })}
+            //         </span>
+            //         <div className="absolute -top-32 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent"></div>
+
+            //         <div className="pl-5 pr-2 pt-1 flex flex-col gap-2 relative z-10">
+            //           <h3
+            //             className="text-2xl text-white font-script"
+            //             style={{
+            //               fontFamily: event.title_font,
+            //             }}
+            //           >
+            //             {event.name}
+            //           </h3>
+            //           {event.description && (
+            //             <p className="text-white text-sm mt-1 line-clamp-1">
+            //               {event.description}
+            //             </p>
+            //           )}
+            //           {event.max_attendees && (
+            //             <div className="text-sm font-medium py-2 text-white box-border">
+            //               <div className="flex items-center mb-2">
+            //                 <Users className="h-5 w-5 text-white mr-3" />
+            //                 {event.rsvp_count || 0}/{event.max_attendees} RSVPed
+            //               </div>
+
+            //               <div className="w-full h-2 rounded-full overflow-hidden bg-muted-foreground min-w-0 box-border">
+            //                 <div
+            //                   className="h-full bg-primary transition-all duration-300"
+            //                   style={{
+            //                     width: `${Math.min(
+            //                       ((event.rsvp_count || 0) /
+            //                         event.max_attendees) *
+            //                         100,
+            //                       100
+            //                     )}%`,
+            //                   }}
+            //                 />
+            //               </div>
+            //             </div>
+            //           )}
+            //           <p className="text-sm flex flex-col text-white pb-2">
+            //             <span className="">
+            //               {event.location_name || "Location not specified"}
+            //             </span>
+            //             {event.restaurants && (
+            //               <span className="text-sm text-gray-400 line-clamp-1">
+            //                 {event.restaurants.name} - {event.restaurants.city}
+            //               </span>
+            //             )}
+            //           </p>
+            //           <div className="flex justify-between gap-2 space-x-2 pb-3">
+            //             {/* <Link
+            //               to={`/event/${event.id}/details`}
+            //               className="flex-1"
+            //             >
+            //               <Button className="w-full bg-primary hover:bg-primary/90 text-black rounded-sm">
+            //                 See details
+            //               </Button>
+            //             </Link> */}
+            //             {/* DEVELOPER COMMENTS THIS. WILL BE UNCOMMENT IN LIVE */}
+            //             {/* {isCreator && (
+            //               <Link to={`/event/${event.id}/edit`}>
+            //                 <Button variant="outline" size="icon" className="">
+            //                   <Edit className="h-4 w-4" />
+            //                 </Button>
+            //               </Link>
+            //             )}
+
+            //             {isCreator && (
+            //               <Button
+            //                 variant="outline"
+            //                 size="icon"
+            //                 onClick={() => deleteEvent && deleteEvent(event.id)}
+            //                 className="text-red-500 hover:text-red-600"
+            //               >
+            //                 <Trash2 className="h-4 w-4" />
+            //               </Button>
+            //             )} */}
+            //             <Link to={`/event/${event.id}/edit`}>
+            //               <Button variant="outline" size="icon">
+            //                 <Edit className="h-4 w-4" />
+            //               </Button>
+            //             </Link>
+            //             <Button
+            //               variant="outline"
+            //               size="icon"
+            //               onClick={() => deleteEvent && deleteEvent(event.id)}
+            //               className="text-red-500 hover:text-red-600"
+            //             >
+            //               <Trash2 className="h-4 w-4" />
+            //             </Button>
+            //             {!event.is_paid && (
+            //               <Button
+            //                 variant="outline"
+            //                 size="icon"
+            //                 onClick={() =>
+            //                   shareEvent(
+            //                     event.name,
+            //                     event.description,
+            //                     event.id
+            //                   )
+            //                 }
+            //               >
+            //                 <Share2 className="h-4 w-4" />
+            //               </Button>
+            //             )}
+            //           </div>
+            //         </div>
+            //       </div>
+            //     </div>
+            //   </div>
+            //   </div>
+            // </Link>
+            <Link
               key={event.id}
-              className="rounded-lg overflow-hidden shadow-md border border-gray-200 hover:border-gray-700 hover:bg-white/10 hover:cursor-pointer transition-all duration-300 w-full sm:w-[90%] md:w-[45%] lg:w-[30%] max-w-[420px]"
+              to={`/event/${event.id}/details`}
+              className="block rounded-lg overflow-hidden shadow-md border border-gray-200 hover:border-gray-700 hover:bg-white/10 hover:cursor-pointer transition-all duration-300 w-full sm:w-[90%] md:w-[45%] lg:w-[30%] max-w-[420px] no-underline"
             >
               <div className="relative">
-                {/* Image */}
+                {/* 🔘 3-Dots Dropdown Positioned on Top Right */}
+                <div className="absolute top-3 right-3 z-20">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="bg-black/40 text-white hover:bg-black/60 transition-colors rounded-full"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <MoreVertical className="h-5 w-5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent align="end" className="w-40">
+                      {isCreator && (
+                        <DropdownMenuItem asChild>
+                          {/* ✅ Only one child element inside asChild */}
+                          <Link
+                            to={`/event/${event.id}/edit`}
+                            className="flex items-center w-full"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Edit className="mr-2 h-4 w-4" />
+                            <span>Edit Event</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+
+                      {isCreator && (
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteEvent && deleteEvent(event.id);
+                          }}
+                          className="text-red-500 focus:text-red-600 flex items-center"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          <span>Delete</span>
+                        </DropdownMenuItem>
+                      )}
+
+                      {!event.is_paid && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              shareEvent(
+                                event.name,
+                                event.description,
+                                event.id
+                              );
+                            }}
+                            className="flex items-center"
+                          >
+                            <Share2 className="mr-2 h-4 w-4" />
+                            <span>Share</span>
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
+                {/* 🖼️ Image */}
                 <img
                   className="w-full object-cover"
                   style={{ height: "35rem" }}
@@ -813,7 +1087,7 @@ const Events = () => {
                   alt={event.name}
                 />
 
-                {/* Title container with black bg + gradient top */}
+                {/* Title container with gradient and content */}
                 <div className="absolute inset-x-0 bottom-0">
                   <div className="relative bg-black pr-4">
                     <div className="absolute -top-[17.5rem] left-0 right-0 h-[17.5rem] bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10"></div>
@@ -831,7 +1105,12 @@ const Events = () => {
                     <div className="absolute -top-32 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent"></div>
 
                     <div className="pl-5 pr-2 pt-1 flex flex-col gap-2 relative z-10">
-                      <h3 className="text-2xl text-white font-script">{event.name}</h3>
+                      <h3
+                        className="text-2xl text-white font-script"
+                        style={{ fontFamily: event.title_font }}
+                      >
+                        {event.name}
+                      </h3>
                       {event.description && (
                         <p className="text-white text-sm mt-1 line-clamp-1">
                           {event.description}
@@ -859,8 +1138,8 @@ const Events = () => {
                           </div>
                         </div>
                       )}
-                      <p className="text-sm flex flex-col text-white pb-2">
-                        <span className="">
+                      <p className="text-sm flex flex-col text-white pb-3">
+                        <span>
                           {event.location_name || "Location not specified"}
                         </span>
                         {event.restaurants && (
@@ -869,68 +1148,11 @@ const Events = () => {
                           </span>
                         )}
                       </p>
-                      <div className="flex space-x-2 pb-3">
-                        <Link
-                          to={`/event/${event.id}/details`}
-                          className="flex-1"
-                        >
-                          <Button className="w-full bg-primary hover:bg-primary/90 text-black rounded-sm">
-                            See details
-                          </Button>
-                        </Link>
-                        {/* DEVELOPER COMMENTS THIS. WILL BE UNCOMMENT IN LIVE */}
-                        {/* {isCreator && (
-                          <Link to={`/event/${event.id}/edit`}>
-                            <Button variant="outline" size="icon" className="">
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                          </Link>
-                        )}
-
-                        {isCreator && (
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => deleteEvent && deleteEvent(event.id)}
-                            className="text-red-500 hover:text-red-600"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )} */}
-                        <Link to={`/event/${event.id}/edit`}>
-                          <Button variant="outline" size="icon" className="">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        </Link>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => deleteEvent && deleteEvent(event.id)}
-                          className="text-red-500 hover:text-red-600"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                        {!event.is_paid && (
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() =>
-                              shareEvent(
-                                event.name,
-                                event.description,
-                                event.id
-                              )
-                            }
-                          >
-                            <Share2 className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>
