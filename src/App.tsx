@@ -113,7 +113,7 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              <Route
+              {/* <Route
                 path="/events-create"
                 element={
                   <ProtectedRoute>
@@ -121,67 +121,48 @@ const App = () => (
                     <OurEventsCreate />
                   </ProtectedRoute>
                 }
-              />
+              /> */}
               {/* <Route element={<Layout />}> */}
-                <Route path="contact-us" element={<ConditionalWrapper><ContactPage /></ConditionalWrapper>} />
-                <Route path="/refund-policy" element={<ConditionalWrapper><RefundPolicyPage /></ConditionalWrapper>} />
-                <Route
-                  path="/safety-guidelines"
-                  element={
-                    <ConditionalWrapper><SafetyGuidelines /></ConditionalWrapper>
-                  }
-                />
-                <Route
-                  path="/terms-conditions"
-                  element={<ConditionalWrapper><TermsAndConditions /></ConditionalWrapper>}
-                />
-                <Route path="/privacy-policy" element={<ConditionalWrapper><PrivacyPolicy /></ConditionalWrapper>} />
-              {/* </Route> */}
-              {/* <Route
+              <Route
                 path="contact-us"
                 element={
-                  <ProtectedRoute>
-                    <Navigation />
+                  <ConditionalWrapper>
                     <ContactPage />
-                  </ProtectedRoute>
+                  </ConditionalWrapper>
                 }
               />
               <Route
                 path="/refund-policy"
                 element={
-                  <ProtectedRoute>
-                    <Navigation />
+                  <ConditionalWrapper>
                     <RefundPolicyPage />
-                  </ProtectedRoute>
+                  </ConditionalWrapper>
                 }
               />
               <Route
                 path="/safety-guidelines"
                 element={
-                  <ProtectedRoute>
-                    <Navigation />
+                  <ConditionalWrapper>
                     <SafetyGuidelines />
-                  </ProtectedRoute>
+                  </ConditionalWrapper>
                 }
               />
               <Route
                 path="/terms-conditions"
                 element={
-                  <ProtectedRoute>
-                    <Navigation />
+                  <ConditionalWrapper>
                     <TermsAndConditions />
-                  </ProtectedRoute>
+                  </ConditionalWrapper>
                 }
               />
               <Route
                 path="/privacy-policy"
                 element={
-                  <ProtectedRoute>
-                    <Navigation />
+                  <ConditionalWrapper>
                     <PrivacyPolicy />
-                  </ProtectedRoute>
+                  </ConditionalWrapper>
                 }
-              /> */}
+              />
               <Route
                 path="/dashboard"
                 element={
@@ -228,7 +209,7 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              <Route
+              {/* <Route
                 path="/create-event"
                 element={
                   <ProtectedRoute>
@@ -236,7 +217,17 @@ const App = () => (
                     <CreateEvent />
                   </ProtectedRoute>
                 }
+              /> */}
+              <Route
+                path="/create-event"
+                element={
+                  <ProtectedRoute>
+                    <Navigation />
+                    <OurEventsCreate />
+                  </ProtectedRoute>
+                }
               />
+
               {/* <Route
                 path="/explore"
                 element={

@@ -1,6 +1,15 @@
 @import url("https://fonts.cdnfonts.com/css/sergio-trendy");
 @import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Dancing+Script:wght@400..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&family=Unbounded:wght@200..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Unbounded:wght@200..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Tagesschrift&family=Unbounded:wght@200..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Raleway:ital,wght@0,100..900;1,100..900&family=Tagesschrift&family=Unbounded:wght@200..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Raleway:ital,wght@0,100..900;1,100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Tagesschrift&family=Unbounded:wght@200..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Caprasimo&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Raleway:ital,wght@0,100..900;1,100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Tagesschrift&family=Unbounded:wght@200..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Caprasimo&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Metal+Mania&family=Raleway:ital,wght@0,100..900;1,100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Tagesschrift&family=Unbounded:wght@200..900&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { TikTokPlayer } from "@/components/tiktok/TikTokPlayer";
 
 interface Event {
   is_paid: boolean;
@@ -56,6 +57,16 @@ interface Event {
   creator_id: string;
   status: string;
   created_at: string;
+  guest_list: boolean;
+  tiktok: boolean;
+  tiktok_Link: string;
+  imageGallery: boolean;
+  imageGalleryLinks: Array<string>;
+  features: boolean;
+  event_features: Array<string>;
+  title_font: string;
+  accent_color: string;
+  accent_bg: string;
   profiles: {
     first_name: string;
     last_name: string;
@@ -267,7 +278,9 @@ const EventDetails = () => {
   //             id,
   //             status,
   //             updated_at
-  //           )
+  //       )
+  //       )
+  //       )
 
   const fetchEventReviews = async () => {
     if (!eventId) return;
@@ -557,46 +570,46 @@ const EventDetails = () => {
           subject: `${inviterName} invited you to ${event.name}!`,
           text: `Hi ${invitedUser.first_name}`,
           html: `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 24px; border-radius: 12px; background-color: #f9fafb; color: #333; line-height: 1.6;">
-      
-      <h1 style="color: #111; text-align: center;">🎉 You're Invited!</h1>
-      <p style="text-align: center; font-size: 16px; margin-top: -8px;">
-        <strong>${inviterName}</strong> has invited you to a special dinner on Parish.
-      </p>
-      
-      <div style="background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-top: 20px;">
-        <h2 style="margin: 0 0 12px; color: #0055ff;">${event.name}</h2>
-        
-        <p><strong>📅 Date & Time:</strong> ${new Date(
-          event.date_time
-        ).toLocaleString()}</p>
-        <p><strong>📍 Location:</strong> ${
-          event.location_name
-        } <span style="margin: 2px 0; font-size: 14px; color: #d4a373;">
-         – ${event.location_address}
-      </span></p>
-        <p><strong>⏳ RSVP By:</strong> ${new Date(
-          event.rsvp_deadline
-        ).toLocaleDateString()}</p>
-        
-        ${
-          event.description
-            ? `<p style="margin-top: 12px; font-style: italic; color: #555;">"${event.description}"</p>`
-            : ""
-        }
-      </div>
-      
-      <div style="text-align: center; margin-top: 24px;">
-        <a href="${eventLink}" style="display: inline-block; background: #0055ff; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 8px;">View Event & RSVP</a>
-        <a href="${profileLink}" style="display: inline-block; background: #f3f4f6; color: #111; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 8px;">View ${inviterName}'s Profile</a>
-      </div>
-      
-      <p style="margin-top: 32px; font-size: 14px; text-align: center; color: #666;">
-        Don’t miss out — spots may be limited!<br/>
-        We can’t wait to see you there 🍽️
-      </p>
-    </div>
-  `,
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 24px; border-radius: 12px; background-color: #f9fafb; color: #333; line-height: 1.6;">
+              
+              <h1 style="color: #111; text-align: center;">🎉 You're Invited!</h1>
+              <p style="text-align: center; font-size: 16px; margin-top: -8px;">
+                <strong>${inviterName}</strong> has invited you to a special dinner on Parish.
+              </p>
+              
+              <div style="background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-top: 20px;">
+                <h2 style="margin: 0 0 12px; color: #0055ff;">${event.name}</h2>
+                
+                <p><strong>📅 Date & Time:</strong> ${new Date(
+                  event.date_time
+                ).toLocaleString()}</p>
+                <p><strong>📍 Location:</strong> ${
+                  event.location_name
+                } <span style="margin: 2px 0; font-size: 14px; color: #d4a373;">
+                – ${event.location_address}
+              </span></p>
+                <p><strong>⏳ RSVP By:</strong> ${new Date(
+                  event.rsvp_deadline
+                ).toLocaleDateString()}</p>
+                
+                ${
+                  event.description
+                    ? `<p style="margin-top: 12px; font-style: italic; color: #555;">"${event.description}"</p>`
+                    : ""
+                }
+              </div>
+              
+              <div style="text-align: center; margin-top: 24px;">
+                <a href="${eventLink}" style="display: inline-block; background: #0055ff; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 8px;">View Event & RSVP</a>
+                <a href="${profileLink}" style="display: inline-block; background: #f3f4f6; color: #111; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 8px;">View ${inviterName}'s Profile</a>
+              </div>
+              
+              <p style="margin-top: 32px; font-size: 14px; text-align: center; color: #666;">
+                Don’t miss out — spots may be limited!<br/>
+                We can’t wait to see you there 🍽️
+              </p>
+            </div>
+          `,
         });
       }
 
@@ -887,13 +900,29 @@ const EventDetails = () => {
   const isBeforeDeadline = now <= rsvpDeadline;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div
+      className="min-h-screen bg-background"
+      style={
+        {
+          "--accent-bg": event.accent_bg,
+          background:
+            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
+          transition: "background 0.5s ease",
+        } as React.CSSProperties
+      }
+    >
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8 flex justify-between items-center">
           {isCreator && (
             <Link to={"/events"}>
-              <Button variant="ghost" className="mb-4">
+              <Button
+                variant="ghost"
+                className="mb-4"
+                style={{
+                  backgroundColor: event.accent_color,
+                }}
+              >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Events
               </Button>
@@ -901,7 +930,13 @@ const EventDetails = () => {
           )}
           {!isCreator && (
             <Link to={"/explore"}>
-              <Button variant="ghost" className="mb-4">
+              <Button
+                variant="ghost"
+                className="mb-4"
+                style={{
+                  backgroundColor: event.accent_color,
+                }}
+              >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Events
               </Button>
@@ -939,12 +974,18 @@ const EventDetails = () => {
                 <Button
                   variant="outline"
                   onClick={() => setShowRSVPConfirm(false)}
+                  style={{
+                    backgroundColor: event.accent_color,
+                  }}
                 >
                   No
                 </Button>
                 <Button
                   variant={hasRSVP ? "destructive" : "default"}
                   onClick={confirmRSVP}
+                  style={{
+                    backgroundColor: event.accent_color,
+                  }}
                 >
                   Yes
                 </Button>
@@ -955,7 +996,12 @@ const EventDetails = () => {
 
         {/* Event Cover Image */}
         {event.cover_photo_url && (
-          <div className="relative w-full flex items-center justify-center bg-primary h-64 mb-8 rounded-lg overflow-hidden">
+          <div
+            className="relative w-full flex items-center justify-center bg-primary h-64 mb-8 rounded-lg overflow-hidden"
+            style={{
+              backgroundColor: event.accent_bg,
+            }}
+          >
             <img
               src={event.cover_photo_url}
               alt={event.name}
@@ -973,7 +1019,14 @@ const EventDetails = () => {
                 <div className="flex items-start justify-between">
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <CardTitle className="text-2xl">{event.name}</CardTitle>
+                      <CardTitle
+                        className="text-2xl"
+                        style={{
+                          fontFamily: event.title_font,
+                        }}
+                      >
+                        {event.name}
+                      </CardTitle>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Avatar className="h-8 w-8">
@@ -1018,14 +1071,27 @@ const EventDetails = () => {
                       </Button>
                     )}
                     {!event.is_paid && (
-                      <Button variant="outline" size="sm" onClick={shareEvent}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={shareEvent}
+                        style={{
+                          backgroundColor: event.accent_color,
+                        }}
+                      >
                         <Share2 className="h-4 w-4" />
                       </Button>
                     )}
 
                     {isCreator && (
                       <Link to={`/event/${event.id}/edit`}>
-                        <Button variant="outline" size="sm">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          style={{
+                            backgroundColor: event.accent_color,
+                          }}
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
                       </Link>
@@ -1154,8 +1220,140 @@ const EventDetails = () => {
               <Card>
                 <EventAnalyticsDashboard
                   eventId={event.id}
+                  eventColor={event.accent_color}
                   subscriptionStatus={subscriptionStatus}
                 />
+              </Card>
+            )}
+
+            {event.features && event.event_features.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Features</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col gap-3">
+                      {event.event_features.map((feature) => (
+                        <div className="relative w-28 aspect-[4/5] rounded-md flex-shrink-0 flex items-center justify-center text-muted-foreground bg-secondary hover:bg-secondary/70 transition-colors cursor-pointer">
+                          <div
+                            key={feature}
+                            className="bg-secondary border rounded-xl p-4 flex justify-between items-center hover:shadow-md transition-all"
+                          >
+                            {/* Feature content */}
+                            <div className="flex items-center space-x-4">
+                              <img
+                                src={feature.image || "/placeholder.png"}
+                                alt={feature.title || "Feature image"}
+                                className="w-20 h-20 object-cover rounded-full border"
+                                onError={(e) =>
+                                  (e.currentTarget.src = "/placeholder.png")
+                                }
+                              />
+                              <div className="flex flex-col">
+                                <h3 className="font-semibold text-lg">
+                                  {feature.title || "Untitled Feature"}
+                                </h3>
+                                {feature.description && (
+                                  <p className="text-sm text-muted-foreground line-clamp-2">
+                                    {feature.description}
+                                  </p>
+                                )}
+                                {feature.url && (
+                                  <Link
+                                    to={feature.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-xs text-blue-600 hover:underline break-all"
+                                  >
+                                    {feature.url}
+                                  </Link>
+                                )}
+                                {feature.start_date && feature.start_time && (
+                                  <div className="text-xs text-muted-foreground mt-1">
+                                    {(() => {
+                                      // Parse dates/times safely
+                                      const start = new Date(
+                                        `${feature.start_date}T${feature.start_time}`
+                                      );
+                                      const end =
+                                        feature.end_date && feature.end_time
+                                          ? new Date(
+                                              `${feature.end_date}T${feature.end_time}`
+                                            )
+                                          : null;
+
+                                      // Format like 28/10 04:23pm
+                                      const formatDateTime = (dt: Date) => {
+                                        const date = dt.toLocaleDateString(
+                                          "en-GB",
+                                          {
+                                            day: "2-digit",
+                                            month: "2-digit",
+                                          }
+                                        );
+                                        const time = dt
+                                          .toLocaleTimeString("en-US", {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                            hour12: true,
+                                          })
+                                          .toLowerCase();
+                                        return `${date} ${time}`;
+                                      };
+
+                                      return (
+                                        <span className="bg-background border px-2 py-1 rounded-md">
+                                          {formatDateTime(start)}
+                                          {end
+                                            ? ` - ${formatDateTime(end)}`
+                                            : ""}
+                                        </span>
+                                      );
+                                    })()}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {event.imageGallery && event.imageGalleryLinks.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Image Gallery</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="my-2 pb-2 w-full overflow-x-auto">
+                    <div className="flex justify-center gap-3 min-w-max px-1">
+                      {event.imageGalleryLinks.map((img) => (
+                        <div className="relative w-28 aspect-[4/5] rounded-md flex-shrink-0 flex items-center justify-center text-muted-foreground bg-secondary hover:bg-secondary/70 transition-colors cursor-pointer">
+                          <img
+                            key={img}
+                            src={img}
+                            alt={`image ${img}`}
+                            className="h-40 w-full object-cover rounded-md"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {event.tiktok && event.tiktok_Link && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>TikTok</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <TikTokPlayer url={event.tiktok_Link} />
+                </CardContent>
               </Card>
             )}
 
@@ -1359,6 +1557,9 @@ const EventDetails = () => {
                         <Button
                           onClick={handleRSVP}
                           className={`w-full ${hasRSVP ? "" : ""}`}
+                          style={{
+                            backgroundColor: event.accent_color,
+                          }}
                         >
                           {hasRSVP ? (
                             <>
@@ -1376,6 +1577,9 @@ const EventDetails = () => {
                         <Button
                           onClick={handleRSVP}
                           className={`w-full ${hasRSVP ? "" : ""}`}
+                          style={{
+                            backgroundColor: event.accent_color,
+                          }}
                         >
                           <UserCheck className="h-4 w-4 mr-2" />
                           Going - Cancel RSVP
@@ -1399,6 +1603,9 @@ const EventDetails = () => {
                           }}
                           disabled={isPaying}
                           className="w-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center"
+                          style={{
+                            backgroundColor: event.accent_color,
+                          }}
                         >
                           {isPaying ? (
                             <>
@@ -1417,6 +1624,9 @@ const EventDetails = () => {
                       <Button
                         disabled
                         className="w-full bg-gray-400 text-white cursor-not-allowed"
+                        style={{
+                          backgroundColor: event.accent_color,
+                        }}
                       >
                         <Clock className="h-4 w-4 mr-2" />
                         RSVP Closed
@@ -1516,7 +1726,64 @@ const EventDetails = () => {
                 </CardContent>
               </Card>
             )} */}
-
+            {event.guest_list && confirmedRSVPs.length > 0 && !isCreator && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Attendees ({confirmedRSVPs.length})</CardTitle>
+                </CardHeader>
+                <CardContent className="p-2">
+                  <div className="space-y-3">
+                    {confirmedRSVPs.map((rsvp) => (
+                      <div
+                        key={rsvp.id}
+                        className="flex items-center justify-between"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage
+                              src={rsvp.profiles?.profile_photo_url}
+                            />
+                            <AvatarFallback>
+                              {rsvp.profiles?.first_name?.[0] || "U"}
+                              {rsvp.profiles?.last_name?.[0] || "U"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-medium">
+                              <Link to={`/profile/${rsvp.profiles?.username}`}>
+                                {rsvp.profiles?.first_name || "Unknown"}{" "}
+                                {rsvp.profiles?.last_name || "User"}
+                              </Link>
+                              {rsvp.profiles.payments?.[0]?.status ===
+                              "completed" ? (
+                                <span className="px-2 py-1 text-xs font-semibold text-black bg-yellow-400 rounded-full ml-2">
+                                  🌟 Paid
+                                </span>
+                              ) : (
+                                <span className="px-2 py-1 text-xs font-semibold text-white bg-[rgb(0,30,83)] rounded-full ml-2">
+                                  {" "}
+                                  🆓 Free
+                                </span>
+                              )}
+                            </span>
+                            {isCreator && (
+                              <span className="text-xs text-muted-foreground">
+                                {rsvp.profiles?.email || "No email"}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        {isCreator && event.event_fee ? (
+                          <span className="text-sm   font-semibold">
+                            ${event.event_fee}
+                          </span>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
             {confirmedRSVPs.length > 0 && (
               <Card>
                 <CardHeader>

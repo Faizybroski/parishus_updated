@@ -20,8 +20,16 @@ export default {
     extend: {
       fontFamily: {
         sergio: ["Sergio Trendy"],
-        script: ["Dancing Script", "cursive"],
-        serif: ["Crimson Text", "serif"],
+        script: ["Dancing Script", "Sergio Trendy"],
+        serif: ["Crimson Text",  "Sergio Trendy"],
+        cormorant: ["Cormorant", "Dancing Script", "Sergio Trendy"],
+        unbounded: ["Unbounded", "Dancing Script", "Sergio Trendy"],
+        audio: ["Audiowide", "Dancing Script", "Sergio Trendy"],
+        tages: ["Tagesschrift", "Dancing Script", "Sergio Trendy"],
+        rale: ["Raleway", "Dancing Script", "Sergio Trendy"],
+        space: ["Space Mono", "Dancing Script", "Sergio Trendy"],
+        caprasimo: ["Caprasimo", "Dancing Script", "Sergio Trendy"],
+        metal: ["Metal Mania", "Dancing Script", "Sergio Trendy"],
       },
       screens: {
         nav: "1050px",

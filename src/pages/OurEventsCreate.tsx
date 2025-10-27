@@ -39,6 +39,9 @@ import {
   Clock,
   MapPin,
   Eye,
+  Edit2,
+  Trash2,
+  PlusCircle,
   EyeOff,
   Upload,
   Camera,
@@ -60,6 +63,18 @@ import { RestaurantSearchDropdown } from "@/components/restaurants/RestaurantSea
 import GooglePlacesEventsForm from "@/components/restaurants/GooglePlacesEventsForm";
 import FlyerUpload from "@/components/flyer/Flyerupload";
 import ImageGalleryUpload from "@/components/imageGallery/ImageGalleryUpload";
+import FeatureDialog from "@/components/eventfeatures/FeaturedDialog";
+// import RecurringEventDialog from "@/components/recurringEvent/AddRecurringEvent";
+import ColorThief from "colorthief";
+
+type RecurrencePattern = {
+  frequency: number;
+  unit: "day" | "week" | "month" | "year";
+  pattern: string;
+  endType: "date" | "after";
+  endDate?: string;
+  afterCount?: number;
+};
 
 const OurEventsCreate = () => {
   const [loading, setLoading] = useState(false);
@@ -97,24 +112,43 @@ const OurEventsCreate = () => {
     event_fee: "",
     flyer_url: "",
     imageGalleryLinks: [] as string[],
+    eventFeatures: [],
+    recurring: false,
+    recurrencePatterns: null as RecurrencePattern | null,
   });
   const [newTag, setNewTag] = useState("");
   const { user, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
   const { restaurants, loading: restaurantsLoading } = useRestaurants();
-  const [showGuestList, setShowGuestList] = useState(false);
   const [emailInviteModelOpen, setEmailInviteModelOpen] = useState(false);
   const [mode, setMode] = useState<"sell" | "rsvp">("sell");
   const [invitedGuestIds, setInvitedGuestIds] = useState<string[]>([]);
   const [crossedPathInviteModelOpen, setCrossedPathInviteModelOpen] =
     useState(false);
-  // const [text, setText] = useState("");
-  // const ref = useRef<HTMLHeadingElement>(null);
+  const [showFeatures, setShowFeatures] = useState(false);
+  const [editFeatureIndex, setEditFeatureIndex] = useState(null);
+  const [colors, setColors] = useState([]);
+  const [selectedFont, setSelectedFont] = useState("");
+  const [selectedColor, setSelectedColor] = useState("primary");
+  const [selectedBgColor, setSelectedBgColor] = useState("background");
+  const [showRecurringDialog, setShowRecurringDialog] = useState(false);
 
   // Optional: handle blur or Enter key to confirm editing
 
   const navigate = useNavigate();
   const subscriptionStatus = useSubscriptionStatus(profile?.id);
+
+  useEffect(() => {
+    if (!formData.flyer_url) return;
+    const img = new Image();
+    img.crossOrigin = "Anonymous";
+    img.src = formData.flyer_url;
+    img.onload = () => {
+      const colorThief = new ColorThief();
+      const palette = colorThief.getPalette(img, 10);
+      setColors(palette.map(([r, g, b]) => `rgb(${r},${g},${b})`));
+    };
+  }, [formData.flyer_url]);
 
   const dummyPictures = [
     "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=500&q=80",
@@ -129,6 +163,20 @@ const OurEventsCreate = () => {
     "https://images.unsplash.com/photo-1552058544-f2b08422138a?auto=format&fit=crop&w=500&q=80",
   ];
 
+  const FONT_OPTIONS = [
+    "Cormorant",
+    "Unbounded",
+    "Audiowide",
+    "Tagesschrift",
+    "Raleway",
+    "Space Mono",
+    "Caprasimo",
+    "Metal Mania",
+    "Dancing Script",
+    "Sergio Trendy",
+    "Crimson Text",
+  ];
+
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => ({
       ...prev,
@@ -141,6 +189,48 @@ const OurEventsCreate = () => {
     if (field === "guest_invitation_type" && value === "crossed_paths") {
       setCrossedPathInviteModelOpen(true);
     }
+  };
+
+  function lightenColor(color: string, percent = 20) {
+    // Convert to RGB
+    let r, g, b;
+
+    if (color.startsWith("#")) {
+      const num = parseInt(color.slice(1), 16);
+      r = (num >> 16) & 255;
+      g = (num >> 8) & 255;
+      b = num & 255;
+    } else if (color.startsWith("rgb")) {
+      const match = color.match(/\d+/g);
+      if (!match) return color;
+      [r, g, b] = match.map(Number);
+    } else {
+      return color;
+    }
+
+    // Apply lighten factor
+    r = Math.min(255, Math.floor(r + (255 - r) * (percent / 100)));
+    g = Math.min(255, Math.floor(g + (255 - g) * (percent / 100)));
+    b = Math.min(255, Math.floor(b + (255 - b) * (percent / 100)));
+
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+
+  const handleFontChange = (font: string) => {
+    setSelectedFont(font);
+    handleInputChange("title_font", font);
+  };
+
+  const handleColorChange = (color: string) => {
+    setSelectedColor(color);
+    const bgColor = lightenColor(color, 30);
+    setSelectedBgColor(bgColor);
+
+    handleInputChange("accent_color", color);
+    handleInputChange("accent_bg", bgColor);
+
+    document.documentElement.style.setProperty("--accent-color", color);
+    document.documentElement.style.setProperty("--accent-bg", bgColor);
   };
 
   const handleFlyerChange = (url: string) => {
@@ -324,6 +414,17 @@ const OurEventsCreate = () => {
       }
     }
 
+    if (formData.features) {
+      if (formData.eventFeatures.length <= 0) {
+        toast({
+          title: "Validation Error",
+          description: "Please give atleast one feature for event features.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     if (formData.imageGallery) {
       if (formData.imageGalleryLinks.length <= 0) {
         toast({
@@ -435,6 +536,11 @@ const OurEventsCreate = () => {
           imageGalleryLinks: formData.imageGallery
             ? formData.imageGalleryLinks
             : [],
+          features: formData.features,
+          event_features: formData.features ? formData.eventFeatures : null,
+          title_font: selectedFont,
+          accent_color: selectedColor,
+          accent_bg: selectedBgColor,
         } as any)
         .select()
         .single();
@@ -493,6 +599,11 @@ const OurEventsCreate = () => {
     }
   };
 
+  const handleFeatureDelete = (index) => {
+    const updated = formData.eventFeatures.filter((_, i) => i !== index);
+    handleInputChange("eventFeatures", updated);
+  };
+
   const isFormValid =
     formData.name &&
     formData.description &&
@@ -531,7 +642,17 @@ const OurEventsCreate = () => {
     );
   }
   return (
-    <div className="min-h-screen bg-background  font-serif">
+    <div
+      className="min-h-screen bg-background  font-serif"
+      style={
+        {
+          "--accent-bg": lightenColor(selectedColor),
+          background:
+            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
+          transition: "background 0.5s ease",
+        } as React.CSSProperties
+      }
+    >
       <EmailInviteModal
         open={emailInviteModelOpen}
         onClose={() => setEmailInviteModelOpen(false)}
@@ -549,27 +670,48 @@ const OurEventsCreate = () => {
 
       <form onSubmit={handleSubmit}>
         <div className="flex justify-center">
-          <div className="flex items-center space-x-1 mt-3 px-1 py-1 bg-secondary rounded-full">
+          <div
+            className="flex items-center space-x-1 mt-3 px-1 py-1 bg-secondary rounded-full"
+            style={
+              selectedBgColor
+                ? {
+                    backgroundColor: selectedBgColor,
+                  }
+                : {}
+            }
+          >
             <Button
               type="button"
+              size="sm"
               onClick={() => setMode("sell")}
-              className={`rounded-full px-4 py-1 text-sm font-medium transition-all duration-200 ${
+              className={`rounded-full px-4 text-sm font-medium transition-all duration-200 ${
                 mode === "sell"
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "bg-transparent text-muted-foreground hover:text-foreground"
               }`}
+              style={{
+                backgroundColor:
+                  mode === "sell" ? "var(--accent-color)" : "transparent",
+                borderColor: "var(--accent-color)",
+              }}
             >
               Sell Tickets
             </Button>
 
             <Button
               type="button"
+              size="sm"
               onClick={() => setMode("rsvp")}
-              className={`rounded-full px-4 py-1 text-sm font-medium transition-all duration-200 ${
+              className={`rounded-full px-4 text-sm font-medium transition-all duration-200 ${
                 mode === "rsvp"
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "bg-transparent text-muted-foreground hover:text-foreground"
               }`}
+              style={{
+                backgroundColor:
+                  mode === "rsvp" ? "var(--accent-color)" : "transparent",
+                borderColor: "var(--accent-color)",
+              }}
             >
               RSVP
             </Button>
@@ -590,6 +732,7 @@ const OurEventsCreate = () => {
                     placeholder="e.g., Wine Tasting Social"
                     value={formData.name}
                     onChange={(e) => handleInputChange("name", e.target.value)}
+                    style={{ fontFamily: selectedFont }}
                   />
                 </div>
 
@@ -711,16 +854,20 @@ const OurEventsCreate = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="max_attendees">Recurring Series *</Label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Recurring Series" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="no">No</SelectItem>
-                        <SelectItem value="yes">Yes</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label htmlFor="recurring">Recurring Series *</Label>
+                    <div className="flex justify-between items-center border py-3 px-4 rounded-md">
+                      <Label htmlFor="recurring">
+                        {formData.recurring == true ? "Yes" : "No"}
+                      </Label>
+                      <Checkbox
+                        id="recurring"
+                        checked={formData.recurring}
+                        onCheckedChange={(checked) => {
+                          handleInputChange("recurring", checked);
+                          setShowRecurringDialog(true);
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -866,7 +1013,7 @@ const OurEventsCreate = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="border  py-2 rounded-md">
+                <div className="border py-2 rounded-md">
                   <div className="flex justify-between items-center px-4">
                     <Label htmlFor="guestList">Guestlist</Label>
                     <Checkbox
@@ -895,15 +1042,171 @@ const OurEventsCreate = () => {
                   )}
                 </div>
 
-                <div className="flex justify-between items-center border px-4 py-2 rounded-md">
-                  <Label htmlFor="features">Event Features</Label>
-                  <Checkbox
-                    id="features"
-                    checked={formData.features}
-                    onCheckedChange={(checked) =>
-                      handleInputChange("features", checked)
-                    }
-                  />
+                <div className="border px-4 py-2 rounded-md">
+                  <div className="flex justify-between items-center">
+                    <Label htmlFor="features">Event Features</Label>
+                    <Checkbox
+                      id="features"
+                      checked={formData.features}
+                      onCheckedChange={(checked) =>
+                        handleInputChange("features", checked)
+                      }
+                    />
+                  </div>
+                  {formData.features && (
+                    <div className="space-y-4 mt-2 bg-primary/10 rounded-lg p-3">
+                      {/* Empty state */}
+                      {formData.eventFeatures.length === 0 ? (
+                        <div className="flex justify-between items-center border rounded-lg px-4 py-3 bg-secondary/30">
+                          <p className="text-sm text-muted-foreground italic">
+                            No event features added yet.
+                          </p>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            type="button"
+                            onClick={() => {
+                              setEditFeatureIndex(null);
+                              setShowFeatures(true);
+                            }}
+                            className="rounded-full"
+                          >
+                            <PlusCircle className="w-4 h-4 mr-1" />
+                            Add Feature
+                          </Button>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex flex-col gap-3">
+                            {formData.eventFeatures.map((feature, i) => (
+                              <div
+                                key={i}
+                                className="bg-secondary border rounded-xl p-4 flex justify-between items-center hover:shadow-md transition-all"
+                              >
+                                {/* Feature content */}
+                                <div className="flex items-center space-x-4">
+                                  <img
+                                    src={feature.image || "/placeholder.png"}
+                                    alt={feature.title || "Feature image"}
+                                    className="w-20 h-20 object-cover rounded-full border"
+                                    onError={(e) =>
+                                      (e.currentTarget.src = "/placeholder.png")
+                                    }
+                                  />
+                                  <div className="flex flex-col">
+                                    <h3 className="font-semibold text-lg">
+                                      {feature.title || "Untitled Feature"}
+                                    </h3>
+                                    {feature.description && (
+                                      <p className="text-sm text-muted-foreground line-clamp-2">
+                                        {feature.description}
+                                      </p>
+                                    )}
+                                    {feature.url && (
+                                      <Link
+                                        to={feature.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-xs text-blue-600 hover:underline break-all"
+                                      >
+                                        {feature.url}
+                                      </Link>
+                                    )}
+                                    {feature.start_date &&
+                                      feature.start_time && (
+                                        <div className="text-xs text-muted-foreground mt-1">
+                                          {(() => {
+                                            // Parse dates/times safely
+                                            const start = new Date(
+                                              `${feature.start_date}T${feature.start_time}`
+                                            );
+                                            const end =
+                                              feature.end_date &&
+                                              feature.end_time
+                                                ? new Date(
+                                                    `${feature.end_date}T${feature.end_time}`
+                                                  )
+                                                : null;
+
+                                            // Format like 28/10 04:23pm
+                                            const formatDateTime = (
+                                              dt: Date
+                                            ) => {
+                                              const date =
+                                                dt.toLocaleDateString("en-GB", {
+                                                  day: "2-digit",
+                                                  month: "2-digit",
+                                                });
+                                              const time = dt
+                                                .toLocaleTimeString("en-US", {
+                                                  hour: "2-digit",
+                                                  minute: "2-digit",
+                                                  hour12: true,
+                                                })
+                                                .toLowerCase();
+                                              return `${date} ${time}`;
+                                            };
+
+                                            return (
+                                              <span className="bg-background border px-2 py-1 rounded-md">
+                                                {formatDateTime(start)}
+                                                {end
+                                                  ? ` - ${formatDateTime(end)}`
+                                                  : ""}
+                                              </span>
+                                            );
+                                          })()}
+                                        </div>
+                                      )}
+                                  </div>
+                                </div>
+
+                                {/* Action buttons */}
+                                <div className="flex space-x-1">
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    type="button"
+                                    onClick={() => {
+                                      setEditFeatureIndex(i);
+                                      setShowFeatures(true);
+                                    }}
+                                  >
+                                    <Edit2 className="w-4 h-4 text-muted-foreground" />
+                                  </Button>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    type="button"
+                                    onClick={() => handleFeatureDelete(i)}
+                                  >
+                                    <Trash2 className="w-4 h-4 text-destructive" />
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Add Feature CTA */}
+                          <div className="flex justify-center">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              type="button"
+                              onClick={() => {
+                                setEditFeatureIndex(null);
+                                setShowFeatures(true);
+                              }}
+                              className="rounded-full mt-2"
+                            >
+                              <PlusCircle className="w-4 h-4 mr-1" />
+                              Add Feature
+                            </Button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div className="border px-4 py-2 rounded-md">
@@ -1129,43 +1432,180 @@ const OurEventsCreate = () => {
               value={formData.flyer_url}
               onChange={handleFlyerChange}
             />
-
-            <Button className="rounded-md px-4 py-2 text-left">
-              Add song from Spotify
-            </Button>
             <Card>
-              <Select>
-                <SelectTrigger className="border-none">
-                  <SelectValue placeholder="Title Font" />
-                </SelectTrigger>
-                <SelectContent>
-                  <Button
-                    size="icon"
-                    className="bg-secondary rounded-sm"
-                  ></Button>
-                </SelectContent>
-              </Select>
-              <Select>
-                <SelectTrigger className="border-none">
-                  <SelectValue placeholder="Accent Color" />
-                </SelectTrigger>
-                <SelectContent>
-                  <Button
-                    size="icon"
-                    className="bg-secondary rounded-sm"
-                  ></Button>
-                </SelectContent>
-              </Select>
+              <CardHeader>
+                <CardTitle>Customize Event Style</CardTitle>
+              </CardHeader>
+
+              <CardContent className="space-y-4">
+                {/* Font Selector */}
+                <div className="flex flex-col gap-1">
+                  <Label>Title Font</Label>
+                  <Select
+                    onValueChange={(font) => {
+                      setSelectedFont(font);
+                      handleFontChange(font);
+                    }}
+                  >
+                    <SelectTrigger className="rounded-lg border bg-background/60 hover:bg-background transition">
+                      <SelectValue
+                        placeholder="Select font"
+                        className="capitalize"
+                      />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-60 overflow-y-auto">
+                      {FONT_OPTIONS.map((font) => (
+                        <SelectItem
+                          key={font}
+                          value={font}
+                          className="cursor-pointer hover:bg-accent/60"
+                        >
+                          <span
+                            className="block text-base"
+                            style={{ fontFamily: font }}
+                          >
+                            {font}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {/* Font Preview */}
+                  {selectedFont && (
+                    <p
+                      className="text-sm text-muted-foreground mt-1 pl-1 italic transition-all"
+                      style={{ fontFamily: selectedFont }}
+                    >
+                      The quick brown fox jumps over the lazy dog
+                    </p>
+                  )}
+                </div>
+
+                {/* Divider */}
+                <div className="h-px bg-border/40 my-2" />
+
+                {/* Color Selector */}
+                <div className="flex flex-col gap-1">
+                  <Label>Accent Color</Label>
+                  {formData.flyer_url ? (
+                    <>
+                      <div className="flex flex-wrap gap-2">
+                        {colors.map((color, i) => (
+                          <Button
+                            type="button"
+                            size="icon"
+                            key={i}
+                            className={`w-7 h-7 rounded-md border transition-all hover:scale-105 ${
+                              selectedColor === color
+                                ? "ring-2 ring-offset-2 ring-primary"
+                                : "ring-0"
+                            }`}
+                            style={{ backgroundColor: color }}
+                            onClick={() => {
+                              setSelectedColor(color);
+                              handleColorChange(color);
+                              handleInputChange("color", color);
+                            }}
+                          />
+                        ))}
+                        {/* Custom Picker */}
+                        {/* <Label className="w-7 h-7 rounded-md border flex items-center justify-center text-xs text-muted-foreground cursor-pointer hover:bg-primary transition">
+                      +
+                    </Label> */}
+                        <div
+                          className="w-8 h-8 rounded-md border cursor-pointer shadow-sm hover:ring-2 hover:ring-primary transition-all"
+                          style={{ backgroundColor: selectedColor }}
+                          onClick={() =>
+                            document.getElementById("color-picker").click()
+                          }
+                        >
+                          {" "}
+                          <Label className="w-7 h-7 flex items-center justify-center text-xs text-primary cursor-pointer">
+                            +
+                          </Label>
+                        </div>
+                        <Input
+                          id="color-picker"
+                          type="color"
+                          value={selectedColor}
+                          onChange={(e) => {
+                            setSelectedColor(e.target.value);
+                            handleColorChange(e.target.value);
+                            handleInputChange("color", e.target.value);
+                          }}
+                          className="hidden"
+                        />
+
+                        {/* <div className="flex items-center gap-3">
+                      <label
+                        htmlFor="color-picker"
+                        className="text-sm font-medium"
+                      >
+                        Choose Color:
+                      </label>
+                      <div
+                        className="w-8 h-8 rounded-md border cursor-pointer shadow-sm hover:ring-2 hover:ring-primary transition-all"
+                        style={{ backgroundColor: selectedColor }}
+                        onClick={() =>
+                          document.getElementById("color-picker").click()
+                        }
+                      ></div>
+                      <input
+                        id="color-picker"
+                        type="color"
+                        value={selectedColor}
+                        onChange={(e) => {
+                          setSelectedColor(e.target.value);
+                          handleColorChange(e.target.value);
+                          handleInputChange("color", e.target.value);
+                        }}
+                        className="hidden"
+                      />
+                    </div> */}
+                      </div>
+
+                      {/* Color Preview */}
+                      {selectedColor && (
+                        <div className="mt-2 text-xs text-muted-foreground pl-1 flex items-center gap-2">
+                          <div
+                            className="w-4 h-4 rounded border"
+                            style={{ backgroundColor: selectedColor }}
+                          ></div>
+                          <span>{selectedColor}</span>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <span>Flyer is not selected</span>
+                  )}
+                </div>
+              </CardContent>
             </Card>
             <Button
               type="submit"
               disabled={!isFormValid || loading}
               className="bg-primary hover:bg-secondary"
+              style={
+                selectedColor
+                  ? {
+                      backgroundColor: selectedColor,
+                      borderColor: selectedColor,
+                    }
+                  : {}
+              }
             >
               {loading ? "Creating..." : "Create Event"}
             </Button>
           </div>
         </div>
+        <FeatureDialog
+          open={showFeatures}
+          onClose={() => setShowFeatures(false)}
+          onChange={handleInputChange}
+          existingFeatures={formData.eventFeatures}
+          editFeatureIndex={editFeatureIndex}
+        />
       </form>
     </div>
   );
