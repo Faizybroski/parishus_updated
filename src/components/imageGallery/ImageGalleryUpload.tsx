@@ -153,7 +153,7 @@ export default function ImageGalleryUpload({
       {/* Scrollable selector row */}
       <div className="my-2 pb-2 w-full overflow-x-auto">
         <div className="flex gap-3 min-w-max px-1">
-          {Array.from({ length: 1 }).map((_, i) => (
+          {Array.from({ length: 10 }).map((_, i) => (
             <div
               key={i}
               className="relative w-28 aspect-[4/5] rounded-md border border-dashed border-muted-foreground/40 flex-shrink-0 flex items-center justify-center text-muted-foreground bg-secondary hover:bg-secondary/70 transition-colors cursor-pointer"

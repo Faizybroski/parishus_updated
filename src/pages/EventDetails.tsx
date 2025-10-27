@@ -63,7 +63,16 @@ interface Event {
   imageGallery: boolean;
   imageGalleryLinks: Array<string>;
   features: boolean;
-  event_features: Array<string>;
+  event_features: Array<{
+    image: string;
+    title: string;
+    description: string;
+    url: string;
+    start_date: string;
+    start_time: string;
+    end_date: string;
+    end_time: string;
+  }>;
   title_font: string;
   accent_color: string;
   accent_bg: string;
@@ -1231,93 +1240,86 @@ const EventDetails = () => {
                 <CardHeader>
                   <CardTitle>Features</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="flex flex-col gap-3">
-                      {event.event_features.map((feature) => (
-                        <div className="relative w-28 aspect-[4/5] rounded-md flex-shrink-0 flex items-center justify-center text-muted-foreground bg-secondary hover:bg-secondary/70 transition-colors cursor-pointer">
-                          <div
-                            key={feature}
-                            className="bg-secondary border rounded-xl p-4 flex justify-between items-center hover:shadow-md transition-all"
-                          >
-                            {/* Feature content */}
-                            <div className="flex items-center space-x-4">
-                              <img
-                                src={feature.image || "/placeholder.png"}
-                                alt={feature.title || "Feature image"}
-                                className="w-20 h-20 object-cover rounded-full border"
-                                onError={(e) =>
-                                  (e.currentTarget.src = "/placeholder.png")
-                                }
-                              />
-                              <div className="flex flex-col">
-                                <h3 className="font-semibold text-lg">
-                                  {feature.title || "Untitled Feature"}
-                                </h3>
-                                {feature.description && (
-                                  <p className="text-sm text-muted-foreground line-clamp-2">
-                                    {feature.description}
-                                  </p>
-                                )}
-                                {feature.url && (
-                                  <Link
-                                    to={feature.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-xs text-blue-600 hover:underline break-all"
-                                  >
-                                    {feature.url}
-                                  </Link>
-                                )}
-                                {feature.start_date && feature.start_time && (
-                                  <div className="text-xs text-muted-foreground mt-1">
-                                    {(() => {
-                                      // Parse dates/times safely
-                                      const start = new Date(
-                                        `${feature.start_date}T${feature.start_time}`
-                                      );
-                                      const end =
-                                        feature.end_date && feature.end_time
-                                          ? new Date(
-                                              `${feature.end_date}T${feature.end_time}`
-                                            )
-                                          : null;
 
-                                      // Format like 28/10 04:23pm
-                                      const formatDateTime = (dt: Date) => {
-                                        const date = dt.toLocaleDateString(
-                                          "en-GB",
-                                          {
-                                            day: "2-digit",
-                                            month: "2-digit",
-                                          }
-                                        );
-                                        const time = dt
-                                          .toLocaleTimeString("en-US", {
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                            hour12: true,
-                                          })
-                                          .toLowerCase();
-                                        return `${date} ${time}`;
-                                      };
+                <CardContent className="space-y-4">
+                  <div className="space-y-4 mt-2 bg-primary/10 rounded-lg p-3">
+                    <div className="flex flex-col gap-4">
+                      {event.event_features.map((feature, i) => (
+                        <div
+                          key={i}
+                          className="bg-secondary border rounded-xl p-4 flex items-center gap-4 hover:shadow-md transition-all"
+                        >
+                          {/* Feature Image */}
+                          <img
+                            src={feature.image || "/placeholder.png"}
+                            alt={feature.title || "Feature image"}
+                            className="w-20 h-20 object-cover rounded-full border"
+                            onError={(e) =>
+                              (e.currentTarget.src = "/placeholder.png")
+                            }
+                          />
 
-                                      return (
-                                        <span className="bg-background border px-2 py-1 rounded-md">
-                                          {formatDateTime(start)}
-                                          {end
-                                            ? ` - ${formatDateTime(end)}`
-                                            : ""}
-                                        </span>
-                                      );
-                                    })()}
-                                  </div>
-                                )}
+                          {/* Text Content */}
+                          <div className="flex flex-col gap-1 flex-1">
+                            <h3 className="font-semibold text-lg">
+                              {feature.title || "Untitled Feature"}
+                            </h3>
+
+                            {feature.description && (
+                              <p className="text-sm text-muted-foreground line-clamp-2">
+                                {feature.description}
+                              </p>
+                            )}
+
+                            {feature.url && (
+                              <Link
+                                to={feature.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-blue-600 hover:underline break-all"
+                              >
+                                {feature.url}
+                              </Link>
+                            )}
+
+                            {feature.start_date && feature.start_time && (
+                              <div className="text-xs text-muted-foreground bg-background border px-2 py-1 rounded-md inline-block mt-1">
+                                {(() => {
+                                  const start = new Date(
+                                    `${feature.start_date}T${feature.start_time}`
+                                  );
+                                  const end =
+                                    feature.end_date && feature.end_time
+                                      ? new Date(
+                                          `${feature.end_date}T${feature.end_time}`
+                                        )
+                                      : null;
+
+                                  const fmt = (dt: Date) =>
+                                    dt.toLocaleDateString("en-GB", {
+                                      day: "2-digit",
+                                      month: "2-digit",
+                                    }) +
+                                    " " +
+                                    dt
+                                      .toLocaleTimeString("en-US", {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                        hour12: true,
+                                      })
+                                      .toLowerCase();
+
+                                  return end
+                                    ? `${fmt(start)} - ${fmt(end)}`
+                                    : fmt(start);
+                                })()}
                               </div>
-                            </div>
+                            )}
                           </div>
                         </div>
                       ))}
                     </div>
+                  </div>
                 </CardContent>
               </Card>
             )}
