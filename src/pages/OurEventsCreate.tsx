@@ -847,10 +847,7 @@ const OurEventsCreate = () => {
                       <Label htmlFor="recurring">
                         {formData.recurring == true ? "Yes" : "No"}
                       </Label>
-                      <Checkbox
-                        id="recurring"
-                        checked={formData.recurring}
-                      />
+                      <Checkbox id="recurring" checked={formData.recurring} />
                     </div>
                   </div>
                 </div>
@@ -1590,7 +1587,6 @@ const OurEventsCreate = () => {
           existingFeatures={formData.eventFeatures}
           editFeatureIndex={editFeatureIndex}
         />
-
       </form>
     </div>
   );
