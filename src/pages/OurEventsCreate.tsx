@@ -63,18 +63,6 @@ import { RestaurantSearchDropdown } from "@/components/restaurants/RestaurantSea
 import GooglePlacesEventsForm from "@/components/restaurants/GooglePlacesEventsForm";
 import FlyerUpload from "@/components/flyer/Flyerupload";
 import ImageGalleryUpload from "@/components/imageGallery/ImageGalleryUpload";
-import FeatureDialog from "@/components/eventfeatures/FeaturedDialog";
-// import RecurringEventDialog from "@/components/recurringEvent/AddRecurringEvent";
-import ColorThief from "colorthief";
-
-type RecurrencePattern = {
-  frequency: number;
-  unit: "day" | "week" | "month" | "year";
-  pattern: string;
-  endType: "date" | "after";
-  endDate?: string;
-  afterCount?: number;
-};
 
 const OurEventsCreate = () => {
   const [loading, setLoading] = useState(false);
@@ -112,9 +100,7 @@ const OurEventsCreate = () => {
     event_fee: "",
     flyer_url: "",
     imageGalleryLinks: [] as string[],
-    eventFeatures: [],
-    recurring: false,
-    recurrencePatterns: null as RecurrencePattern | null,
+        eventFeatures: [],
   });
   const [newTag, setNewTag] = useState("");
   const { user, loading: authLoading } = useAuth();
@@ -125,13 +111,14 @@ const OurEventsCreate = () => {
   const [invitedGuestIds, setInvitedGuestIds] = useState<string[]>([]);
   const [crossedPathInviteModelOpen, setCrossedPathInviteModelOpen] =
     useState(false);
-  const [showFeatures, setShowFeatures] = useState(false);
+  // const [text, setText] = useState("");
+  // const ref = useRef<HTMLHeadingElement>(null);
+    const [showFeatures, setShowFeatures] = useState(false);
   const [editFeatureIndex, setEditFeatureIndex] = useState(null);
   const [colors, setColors] = useState([]);
   const [selectedFont, setSelectedFont] = useState("");
   const [selectedColor, setSelectedColor] = useState("primary");
   const [selectedBgColor, setSelectedBgColor] = useState("background");
-  const [showRecurringDialog, setShowRecurringDialog] = useState(false);
 
   // Optional: handle blur or Enter key to confirm editing
 
@@ -1433,154 +1420,28 @@ const OurEventsCreate = () => {
               onChange={handleFlyerChange}
             />
             <Card>
-              <CardHeader>
-                <CardTitle>Customize Event Style</CardTitle>
-              </CardHeader>
-
-              <CardContent className="space-y-4">
-                {/* Font Selector */}
-                <div className="flex flex-col gap-1">
-                  <Label>Title Font</Label>
-                  <Select
-                    onValueChange={(font) => {
-                      setSelectedFont(font);
-                      handleFontChange(font);
-                    }}
-                  >
-                    <SelectTrigger className="rounded-lg border bg-background/60 hover:bg-background transition">
-                      <SelectValue
-                        placeholder="Select font"
-                        className="capitalize"
-                      />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-60 overflow-y-auto">
-                      {FONT_OPTIONS.map((font) => (
-                        <SelectItem
-                          key={font}
-                          value={font}
-                          className="cursor-pointer hover:bg-accent/60"
-                        >
-                          <span
-                            className="block text-base"
-                            style={{ fontFamily: font }}
-                          >
-                            {font}
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  {/* Font Preview */}
-                  {selectedFont && (
-                    <p
-                      className="text-sm text-muted-foreground mt-1 pl-1 italic transition-all"
-                      style={{ fontFamily: selectedFont }}
-                    >
-                      The quick brown fox jumps over the lazy dog
-                    </p>
-                  )}
-                </div>
-
-                {/* Divider */}
-                <div className="h-px bg-border/40 my-2" />
-
-                {/* Color Selector */}
-                <div className="flex flex-col gap-1">
-                  <Label>Accent Color</Label>
-                  {formData.flyer_url ? (
-                    <>
-                      <div className="flex flex-wrap gap-2">
-                        {colors.map((color, i) => (
-                          <Button
-                            type="button"
-                            size="icon"
-                            key={i}
-                            className={`w-7 h-7 rounded-md border transition-all hover:scale-105 ${
-                              selectedColor === color
-                                ? "ring-2 ring-offset-2 ring-primary"
-                                : "ring-0"
-                            }`}
-                            style={{ backgroundColor: color }}
-                            onClick={() => {
-                              setSelectedColor(color);
-                              handleColorChange(color);
-                              handleInputChange("color", color);
-                            }}
-                          />
-                        ))}
-                        {/* Custom Picker */}
-                        {/* <Label className="w-7 h-7 rounded-md border flex items-center justify-center text-xs text-muted-foreground cursor-pointer hover:bg-primary transition">
-                      +
-                    </Label> */}
-                        <div
-                          className="w-8 h-8 rounded-md border cursor-pointer shadow-sm hover:ring-2 hover:ring-primary transition-all"
-                          style={{ backgroundColor: selectedColor }}
-                          onClick={() =>
-                            document.getElementById("color-picker").click()
-                          }
-                        >
-                          {" "}
-                          <Label className="w-7 h-7 flex items-center justify-center text-xs text-primary cursor-pointer">
-                            +
-                          </Label>
-                        </div>
-                        <Input
-                          id="color-picker"
-                          type="color"
-                          value={selectedColor}
-                          onChange={(e) => {
-                            setSelectedColor(e.target.value);
-                            handleColorChange(e.target.value);
-                            handleInputChange("color", e.target.value);
-                          }}
-                          className="hidden"
-                        />
-
-                        {/* <div className="flex items-center gap-3">
-                      <label
-                        htmlFor="color-picker"
-                        className="text-sm font-medium"
-                      >
-                        Choose Color:
-                      </label>
-                      <div
-                        className="w-8 h-8 rounded-md border cursor-pointer shadow-sm hover:ring-2 hover:ring-primary transition-all"
-                        style={{ backgroundColor: selectedColor }}
-                        onClick={() =>
-                          document.getElementById("color-picker").click()
-                        }
-                      ></div>
-                      <input
-                        id="color-picker"
-                        type="color"
-                        value={selectedColor}
-                        onChange={(e) => {
-                          setSelectedColor(e.target.value);
-                          handleColorChange(e.target.value);
-                          handleInputChange("color", e.target.value);
-                        }}
-                        className="hidden"
-                      />
-                    </div> */}
-                      </div>
-
-                      {/* Color Preview */}
-                      {selectedColor && (
-                        <div className="mt-2 text-xs text-muted-foreground pl-1 flex items-center gap-2">
-                          <div
-                            className="w-4 h-4 rounded border"
-                            style={{ backgroundColor: selectedColor }}
-                          ></div>
-                          <span>{selectedColor}</span>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <span>Flyer is not selected</span>
-                  )}
-                </div>
-              </CardContent>
+              <Select>
+                <SelectTrigger className="border-none">
+                  <SelectValue placeholder="Title Font" />
+                </SelectTrigger>
+                <SelectContent>
+                  <Button
+                    size="icon"
+                    className="bg-secondary rounded-sm"
+                  ></Button>
+                </SelectContent>
+              </Select>
+              <Select>
+                <SelectTrigger className="border-none">
+                  <SelectValue placeholder="Accent Color" />
+                </SelectTrigger>
+                <SelectContent>
+                  <Button
+                    size="icon"
+                    className="bg-secondary rounded-sm"
+                  ></Button>
+                </SelectContent>
+              </Select>
             </Card>
             <Button
               type="submit"
@@ -1599,13 +1460,7 @@ const OurEventsCreate = () => {
             </Button>
           </div>
         </div>
-        <FeatureDialog
-          open={showFeatures}
-          onClose={() => setShowFeatures(false)}
-          onChange={handleInputChange}
-          existingFeatures={formData.eventFeatures}
-          editFeatureIndex={editFeatureIndex}
-        />
+
       </form>
     </div>
   );
