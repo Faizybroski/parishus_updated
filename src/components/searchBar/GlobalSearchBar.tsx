@@ -62,7 +62,7 @@ const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({
       {
         label: "Create Event",
         keywords: ["create", "event", "add", "new event", "make event"],
-        path: "/events-create",
+        path: "/create-event",
         type: "action",
       },
       {

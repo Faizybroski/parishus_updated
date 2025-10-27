@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 import Cropper from "react-easy-crop";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -16,6 +21,7 @@ export default function ImageGalleryUpload({
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (Array.isArray(existingImages)) {
@@ -94,7 +100,9 @@ export default function ImageGalleryUpload({
 
     const imageUrl = URL.createObjectURL(selectedFile);
     const croppedBlob = await getCroppedImg(imageUrl, croppedAreaPixels);
-    const croppedFile = new File([croppedBlob], selectedFile.name, { type: "image/jpeg" });
+    const croppedFile = new File([croppedBlob], selectedFile.name, {
+      type: "image/jpeg",
+    });
 
     await uploadImage(croppedFile, selectedIndex);
 
@@ -105,6 +113,7 @@ export default function ImageGalleryUpload({
 
   const uploadImage = async (file: File, index: number) => {
     try {
+      setUploading(true);
       const fileExt = file.name.split(".").pop();
       const fileName = `${Date.now()}-${Math.random()}.${fileExt}`;
       const filePath = `gallery/${fileName}`;
@@ -125,6 +134,9 @@ export default function ImageGalleryUpload({
       onImagesUploaded(newImages);
     } catch (error) {
       console.error("Upload error:", error);
+      alert("Upload failed. Check console for details.");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -141,7 +153,7 @@ export default function ImageGalleryUpload({
       {/* Scrollable selector row */}
       <div className="my-2 pb-2 w-full overflow-x-auto">
         <div className="flex gap-3 min-w-max px-1">
-          {Array.from({ length: 10 }).map((_, i) => (
+          {Array.from({ length: 1 }).map((_, i) => (
             <div
               key={i}
               className="relative w-28 aspect-[4/5] rounded-md border border-dashed border-muted-foreground/40 flex-shrink-0 flex items-center justify-center text-muted-foreground bg-secondary hover:bg-secondary/70 transition-colors cursor-pointer"
@@ -196,7 +208,7 @@ export default function ImageGalleryUpload({
             <Button variant="outline" onClick={() => setCropModalOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleUploadCropped}>Upload Cropped</Button>
+            <Button onClick={handleUploadCropped}  disabled={uploading}>{uploading ? "Uploading..." : "Upload"}</Button>
           </div>
         </DialogContent>
       </Dialog>

@@ -23,11 +23,13 @@ interface AnalyticsData {
 
 interface EventAnalyticsDashboardProps {
   eventId: string;
+  eventColor: string;
   subscriptionStatus: "loading" | "free" | "premium";
 }
 
 export default function EventAnalyticsDashboard({
   eventId,
+  eventColor,
   subscriptionStatus,
 }: EventAnalyticsDashboardProps) {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData[]>([]);
@@ -78,7 +80,7 @@ export default function EventAnalyticsDashboard({
 
   if (isFreeTier) {
     return (
-      <Card className="bg-surface shadow-lg rounded-lg max-w-3xl mx-auto p-6">
+      <Card className="bg-card rounded-lg max-w-3xl mx-auto p-6">
         <CardHeader>
           <CardTitle className="text-xl font-bold">
             Upgrade to Premium
@@ -89,7 +91,10 @@ export default function EventAnalyticsDashboard({
             Analytics are only available for Premium users.
           </p>
           <Link to={"/subscription"}>
-            <Button className="text-surface px-6 py-2 rounded-md font-semibold transition">
+            <Button className="text-surface px-6 py-2 rounded-md font-semibold transition"
+            style={{
+                  backgroundColor: eventColor,
+                }}>
               Go to Subscription
             </Button>
           </Link>

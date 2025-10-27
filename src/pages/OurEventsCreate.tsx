@@ -64,10 +64,17 @@ import GooglePlacesEventsForm from "@/components/restaurants/GooglePlacesEventsF
 import FlyerUpload from "@/components/flyer/Flyerupload";
 import ImageGalleryUpload from "@/components/imageGallery/ImageGalleryUpload";
 import FeatureDialog from "@/components/eventfeatures/FeaturedDialog";
+// import RecurringEventDialog from "@/components/recurringEvent/AddRecurringEvent";
 import ColorThief from "colorthief";
-import { HexColorPicker } from "react-colorful";
-import { ChromePicker } from "react-color";
-import { spawn } from "child_process";
+
+type RecurrencePattern = {
+  frequency: number;
+  unit: "day" | "week" | "month" | "year";
+  pattern: string; 
+  endType: "date" | "after";
+  endDate?: string;
+  afterCount?: number;
+};
 
 const OurEventsCreate = () => {
   const [loading, setLoading] = useState(false);
@@ -106,12 +113,13 @@ const OurEventsCreate = () => {
     flyer_url: "",
     imageGalleryLinks: [] as string[],
     eventFeatures: [],
+    recurring: false,
+    recurrencePatterns: null as RecurrencePattern | null,
   });
   const [newTag, setNewTag] = useState("");
   const { user, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
   const { restaurants, loading: restaurantsLoading } = useRestaurants();
-  const [showGuestList, setShowGuestList] = useState(false);
   const [emailInviteModelOpen, setEmailInviteModelOpen] = useState(false);
   const [mode, setMode] = useState<"sell" | "rsvp">("sell");
   const [invitedGuestIds, setInvitedGuestIds] = useState<string[]>([]);
@@ -123,6 +131,7 @@ const OurEventsCreate = () => {
   const [selectedFont, setSelectedFont] = useState("");
   const [selectedColor, setSelectedColor] = useState("primary");
   const [selectedBgColor, setSelectedBgColor] = useState("background");
+  const [showRecurringDialog, setShowRecurringDialog] = useState(false);
 
   // Optional: handle blur or Enter key to confirm editing
 
@@ -845,16 +854,20 @@ const OurEventsCreate = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="max_attendees">Recurring Series *</Label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Recurring Series" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="no">No</SelectItem>
-                        <SelectItem value="yes">Yes</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label htmlFor="recurring">Recurring Series *</Label>
+                    <div className="flex justify-between items-center border py-3 px-4 rounded-md">
+                      <Label htmlFor="recurring">
+                        {formData.recurring == true ? "Yes" : "No"}
+                      </Label>
+                      <Checkbox
+                        id="recurring"
+                        checked={formData.recurring}
+                        onCheckedChange={(checked) => {
+                          handleInputChange("recurring", checked);
+                          setShowRecurringDialog(true);
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -1000,7 +1013,7 @@ const OurEventsCreate = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="border  py-2 rounded-md">
+                <div className="border py-2 rounded-md">
                   <div className="flex justify-between items-center px-4">
                     <Label htmlFor="guestList">Guestlist</Label>
                     <Checkbox
@@ -1427,9 +1440,7 @@ const OurEventsCreate = () => {
               <CardContent className="space-y-4">
                 {/* Font Selector */}
                 <div className="flex flex-col gap-1">
-                  <Label>
-                    Title Font
-                  </Label>
+                  <Label>Title Font</Label>
                   <Select
                     onValueChange={(font) => {
                       setSelectedFont(font);
@@ -1476,9 +1487,7 @@ const OurEventsCreate = () => {
 
                 {/* Color Selector */}
                 <div className="flex flex-col gap-1">
-                  <Label>
-                    Accent Color
-                  </Label>
+                  <Label>Accent Color</Label>
                   {formData.flyer_url ? (
                     <>
                       <div className="flex flex-wrap gap-2">
@@ -1567,7 +1576,9 @@ const OurEventsCreate = () => {
                         </div>
                       )}
                     </>
-                  ) : <span>Flyer is not selected</span>}
+                  ) : (
+                    <span>Flyer is not selected</span>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -1595,6 +1606,7 @@ const OurEventsCreate = () => {
           existingFeatures={formData.eventFeatures}
           editFeatureIndex={editFeatureIndex}
         />
+
       </form>
     </div>
   );
