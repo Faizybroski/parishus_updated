@@ -10,11 +10,16 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function ImageGalleryUpload({
+  style,
+  style_button,
   onImagesUploaded,
   existingImages = [],
   bucketName = "event-photos",
 }) {
-  const [images, setImages] = useState<string[]>([]);
+  // const [images, setImages] = useState<string[]>([]);
+  const MAX_IMAGES = 10;
+  const [images, setImages] = useState<string[]>(Array(MAX_IMAGES).fill(""));
+
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -23,11 +28,18 @@ export default function ImageGalleryUpload({
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
   const [uploading, setUploading] = useState(false);
 
+  // useEffect(() => {
+  //   if (Array.isArray(existingImages)) {
+  //     setImages(existingImages);
+  //   }
+  // }, [existingImages]);
+
   useEffect(() => {
-    if (Array.isArray(existingImages)) {
-      setImages(existingImages);
-    }
-  }, [existingImages]);
+    const filled = Array(MAX_IMAGES)
+      .fill("")
+      .map((_, i) => existingImages[i] || "");
+    setImages(filled);
+  }, [JSON.stringify(existingImages)]);
 
   const handleFileSelect = (index: number) => {
     const input = document.createElement("input");
@@ -128,10 +140,16 @@ export default function ImageGalleryUpload({
         data: { publicUrl },
       } = supabase.storage.from(bucketName).getPublicUrl(filePath);
 
-      const newImages = [...images];
-      newImages[index] = publicUrl;
-      setImages(newImages);
-      onImagesUploaded(newImages);
+      // const newImages = [...images];
+      // newImages[index] = publicUrl;
+      // setImages(newImages);
+      // onImagesUploaded(newImages);
+      setImages((prev) => {
+        const updated = [...prev];
+        updated[index] = publicUrl;
+        onImagesUploaded(updated.filter((url) => !!url)); // only send filled
+        return updated;
+      });
     } catch (error) {
       console.error("Upload error:", error);
       alert("Upload failed. Check console for details.");
@@ -142,16 +160,23 @@ export default function ImageGalleryUpload({
 
   const handleRemoveImage = (e: React.MouseEvent, index: number) => {
     e.stopPropagation();
-    const newImages = [...images];
-    newImages[index] = "";
-    setImages(newImages);
-    onImagesUploaded(newImages);
+    // const newImages = [...images];
+    // newImages[index] = "";
+    // setImages(newImages);
+    // onImagesUploaded(newImages);
+    setImages((prev) => {
+      const updated = [...prev];
+      updated[index] = "";
+      const allEmpty = updated.every((img) => !img);
+      onImagesUploaded(allEmpty ? [] : updated.filter((url) => !!url));
+      return updated;
+    });
   };
 
   return (
     <>
       {/* Scrollable selector row */}
-      <div className="my-2 pb-2 w-full overflow-x-auto">
+      <div className="my-2 pb-2 w-full overflow-x-auto scroll-hidden">
         <div className="flex gap-3 min-w-max px-1">
           {Array.from({ length: 10 }).map((_, i) => (
             <div
@@ -160,6 +185,7 @@ export default function ImageGalleryUpload({
               onDrop={(e) => handleDrop(e, i)}
               onDragOver={(e) => e.preventDefault()}
               onClick={() => handleFileSelect(i)}
+              style={style}
             >
               {images[i] ? (
                 <>
@@ -185,7 +211,7 @@ export default function ImageGalleryUpload({
 
       {/* Cropping Modal */}
       <Dialog open={cropModalOpen} onOpenChange={setCropModalOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px]" style={style}>
           <DialogHeader>
             <DialogTitle>Crop Image (4:5)</DialogTitle>
           </DialogHeader>
@@ -205,10 +231,13 @@ export default function ImageGalleryUpload({
           </div>
 
           <div className="flex justify-end gap-2 mt-4">
-            <Button variant="outline" onClick={() => setCropModalOpen(false)}>
-              Cancel
+            <Button
+              onClick={handleUploadCropped}
+              disabled={uploading}
+              style={style_button}
+            >
+              {uploading ? "Uploading..." : "Upload"}
             </Button>
-            <Button onClick={handleUploadCropped}  disabled={uploading}>{uploading ? "Uploading..." : "Upload"}</Button>
           </div>
         </DialogContent>
       </Dialog>

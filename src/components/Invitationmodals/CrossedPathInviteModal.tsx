@@ -1,8 +1,10 @@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -21,6 +23,8 @@ interface Profile {
 }
 
 interface CrossedPathInviteModalProps {
+  style: string;
+  style_button: string;
   open: boolean;
   onClose: () => void;
   onInviteResolved: (guestIds: string[]) => void;
@@ -28,6 +32,8 @@ interface CrossedPathInviteModalProps {
 }
 
 export const CrossedPathInviteModal = ({
+  style,
+  style_button,
   open,
   onClose,
   onInviteResolved,
@@ -113,6 +119,8 @@ export const CrossedPathInviteModal = ({
     }
   };
 
+  const data = {};
+
   // const toggleUserSelection = (userId: string) => {
   // setSelectedIds((prev) =>
   //     prev.includes(userId)
@@ -147,7 +155,10 @@ export const CrossedPathInviteModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent
+        className="max-w-lg max-h-[90vh] overflow-y-auto"
+        style={style}
+      >
         <DialogHeader>
           <DialogTitle>Invite from Crossed Paths</DialogTitle>
         </DialogHeader>
@@ -166,9 +177,10 @@ export const CrossedPathInviteModal = ({
                   variant="ghost"
                   className={`w-full justify-start p-2 rounded-lg flex items-center gap-3 border transition-all ${
                     isSelected
-                      ? "bg-primary text-white border-primary"
+                      ? "bg-primary border-primary text-lg font-bold"
                       : "hover:bg-muted border-border"
                   }`}
+                  style={style_button}
                   onClick={() => toggleUserSelection(user.id)}
                 >
                   <Avatar className="h-8 w-8">
@@ -178,7 +190,7 @@ export const CrossedPathInviteModal = ({
                       {user.last_name?.[0]}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="text-sm font-medium">
+                  <span className="font-medium">
                     {user.first_name} {user.last_name}
                   </span>
                 </Button>
@@ -190,7 +202,7 @@ export const CrossedPathInviteModal = ({
           <div className="text-xs text-muted-foreground pt-2 flex justify-between items-center">
             <span>You’ve reached your invite limit.</span>
             <Link to={"/subscription"}>
-              <Button size="sm" variant="outline">
+              <Button size="sm" variant="outline" style={style_button}>
                 Upgrade
               </Button>
             </Link>
@@ -201,6 +213,7 @@ export const CrossedPathInviteModal = ({
           <Button
             disabled={selectedIds.length === 0 || loading}
             onClick={handleSubmit}
+            style={style_button}
           >
             Invite {selectedIds.length > 0 ? `(${selectedIds.length})` : ""}
           </Button>

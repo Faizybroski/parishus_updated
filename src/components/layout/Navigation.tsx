@@ -66,7 +66,7 @@ const Navigation = () => {
   const navItems = getNavItems();
 
   return (
-    <nav className="bg-dark-surface border-b border-border">
+    <nav className="bg-background border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}

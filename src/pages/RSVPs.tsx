@@ -25,7 +25,19 @@ import {
   Trash2,
   Search,
   Filter,
+  Plus,
+  MoreVertical,
+  Heart,
+  UserCheck,
+  Share2,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { useNavigate, Link } from "react-router-dom";
@@ -554,11 +566,74 @@ const RSVPs = () => {
                           //     </div>
                           //   </CardContent>
                           // </Card>
-                          <div
+                          <Link
+                            key={rsvp.id}
+                            to={`/event/${rsvp.events.id}/details`}
+                            className="block rounded-lg overflow-hidden shadow-md border border-gray-200 hover:border-gray-700 hover:bg-white/10 hover:cursor-pointer transition-all duration-300 w-full sm:w-[90%] md:w-[45%] lg:w-[30%] max-w-[420px] no-underline"
+                          >
+                            {/* <div
                             key={rsvp.id}
                             className=" rounded-lg overflow-hidden shadow-md border border-gray-200 hover:border-gray-700 hover:bg-white/10 hover:cursor-pointer transition-all duration-300 w-full sm:w-[90%] md:w-[45%] lg:w-[30%] max-w-[420px]"
-                          >
+                          > */}
                             <div className="relative">
+                              <div className="absolute top-3 right-3 z-20">
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="bg-black/40 text-white hover:bg-black/60 transition-colors rounded-full"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <MoreVertical className="h-5 w-5" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+
+                                  <DropdownMenuContent
+                                    align="end"
+                                    className="w-40"
+                                  >
+                                    {/* DEVELOPER COMMENTS THIS. WILL BE UNCOMMENT IN LIVE */}
+                                    {/* {isCreator && (
+                                    <DropdownMenuItem asChild>
+                                      <Link
+                                        to={`/event/${rsvp.events.id}/edit`}
+                                        className="flex items-center w-full"
+                                        onClick={(e) => e.stopPropagation()}
+                                      >
+                                        <Edit className="mr-2 h-4 w-4" />
+                                        <span>Edit Event</span>
+                                      </Link>
+                                    </DropdownMenuItem>
+                                    )} */}
+
+                                    <DropdownMenuItem
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        cancelRSVP(rsvp.id, rsvp.events.id);
+                                      }}
+                                      className="flex items-center "
+                                    >
+                                      <Trash2 className="mr-2 h-4 w-4" />
+                                      <span>Cancel RSVP</span>
+                                    </DropdownMenuItem>
+
+                                    {/* DEVELOPER COMMENTS THIS. WILL BE UNCOMMENT IN LIVE */}
+                                    {/* {isCreator && (
+                                    <DropdownMenuItem
+                                      // onClick={(e) => {
+                                      //   e.stopPropagation();
+                                      //   deleteEvent && deleteEvent(event.id);
+                                      // }}
+                                      className="text-red-500 focus:text-red-600 flex items-center"
+                                    >
+                                      <Trash2 className="mr-2 h-4 w-4" />
+                                      <span>Delete</span>
+                                    </DropdownMenuItem>
+                                    )}  */}
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
                               {/* Image */}
                               <img
                                 className="w-full object-cover"
@@ -677,23 +752,15 @@ const RSVPs = () => {
                                       RSVP'd on{" "}
                                       {format(new Date(rsvp.created_at), "PPP")}
                                     </div>
-                                    <p className="text-sm flex flex-col text-secondary pb-2">
+                                    <p className="text-sm flex flex-col text-secondary pb-3">
                                       <span className="">
                                         {rsvp.events.location_name ||
                                           "Location not specified"}
                                       </span>
                                     </p>
-                                    <div className="flex space-x-2 pb-3">
-                                      <Link
-                                        to={`/event/${rsvp.events.id}/details`}
-                                        className="flex-1"
-                                      >
-                                        <Button className="w-full bg-primary hover:bg-primary/90 text-black rounded-sm">
-                                          See details
-                                        </Button>
-                                      </Link>
-                                      {/* DEVELOPER COMMENTS THIS. WILL BE UNCOMMENT IN LIVE */}
-                                      {/* {isCreator && (
+
+                                    {/* DEVELOPER COMMENTS THIS. WILL BE UNCOMMENT IN LIVE */}
+                                    {/* {isCreator && (
                                         <Link to={`/event/${event.id}/edit`}>
                                           <Button variant="outline" size="icon" className="">
                                             <Edit className="h-4 w-4" />
@@ -711,23 +778,12 @@ const RSVPs = () => {
                                           <Trash2 className="h-4 w-4" />
                                         </Button>
                                       )} */}
-
-                                      <Button
-                                        variant="outline"
-                                        size="icon"
-                                        onClick={() =>
-                                          cancelRSVP(rsvp.id, rsvp.events.id)
-                                        }
-                                        className="text-red-500 hover:text-red-600"
-                                      >
-                                        <Trash2 className="h-4 w-4" />
-                                      </Button>
-                                    </div>
                                   </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
+                            {/* </div> */}
+                          </Link>
                         );
                       })}
                     </div>
@@ -811,7 +867,11 @@ const RSVPs = () => {
                                     </Badge>
                                   </div>
                                   <Link to={`/event/${rsvp.events.id}/details`}>
-                                    <Button variant="default" size="sm" className="hover:bg-secondary-700">
+                                    <Button
+                                      variant="default"
+                                      size="sm"
+                                      className="hover:bg-secondary-700"
+                                    >
                                       <Eye className="h-4 w-4 " />
                                       View
                                     </Button>

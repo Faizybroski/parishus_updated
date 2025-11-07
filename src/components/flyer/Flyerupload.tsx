@@ -196,7 +196,7 @@ export default function FlyerUpload({
           <div
             {...getRootProps()}
             className={cn(
-              "border-2 border-dashed rounded-md p-10 text-center transition",
+              "border-2 border-dashed rounded-md p-10 text-center transition cursor-pointer",
               isDragActive
                 ? "border-primary bg-primary/10"
                 : "border-muted-foreground/30 hover:border-primary/50"

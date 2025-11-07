@@ -87,6 +87,17 @@
     background-color: hsl(var(--primary));
   }
 
+  .scroll-hidden {
+    overflow: auto; /* or scroll */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE & Edge (legacy) */
+  }
+
+  /* Chrome, Safari, Edge (Chromium) */
+  .scroll-hidden::-webkit-scrollbar {
+    display: none;
+  }
+
   /* Firefox */
   * {
     scrollbar-width: thin;
@@ -377,4 +388,15 @@ h1:empty::before {
   content: attr(data-placeholder);
   color: #9ca3af; /* Tailwind's muted color, adjust if needed */
   pointer-events: none;
+}
+
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge, and Firefox */
+* {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
 }

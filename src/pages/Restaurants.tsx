@@ -199,7 +199,7 @@ const Restaurants = () => {
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
-                        <CardTitle className="text-xl font-semibold text-foreground transition-colors">
+                        <CardTitle className="text-xl font-semibold text-foreground transition-colors font-script">
                           {restaurant.name}
                         </CardTitle>
                         <CardDescription className="flex items-center mt-2">
@@ -267,11 +267,34 @@ const Restaurants = () => {
                         <div className="flex items-center gap-2">
                           <User className="h-3 w-3 text-muted-foreground" />
                           <p className="text-sm">
-                            {restaurant.creator
-                              ? `${restaurant.creator.first_name || ""} ${
-                                  restaurant.creator.last_name || ""
-                                }`.trim() || restaurant.creator.email
-                              : "Unknown"}
+                            {restaurant.creator.id === profile?.id && (
+                              <>
+                                {/* {restaurant.creator
+                                  ? `${restaurant.creator.first_name || ""} ${
+                                      restaurant.creator.last_name || ""
+                                    }`.trim() || restaurant.creator.email
+                                  : "Unknown"} */}
+                                <Link to={`/profile/`}>
+                                  {restaurant.creator.first_name}{" "}
+                                  {restaurant.creator.last_name}
+                                </Link>
+                              </>
+                            )}
+                            {restaurant.creator.id != profile?.id && (
+                              <>
+                                {/* {restaurant.creator
+                                  ? `${restaurant.creator.first_name || ""} ${
+                                      restaurant.creator.last_name || ""
+                                    }`.trim() || restaurant.creator.email
+                                  : "Unknown"} */}
+                                <Link
+                                  to={`/profile/${restaurant.creator.username}`}
+                                >
+                                  {restaurant.creator.first_name}{" "}
+                                  {restaurant.creator.last_name}
+                                </Link>
+                              </>
+                            )}
                           </p>
                         </div>
                       </div>

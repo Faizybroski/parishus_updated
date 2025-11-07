@@ -1,8 +1,10 @@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,10 +13,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Database } from "@/integrations/supabase/types";
 import { toast } from "@/components/ui/use-toast";
 import { useNavigate, Link, useLocation } from "react-router-dom";
+import { Cross, Plus, X } from "lucide-react";
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
 interface EmailInviteModalProps {
+  style: string;
+  style_button: string;
   open: boolean;
   onClose: () => void;
   onInviteResolved: (guestIds: string[]) => void;
@@ -23,6 +28,8 @@ interface EmailInviteModalProps {
 }
 
 export const EmailInviteModal = ({
+  style,
+  style_button,
   open,
   onClose,
   onInviteResolved,
@@ -122,7 +129,10 @@ export const EmailInviteModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent
+        className="max-h-[90vh] overflow-y-auto sm:max-w-[500px]"
+        style={style}
+      >
         <DialogHeader>
           <DialogTitle>Invite Guests</DialogTitle>
         </DialogHeader>
@@ -135,20 +145,25 @@ export const EmailInviteModal = ({
                 value={email}
                 onChange={(e) => handleEmailChange(idx, e.target.value.trim())}
                 placeholder="Enter guest email"
+                style={style}
               />
               {idx === emails.length - 1 &&
                 (!isFreeTier || emails.length < MAX_FREE_INVITES) && (
-                  <Button onClick={addEmailField} variant="ghost">
-                    ➕
+                  <Button
+                    onClick={addEmailField}
+                    variant="ghost"
+                    className="hover:bg-transparent"
+                  >
+                    <Plus className="h-4 w-4" />
                   </Button>
                 )}
               {emails.length > 1 && (
                 <Button
                   onClick={() => removeEmailField(idx)}
                   variant="ghost"
-                  className="text-red-500"
+                  className="text-red-500  hover:bg-transparent"
                 >
-                  ❌
+                  <X className="h-4 w-4" />
                 </Button>
               )}
             </div>
@@ -160,7 +175,11 @@ export const EmailInviteModal = ({
               <div className="text-sm text-muted-foreground flex justify-between items-center border border-border p-2 rounded">
                 <span>You’ve reached the free invite limit.</span>
                 <Link to={"/subscription"}>
-                  <Button variant="outline" className="text-xs">
+                  <Button
+                    variant="outline"
+                    className="text-xs"
+                    style={style_button}
+                  >
                     Upgrade Plan
                   </Button>
                 </Link>
@@ -173,9 +192,15 @@ export const EmailInviteModal = ({
             </div>
           )}
 
-          <Button disabled={sending} onClick={handleSubmit}>
-            {sending ? "Sending..." : "Send Invitations"}
-          </Button>
+          <DialogFooter>
+            <Button
+              disabled={sending}
+              onClick={handleSubmit}
+              style={style_button}
+            >
+              {sending ? "Sending..." : "Send Invitations"}
+            </Button>
+          </DialogFooter>
         </div>
       </DialogContent>
     </Dialog>

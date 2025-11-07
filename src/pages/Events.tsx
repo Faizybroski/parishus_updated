@@ -49,6 +49,7 @@ interface Event {
   accent_bg: string;
   is_paid: boolean;
   accent_color: string;
+  recurrence: boolean;
   profiles?: {
     first_name?: string;
     last_name?: string;
@@ -199,9 +200,9 @@ const Events = () => {
         )
         .eq("status", "active")
         .neq("creator_id", currentProfileId)
-        .order("created_at", { ascending: false });
+        .order("date_time", { ascending: false });
 
-      //         rsvps (
+      //rsvps (
       //   id,
       //   status,
       //   user_id
@@ -261,7 +262,7 @@ const Events = () => {
         )
         .eq("creator_id", currentProfileId)
         .eq("status", "active")
-        .order("created_at", { ascending: false });
+        .order("date_time", { ascending: false });
 
       //         rsvps (
       //   id,
@@ -1102,12 +1103,16 @@ const Events = () => {
                         minute: "2-digit",
                       })}
                     </span>
+                    {event.recurrence && (
+                      <span className="absolute -top-12 right-5 border border-white/20 text-white text-sm px-3 py-2 rounded shadow-md z-20">
+                        <>more dates</>
+                      </span>
+                    )}
                     <div className="absolute -top-32 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent"></div>
 
                     <div className="pl-5 pr-2 pt-1 flex flex-col gap-2 relative z-10">
                       <h3
                         className="text-2xl text-white font-script"
-                        style={{ fontFamily: event.title_font }}
                       >
                         {event.name}
                       </h3>
@@ -1117,9 +1122,9 @@ const Events = () => {
                         </p>
                       )}
                       {event.max_attendees && (
-                        <div className="text-sm font-medium py-2 text-white box-border">
-                          <div className="flex items-center mb-2">
-                            <Users className="h-5 w-5 text-white mr-3" />
+                        <div className="text-sm font-medium py-2  box-border">
+                          <div className="flex items-center mb-2 text-secondary">
+                            <Users className="h-5 w-5  mr-3 text-secondary" />
                             {event.rsvp_count || 0}/{event.max_attendees} RSVPed
                           </div>
 
@@ -1138,15 +1143,15 @@ const Events = () => {
                           </div>
                         </div>
                       )}
-                      <p className="text-sm flex flex-col text-white pb-3">
+                      <p className="text-sm flex flex-col pb-3 text-secondary">
                         <span>
                           {event.location_name || "Location not specified"}
                         </span>
-                        {event.restaurants && (
+                        {/* {event.restaurants && (
                           <span className="text-sm text-gray-400 line-clamp-1">
                             {event.restaurants.name} - {event.restaurants.city}
                           </span>
-                        )}
+                        )} */}
                       </p>
                     </div>
                   </div>
