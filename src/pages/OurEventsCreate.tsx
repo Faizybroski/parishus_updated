@@ -694,6 +694,22 @@ const OurEventsCreate = () => {
       }
     >
       <EmailInviteModal
+        style={
+          {
+            "--accent-bg": lightenColor(selectedColor),
+            background:
+              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
+            transition: "background 0.5s ease",
+          } as React.CSSProperties
+        }
+        style_button={
+          selectedColor
+            ? {
+                backgroundColor: selectedColor,
+                borderColor: selectedColor,
+              }
+            : {}
+        }
         open={emailInviteModelOpen}
         onClose={() => setEmailInviteModelOpen(false)}
         onInviteResolved={(guestIds) => setInvitedGuestIds(guestIds)}
@@ -702,6 +718,22 @@ const OurEventsCreate = () => {
       />
 
       <CrossedPathInviteModal
+        style={
+          {
+            "--accent-bg": lightenColor(selectedColor),
+            background:
+              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
+            transition: "background 0.5s ease",
+          } as React.CSSProperties
+        }
+        style_button={
+          selectedColor
+            ? {
+                backgroundColor: selectedColor,
+                borderColor: selectedColor,
+              }
+            : {}
+        }
         open={crossedPathInviteModelOpen}
         onClose={() => setCrossedPathInviteModelOpen(false)}
         onInviteResolved={(guestIds) => setInvitedGuestIds(guestIds)}
@@ -1253,16 +1285,15 @@ const OurEventsCreate = () => {
               <CardContent className="space-y-4">
                 <div className="space-y-3">
                   <div className="flex items-center space-x-2">
-                    <input
-                      type="radio"
+                    <Checkbox
                       id="manual"
                       name="guest_invitation_type"
                       value="manual"
                       checked={formData.guest_invitation_type === "manual"}
-                      onChange={(e) =>
+                      onCheckedChange={(e) =>
                         handleInputChange(
                           "guest_invitation_type",
-                          e.target.value
+                          "manual"
                         )
                       }
                       className="w-4 h-4"
@@ -1270,18 +1301,17 @@ const OurEventsCreate = () => {
                     <Label htmlFor="manual">Manually Invite Guests</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <input
-                      type="radio"
+                    <Checkbox
                       id="crossed_paths"
                       name="guest_invitation_type"
                       value="crossed_paths"
                       checked={
                         formData.guest_invitation_type === "crossed_paths"
                       }
-                      onChange={(e) =>
+                      onCheckedChange={(e) =>
                         handleInputChange(
                           "guest_invitation_type",
-                          e.target.value
+                          "crossed_paths"
                         )
                       }
                       className="w-4 h-4"
