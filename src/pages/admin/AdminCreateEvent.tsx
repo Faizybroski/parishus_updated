@@ -727,12 +727,12 @@ const AdminCreateEvent = () => {
               onClick={() => setMode("sell")}
               className={`rounded-full px-4 text-sm font-medium transition-all duration-200 ${
                 mode === "sell"
-                  ? "bg-primary text-primary-foreground shadow-sm"
+                  ? "bg-primary text-primary-foreground shadow-lg text-lg"
                   : "bg-transparent text-muted-foreground hover:text-foreground"
               }`}
               style={{
                 backgroundColor:
-                  mode === "sell" ? "var(--accent-color)" : "primary",
+                  mode === "sell" ? "var(--accent-color)" : "transparent",
                 borderColor: "var(--accent-color)",
               }}
             >
@@ -745,12 +745,12 @@ const AdminCreateEvent = () => {
               onClick={() => setMode("rsvp")}
               className={`rounded-full px-4 text-sm font-medium transition-all duration-200 ${
                 mode === "rsvp"
-                  ? "bg-primary text-primary-foreground shadow-sm"
+                  ? "bg-primary text-primary-foreground shadow-lg text-lg"
                   : "bg-transparent text-muted-foreground hover:text-foreground"
               }`}
               style={{
                 backgroundColor:
-                  mode === "rsvp" ? "var(--accent-color)" : "primary",
+                  mode === "rsvp" ? "var(--accent-color)" : "transparent",
                 borderColor: "var(--accent-color)",
               }}
             >
@@ -2205,6 +2205,14 @@ const AdminCreateEvent = () => {
           </div>
         </div>
         <FeatureDialog
+          style={
+            {
+              "--accent-bg": lightenColor(selectedColor),
+              background:
+                "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
+              transition: "background 0.5s ease",
+            } as React.CSSProperties
+          }
           style_button={
             selectedColor
               ? {
@@ -2220,6 +2228,14 @@ const AdminCreateEvent = () => {
           editFeatureIndex={editFeatureIndex}
         />
         <RecurringEventDialog
+          style={
+            {
+              "--accent-bg": lightenColor(selectedColor),
+              background:
+                "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
+              transition: "background 0.5s ease",
+            } as React.CSSProperties
+          }
           style_button={
             selectedColor
               ? {
