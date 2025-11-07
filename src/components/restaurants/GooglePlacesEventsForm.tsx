@@ -23,9 +23,10 @@ declare global {
 interface Props {
   formData: FormData;
   onChange: (field: keyof FormData, value: string) => void;
+  style: React.CSSProperties;
 }
 
-const GooglePlacesEventsForm: React.FC<Props> = ({ formData, onChange }) => {
+const GooglePlacesEventsForm: React.FC<Props> = ({ formData, onChange, style }) => {
   const { profile, loading } = useProfile();
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<any>(null);
@@ -145,6 +146,7 @@ const GooglePlacesEventsForm: React.FC<Props> = ({ formData, onChange }) => {
             placeholder="e.g., The Garden Cafe"
             value={formData.location_name}
             onChange={(e) => onChange("location_name", e.target.value)}
+            style={style}
           />
         </div>
       </div>
@@ -156,6 +158,7 @@ const GooglePlacesEventsForm: React.FC<Props> = ({ formData, onChange }) => {
           placeholder="Enter Your Address"
           value={formData.location_address}
           readOnly
+          style={style}
         />
       </div>
 
@@ -167,6 +170,7 @@ const GooglePlacesEventsForm: React.FC<Props> = ({ formData, onChange }) => {
             placeholder="Enter Latitude"
             value={formData.location_lat}
             readOnly
+            style={style}
           />
         </div>
         <div className="space-y-2">
@@ -176,6 +180,7 @@ const GooglePlacesEventsForm: React.FC<Props> = ({ formData, onChange }) => {
             placeholder="Enter Longitude"
             value={formData.location_lng}
             readOnly
+            style={style}
           />
         </div>
       </div>

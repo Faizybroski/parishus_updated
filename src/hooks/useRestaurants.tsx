@@ -9,6 +9,8 @@ export type Restaurant = Database['public']['Tables']['restaurants']['Row'] & {
     first_name: string | null;
     last_name: string | null;
     email: string;
+    username: string;
+    id: string;
   };
 };
 export type RestaurantInsert = Database['public']['Tables']['restaurants']['Insert'];
@@ -36,7 +38,9 @@ export const useRestaurants = () => {
           creator:profiles!restaurants_creator_id_fkey (
             first_name,
             last_name,
-            email
+            email,
+            id,
+            username
           )
         `)
         .order('created_at', { ascending: false });
@@ -88,7 +92,9 @@ export const useRestaurants = () => {
           creator:profiles!restaurants_creator_id_fkey (
             first_name,
             last_name,
-            email
+            email,
+            id,
+            username
           )
         `)
         .single();
@@ -123,7 +129,9 @@ export const useRestaurants = () => {
           creator:profiles!restaurants_creator_id_fkey (
             first_name,
             last_name,
-            email
+            email,
+            id,
+            username
           )
         `)
         .single();

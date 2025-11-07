@@ -51,7 +51,7 @@ import CheckoutSuccess from "./pages/CheckoutSuccess";
 import UserCheckout from "./pages/UserCheckout";
 import PaymentCheckoutPage from "./pages/PaymentCheckoutPage";
 import RsvpSuccessPage from "./pages/RsvpSuccessPage";
-import AdminEventDetails from "./pages/AdminEventDetails";
+import AdminEventDetails from "./pages/admin/AdminEventDetails";
 import RSVPDetails from "./pages/RSVPDetails";
 import WalletWithdraw from "./pages/WalletWithdraw";
 import AdminWalletRequests from "./pages/admin/AdminWalletRequests";

@@ -80,14 +80,14 @@ export default function EventAnalyticsDashboard({
 
   if (isFreeTier) {
     return (
-      <Card className="bg-card rounded-lg max-w-3xl mx-auto p-6">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-xl font-bold">
+          <CardTitle className="">
             Upgrade to Premium
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground text-base leading-relaxed max-w-md mx-auto mb-6">
+          <p className="text-muted-foreground text-base leading-relaxed max-w-md mb-6">
             Analytics are only available for Premium users.
           </p>
           <Link to={"/subscription"}>

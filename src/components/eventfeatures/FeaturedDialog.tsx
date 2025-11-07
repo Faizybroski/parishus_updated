@@ -16,6 +16,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
 export default function FeatureDialog({
+  style,
+  style_button,
   open,
   onClose,
   onChange,
@@ -188,7 +190,10 @@ export default function FeatureDialog({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[500px]">
+      <DialogContent
+        className="max-h-[90vh] overflow-y-auto sm:max-w-[500px]"
+        style={style}
+      >
         <DialogHeader>
           <DialogTitle>
             {isEditMode ? "Edit Feature" : "Add Feature"}
@@ -203,7 +208,10 @@ export default function FeatureDialog({
               onClick={() => fileInputRef.current?.click()}
             >
               {uploading ? (
-                <div className="flex items-center justify-center w-full h-full text-gray-500">
+                <div
+                  className="flex items-center justify-center w-full h-full text-gray-500"
+                  style={style}
+                >
                   <Loader2 className="h-8 w-8 animate-spin" />
                 </div>
               ) : feature.image ? (
@@ -213,7 +221,10 @@ export default function FeatureDialog({
                   className="object-cover w-full h-full rounded-full"
                 />
               ) : (
-                <div className="flex items-center justify-center w-full h-full text-gray-500 bg-primary">
+                <div
+                  className="flex items-center justify-center w-full h-full text-gray-500 bg-primary"
+                  style={style}
+                >
                   <Image className="h-10 w-10 opacity-70" />
                 </div>
               )}
@@ -236,6 +247,7 @@ export default function FeatureDialog({
               value={feature.title}
               onChange={handleFieldChange}
               placeholder="e.g., Live Concert"
+              style={style}
             />
           </div>
 
@@ -248,13 +260,18 @@ export default function FeatureDialog({
               value={feature.url}
               onChange={handleFieldChange}
               placeholder="https://example.com"
+              style={style}
             />
           </div>
 
           {/* Toggle Dates & Time */}
           <div className="flex items-center justify-between mt-2">
             <Label>Show Date & Time</Label>
-            <Switch checked={showDates} onCheckedChange={setShowDates} />
+            <Switch
+              checked={showDates}
+              onCheckedChange={setShowDates}
+              style={style_button}
+            />
           </div>
 
           {showDates && (
@@ -266,6 +283,7 @@ export default function FeatureDialog({
                   name="start_date"
                   value={feature.start_date}
                   onChange={handleFieldChange}
+                  style={style}
                 />
               </div>
               <div className="space-y-1">
@@ -275,6 +293,7 @@ export default function FeatureDialog({
                   name="start_time"
                   value={feature.start_time}
                   onChange={handleFieldChange}
+                  style={style}
                 />
               </div>
               <div className="space-y-1">
@@ -284,6 +303,7 @@ export default function FeatureDialog({
                   name="end_date"
                   value={feature.end_date}
                   onChange={handleFieldChange}
+                  style={style}
                 />
               </div>
               <div className="space-y-1">
@@ -293,6 +313,7 @@ export default function FeatureDialog({
                   name="end_time"
                   value={feature.end_time}
                   onChange={handleFieldChange}
+                  style={style}
                 />
               </div>
             </div>
@@ -308,15 +329,20 @@ export default function FeatureDialog({
               value={feature.description}
               onChange={handleFieldChange}
               placeholder="Write a short description..."
+              style={style}
             />
           </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} style={style_button}>
             Cancel
           </Button>
-          <Button onClick={handleFeatureSave} disabled={uploading}>
+          <Button
+            onClick={handleFeatureSave}
+            disabled={uploading}
+            style={style_button}
+          >
             {isEditMode ? "Save Changes" : "Add Feature"}
           </Button>
         </DialogFooter>
