@@ -75,8 +75,9 @@ const OurEventsCreate = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    start_time: "",
-    start_date: "",
+    // start_time: "",
+    // start_date: "",
+    start_datetime: "",
     location_name: "",
     location_address: "",
     location_lat: "",
@@ -85,8 +86,9 @@ const OurEventsCreate = () => {
     max_attendees: 10,
     dining_style: "",
     dietary_theme: "",
-    rsvp_deadline_date: "",
-    rsvp_deadline_time: "",
+    // rsvp_deadline_date: "",
+    // rsvp_deadline_time: "",
+    rsvp_deadline: "",
     tags: [] as string[],
     cover_photo_url: "",
     is_mystery_dinner: false,
@@ -106,8 +108,9 @@ const OurEventsCreate = () => {
     eventFeatures: [],
     recurring: false,
     recurrenceDates: [],
-    end_date: "",
-    end_time: "",
+    // end_date: "",
+    // end_time: "",
+    end_datetime: "",
   });
   const [newTag, setNewTag] = useState("");
   const { user, loading: authLoading } = useAuth();
@@ -328,19 +331,28 @@ const OurEventsCreate = () => {
       return;
     }
 
-    if (!formData.start_date) {
-      toast({
-        title: "Validation Error",
-        description: "Please select event start date.",
-        variant: "destructive",
-      });
-      return;
-    }
+    // if (!formData.start_date) {
+    //   toast({
+    //     title: "Validation Error",
+    //     description: "Please select event start date.",
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
 
-    if (!formData.start_time) {
+    // if (!formData.start_time) {
+    //   toast({
+    //     title: "Validation Error",
+    //     description: "Please select event start time.",
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
+
+    if (!formData.end_datetime) {
       toast({
         title: "Validation Error",
-        description: "Please select event start time.",
+        description: "Please select event start date and time.",
         variant: "destructive",
       });
       return;
@@ -355,9 +367,18 @@ const OurEventsCreate = () => {
       return;
     }
 
-    if (
-      new Date(`${formData.start_date}T${formData.start_time}`) < new Date()
-    ) {
+    // if (
+    //   new Date(`${formData.start_date}T${formData.start_time}`) < new Date()
+    // ) {
+    //   toast({
+    //     title: "Validation Error",
+    //     description: "Event start date and time must be in the future.",
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
+
+    if (new Date(`${formData.start_datetime}`) < new Date()) {
       toast({
         title: "Validation Error",
         description: "Event start date and time must be in the future.",
@@ -479,26 +500,55 @@ const OurEventsCreate = () => {
         passwordHashed = await bcrypt.hash(trimmedPassword, salt);
       }
 
-      const eventDateTime = new Date(
-        `${formData.start_date}T${formData.start_time}`
-      );
+      // const eventDateTime = new Date(
+      //   `${formData.start_date}T${formData.start_time}`
+      // );
+
+      const eventDateTime = new Date(formData.start_datetime);
 
       let eventEndDateTime: Date | null = null;
 
-      if (formData.end_date || formData.end_time) {
-        if (!formData.end_date || !formData.end_time) {
-          toast({
-            title: "Invalid end time",
-            description: "Please provide both end date and end time.",
-            variant: "destructive",
-          });
-          return;
-        }
+      // if (formData.end_date || formData.end_time) {
+      //   if (!formData.end_date || !formData.end_time) {
+      //     toast({
+      //       title: "Invalid end time",
+      //       description: "Please provide both end date and end time.",
+      //       variant: "destructive",
+      //     });
+      //     return;
+      //   }
 
-        const endDateTime = new Date(
-          `${formData.end_date}T${formData.end_time}`
-        );
+      //   const endDateTime = new Date(
+      //     `${formData.end_date}T${formData.end_time}`
+      //   );
 
+      //   if (isNaN(endDateTime.getTime())) {
+      //     toast({
+      //       title: "Invalid date or time format",
+      //       description: "Please ensure the end date and time are valid.",
+      //       variant: "destructive",
+      //     });
+      //     return;
+      //   }
+
+      //   const now = new Date();
+      //   if (endDateTime < now) {
+      //     toast({
+      //       title: "End time in the past",
+      //       description: "End date and time cannot be in the past.",
+      //       variant: "destructive",
+      //     });
+      //     return;
+      //   }
+
+      //   eventEndDateTime = endDateTime;
+      // }
+
+      if (formData.end_datetime) {
+        const endDateTime = new Date(formData.end_datetime);
+        const now = new Date();
+
+        // Validate datetime parsing
         if (isNaN(endDateTime.getTime())) {
           toast({
             title: "Invalid date or time format",
@@ -508,8 +558,8 @@ const OurEventsCreate = () => {
           return;
         }
 
-        const now = new Date();
-        if (endDateTime < now) {
+        // Validate that it’s not in the past
+        if (endDateTime <= now) {
           toast({
             title: "End time in the past",
             description: "End date and time cannot be in the past.",
@@ -521,16 +571,42 @@ const OurEventsCreate = () => {
         eventEndDateTime = endDateTime;
       }
 
-      let rsvpDeadline = null;
+      // let rsvpDeadline = null;
 
-      if (formData.rsvp_deadline_date && formData.rsvp_deadline_time) {
-        rsvpDeadline = new Date(
-          `${formData.rsvp_deadline_date}T${formData.rsvp_deadline_time}`
-        );
-      } else if (formData.rsvp_deadline_date) {
-        rsvpDeadline = new Date(`${formData.rsvp_deadline_date}T23:59`);
+      // if (formData.rsvp_deadline_date && formData.rsvp_deadline_time) {
+      //   rsvpDeadline = new Date(
+      //     `${formData.rsvp_deadline_date}T${formData.rsvp_deadline_time}`
+      //   );
+      // } else if (formData.rsvp_deadline_date) {
+      //   rsvpDeadline = new Date(`${formData.rsvp_deadline_date}T23:59`);
+      // } else {
+      //   rsvpDeadline = eventDateTime;
+      // }
+
+      let rsvpDeadline: Date | null = null;
+
+      if (formData.rsvp_deadline) {
+        const parsed = new Date(formData.rsvp_deadline);
+        if (isNaN(parsed.getTime())) {
+          toast({
+            title: "Invalid RSVP deadline",
+            description: "Please provide a valid RSVP deadline date and time.",
+            variant: "destructive",
+          });
+          return;
+        }
+        rsvpDeadline = parsed;
       } else {
         rsvpDeadline = eventDateTime;
+      }
+
+      if (rsvpDeadline && rsvpDeadline > eventDateTime) {
+        toast({
+          title: "Invalid RSVP deadline",
+          description: "RSVP deadline cannot be after the event starts.",
+          variant: "destructive",
+        });
+        return;
       }
 
       const { data, error } = await supabase
@@ -741,86 +817,62 @@ const OurEventsCreate = () => {
       />
 
       <form onSubmit={handleSubmit}>
-        <div className="flex justify-center">
-          <div
-            className="flex items-center space-x-1 mt-3 px-1 py-1 bg-secondary rounded-full"
-            style={
-              selectedBgColor
-                ? {
-                    backgroundColor: selectedBgColor,
-                  }
-                : {}
-            }
-          >
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => setMode("sell")}
-              className={`rounded-full px-4 text-sm font-medium transition-all duration-200 ${
-                mode === "sell"
-                  ? "bg-primary text-primary-foreground shadow-lg text-lg"
-                  : "bg-transparent text-muted-foreground hover:text-foreground"
-              }`}
-              style={{
-                backgroundColor:
-                  mode === "sell" ? "var(--accent-color)" : "transparent",
-                borderColor: "var(--accent-color)",
-              }}
-            >
-              Sell Tickets
-            </Button>
-
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => setMode("rsvp")}
-              className={`rounded-full px-4 text-sm font-medium transition-all duration-200 ${
-                mode === "rsvp"
-                  ? "bg-primary text-primary-foreground shadow-lg text-lg"
-                  : "bg-transparent text-muted-foreground hover:text-foreground"
-              }`}
-              style={{
-                backgroundColor:
-                  mode === "rsvp" ? "var(--accent-color)" : "transparent",
-                borderColor: "var(--accent-color)",
-              }}
-            >
-              RSVP
-            </Button>
-          </div>
-        </div>
-
         <div className="flex flex-col lg:flex-row gap-6 p-6">
           <div className="flex-1 space-y-6 min-w-0">
-            <Card
-              className="space-y-2 bg-background"
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
-              <CardHeader>
-                <CardTitle>Name & Description</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
+            <Card className="space-y-2 bg-transparent border-none shadow-none">
+              <CardContent className="space-y-6 pt-4">
+                <div className="flex justify-center">
+                  <div
+                    className="flex items-center w-full space-x-1 mt-3 px-1 py-1 
+                       rounded-full backdrop-blur-md bg-white/10" // <- blur + translucent bg
+                  >
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => setMode("sell")}
+                      className={`rounded-full flex-1 px-4 text-sm font-medium transition-all duration-200 
+                        hover:none hover:bg-transparent hover:!text-inherit hover:!shadow-none ${
+                          mode === "sell"
+                            ? "bg-primary hover:bg-primary text-primary-foreground shadow-lg text-lg"
+                            : "bg-transparent text-muted-foreground"
+                        }`}
+                    >
+                      Sell Tickets
+                    </Button>
+
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => setMode("rsvp")}
+                      className={`rounded-full flex-1 px-4 text-sm font-medium transition-all duration-200 
+                        hover:none hover:bg-transparent hover:!text-inherit hover:!shadow-none ${
+                          mode === "rsvp"
+                            ? "bg-primary hover:bg-primary text-primary-foreground shadow-lg text-lg"
+                            : "bg-transparent text-muted-foreground"
+                        }`}
+                    >
+                      RSVP
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="space-y-2 bg-transparent border-none shadow-none">
+              <CardContent className="space-y-6 pt-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Event Name *</Label>
                   <Input
                     id="name"
-                    placeholder="e.g., Wine Tasting Social"
+                    placeholder="My Event Name"
                     value={formData.name}
                     onChange={(e) => handleInputChange("name", e.target.value)}
+                    className="border-none ring-0 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none text-[8rem] h-[4rem]"
                     style={
                       {
                         "--accent-bg": lightenColor(selectedColor),
-                        background:
-                          "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
+                        background: `transparent`,
                         transition: "background 0.5s ease",
                         fontFamily: selectedFont,
+                        fontSize: "3rem", // ✅ directly override
                       } as React.CSSProperties
                     }
                   />
@@ -830,12 +882,13 @@ const OurEventsCreate = () => {
                   <Label htmlFor="description">Description *</Label>
                   <Textarea
                     id="description"
-                    placeholder="Describe your event, what to expect, dress code, etc."
+                    placeholder="a brief description of the event."
+                    maxLength={140}
                     value={formData.description}
                     onChange={(e) =>
                       handleInputChange("description", e.target.value)
                     }
-                    rows={4}
+                    rows={1}
                     style={
                       {
                         "--accent-bg": lightenColor(selectedColor),
@@ -849,23 +902,35 @@ const OurEventsCreate = () => {
               </CardContent>
             </Card>
 
-            <Card
-              className="space-y-2"
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
-              <CardHeader>
-                <CardTitle>Date & Time</CardTitle>
+            <Card className="space-y-2 bg-transparent shadow-none border-none">
+              <div className="border-t border-gray-300 mx-6" />
+              <CardHeader >
+                <CardTitle className="flex gap-3">
+                  <Calendar className="h-5 w-5" /> Dates
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
+                <div className="space-y-2">
+                  <div className="border py-3 px-4 rounded-md flex justify-between items-center bg-transparent">
+                    <Label
+                      htmlFor="start_datetime"
+                      className="text-sm font-medium"
+                    >
+                      Start
+                    </Label>
+                    <Input
+                      id="start_datetime"
+                      type="datetime-local"
+                      min={new Date().toISOString().slice(0, 16)}
+                      value={formData.start_datetime}
+                      onChange={(e) =>
+                        handleInputChange("start_datetime", e.target.value)
+                      }
+                      className="pl-10 w-fit bg-transparent backdrop-blur-md bg-white/10"
+                    />
+                  </div>
+                </div>
+                {/* <div className="space-y-2">
                     <Label htmlFor="start_date">Start date *</Label>
                     <div className="relative">
                       <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -912,9 +977,30 @@ const OurEventsCreate = () => {
                         }
                       />
                     </div>
+                  </div> */}
+
+                <div className="space-y-2">
+                  <div className="border py-3 px-4 rounded-md flex justify-between items-center bg-transparent">
+                    <Label
+                      htmlFor="end_datetime"
+                      className="text-sm font-medium"
+                    >
+                      End
+                    </Label>
+                    <Input
+                      id="end_datetime"
+                      type="datetime-local"
+                      min={new Date().toISOString().slice(0, 16)}
+                      value={formData.end_datetime}
+                      onChange={(e) =>
+                        handleInputChange("end_datetime", e.target.value)
+                      }
+                      className="pl-10 w-fit bg-transparent backdrop-blur-md bg-white/10"
+                    />
                   </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="end_date">End Date</Label>
                     <div className="relative">
@@ -962,9 +1048,30 @@ const OurEventsCreate = () => {
                       />
                     </div>
                   </div>
+                </div> */}
+
+                <div className="space-y-2">
+                  <div className="border py-3 px-4 rounded-md flex justify-between items-center bg-transparent">
+                    <Label
+                      htmlFor="rsvp_deadline"
+                      className="text-sm font-medium"
+                    >
+                      RSVP Deadline
+                    </Label>
+                    <Input
+                      id="rsvp_deadline"
+                      type="datetime-local"
+                      min={new Date().toISOString().slice(0, 16)}
+                      value={formData.rsvp_deadline}
+                      onChange={(e) =>
+                        handleInputChange("rsvp_deadline", e.target.value)
+                      }
+                      className="pl-10 w-fit bg-transparent backdrop-blur-md bg-white/10"
+                    />
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="rsvp_deadline_date">
                       RSVP Deadline Date
@@ -1008,7 +1115,8 @@ const OurEventsCreate = () => {
                       }
                     />
                   </div>
-                </div>
+                </div> */}
+
                 <div className="space-y-2">
                   <Label htmlFor="max_attendees">Maximum Attendees *</Label>
                   <Input
@@ -1023,14 +1131,7 @@ const OurEventsCreate = () => {
                         parseInt(e.target.value)
                       )
                     }
-                    style={
-                      {
-                        "--accent-bg": lightenColor(selectedColor),
-                        background:
-                          "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                        transition: "background 0.5s ease",
-                      } as React.CSSProperties
-                    }
+                    className="bg-transparent"
                   />
                 </div>
                 <div className="space-y-2">
