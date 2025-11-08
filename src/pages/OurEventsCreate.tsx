@@ -90,7 +90,7 @@ const OurEventsCreate = () => {
     tags: [] as string[],
     cover_photo_url: "",
     is_mystery_dinner: false,
-    guest_invitation_type: "",
+    guest_invitation_type: "manual",
     guestList: true,
     features: false,
     is_paid: false,
@@ -1291,12 +1291,17 @@ const OurEventsCreate = () => {
                       value="manual"
                       checked={formData.guest_invitation_type === "manual"}
                       onCheckedChange={(e) =>
-                        handleInputChange(
-                          "guest_invitation_type",
-                          "manual"
-                        )
+                        handleInputChange("guest_invitation_type", "manual")
                       }
                       className="w-4 h-4"
+                      style={
+                        {
+                          "--accent-bg": lightenColor(selectedColor),
+                          background:
+                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
+                          transition: "background 0.5s ease",
+                        } as React.CSSProperties
+                      }
                     />
                     <Label htmlFor="manual">Manually Invite Guests</Label>
                   </div>
@@ -1315,6 +1320,14 @@ const OurEventsCreate = () => {
                         )
                       }
                       className="w-4 h-4"
+                      style={
+                        {
+                          "--accent-bg": lightenColor(selectedColor),
+                          background:
+                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
+                          transition: "background 0.5s ease",
+                        } as React.CSSProperties
+                      }
                     />
                     <Label htmlFor="crossed_paths">
                       Suggest from Crossed Paths

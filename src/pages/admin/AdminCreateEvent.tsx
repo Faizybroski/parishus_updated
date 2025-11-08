@@ -73,7 +73,7 @@ const AdminCreateEvent = () => {
     tags: [] as string[],
     cover_photo_url: "",
     is_mystery_dinner: false,
-    guest_invitation_type: "",
+    guest_invitation_type: "manual",
     is_private: false,
     is_paid: false,
     event_fee: 0,

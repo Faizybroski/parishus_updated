@@ -2237,7 +2237,7 @@ const EventDetails = () => {
                 </CardContent>
               </Card>
             )}
-            {event.guest_list && confirmedRSVPs.length > 0 && isCreator && (
+            {confirmedRSVPs.length > 0 && isCreator && (
               <Card>
                 <CardHeader>
                   <CardTitle>Attendees ({confirmedRSVPs.length})</CardTitle>
