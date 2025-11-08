@@ -937,9 +937,23 @@ const OurExploreEvents = () => {
               {/* Trending */}
               <div>
                 <label className="block mb-1 text-gray-400">Trending</label>
-                <select
+                {/* <select
                   value={trending}
                   onChange={(e) => setTrending(e.target.value)}
+                  className="w-full bg-black/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-white"
+                >
+                  {trendingOptions.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select> */}
+                <select
+                  value={filters.trending}
+                  // onChange={(e) =>
+                  //   setFilters({ ...filters, trending: e.target.value })
+                  // }
+                  onChange={(e) => handleFilterChange("trending", e.target.value)}
                   className="w-full bg-black/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-white"
                 >
                   {trendingOptions.map((opt) => (
@@ -953,9 +967,23 @@ const OurExploreEvents = () => {
               {/* Timeframe */}
               <div>
                 <label className="block mb-1 text-gray-400">Timeframe</label>
-                <select
+                {/* <select
                   value={timeframe}
                   onChange={(e) => setTimeframe(e.target.value)}
+                  className="w-full bg-black/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-white"
+                >
+                  {timeframeOptions.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select> */}
+                <select
+                  value={filters.timeframe}
+                  // onChange={(e) =>
+                  //   setFilters({ ...filters, timeframe: e.target.value })
+                  // }
+                  onChange={(e) => handleFilterChange("timeframe", e.target.value)}
                   className="w-full bg-black/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-white"
                 >
                   {timeframeOptions.map((opt) => (
@@ -969,16 +997,27 @@ const OurExploreEvents = () => {
               {/* City */}
               <div>
                 <label className="block mb-1 text-gray-400">City</label>
-                <input
+                {/* <input
                   type="text"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="Enter a City"
                   className="w-full bg-black/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-white"
+                /> */}
+
+                <input
+                  type="text"
+                  value={filters.city}
+                  // onChange={(e) =>
+                  //   setFilters({ ...filters, city: e.target.value })
+                  // }
+                  onChange={(e) => handleFilterChange("city", e.target.value)}
+                  placeholder="Enter a City"
+                  className="w-full bg-black/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-white"
                 />
               </div>
             </div>
-            <div className="mt-6">
+            {/* <div className="mt-6">
               <PriceFilter
                 onApply={(selectedRange) => {
                   setPriceRange(selectedRange);
@@ -986,7 +1025,16 @@ const OurExploreEvents = () => {
                 }}
                 onClose={() => setFilterOpen(false)} // 👈 pass this too
               />
-            </div>
+            </div> */}
+            <button
+  onClick={() => {
+    fetchEvents(userProfileId, filters);
+    setFilterOpen(false);
+  }}
+  className="mt-4 w-full bg-white text-black px-6 py-2 rounded-full font-semibold"
+>
+  Apply Filters
+</button>
           </div>
         </div>
       )}

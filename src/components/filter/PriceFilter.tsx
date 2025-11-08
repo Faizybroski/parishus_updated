@@ -79,9 +79,9 @@ const PriceFilter = ({ onApply, onClose }) => {
       <div className="flex gap-3">
         <button
           onClick={() => {
-            onClose()
-            onApply([min, max])}
-          }
+            onClose();
+            onApply([min, max]);
+          }}
           className="flex-1 bg-blue-500 py-2 rounded-lg hover:bg-blue-600"
         >
           Apply
