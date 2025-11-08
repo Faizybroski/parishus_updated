@@ -237,7 +237,7 @@ const AdminEventDetails = () => {
 
     try {
       const { data, error } = await supabase
-        .from("events")
+        .from("dummyevents")
         .select(
           `
           *,
@@ -252,23 +252,25 @@ const AdminEventDetails = () => {
             city,
             country,
             full_address
-          ),
-          rsvps (
-            id,
-            user_id,
-            status,
-            created_at,
-            profiles:user_id (
-              first_name,
-              last_name,
-              profile_photo_url,
-              email
-            )
           )
         `
         )
         .eq("id", eventId)
         .single();
+
+        // ,
+        //   rsvps (
+        //     id,
+        //     user_id,
+        //     status,
+        //     created_at,
+        //     profiles:user_id (
+        //       first_name,
+        //       last_name,
+        //       profile_photo_url,
+        //       email
+        //     )
+        //   )
 
       if (error) throw error;
       setEvent(data);
@@ -645,8 +647,7 @@ const AdminEventDetails = () => {
             The event you're looking for doesn't exist or has been removed.
           </p>
           <Link to={"/admin/events"}>
-            <Button
-            >
+            <Button>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Events
             </Button>
@@ -1507,18 +1508,21 @@ const AdminEventDetails = () => {
                                 </span>
                               )}
                             </span>
-                            {!isCreator && (
-                              <span className="text-xs text-muted-foreground">
-                                {rsvp.profiles?.email || "No email"}
-                              </span>
-                            )}
+                            {/* {!isCreator && ( */}
+                            <span className="text-xs text-muted-foreground">
+                              {rsvp.profiles?.email || "No email"}
+                            </span>
+                            {/* )} */}
                           </div>
                         </div>
-                        {!isCreator && event.event_fee ? (
-                          <span className="text-sm   font-semibold">
-                            ${event.event_fee}
-                          </span>
-                        ) : null}
+                        {
+                          // !isCreator &&
+                          event.event_fee ? (
+                            <span className="text-sm   font-semibold">
+                              ${event.event_fee}
+                            </span>
+                          ) : null
+                        }
                       </div>
                     ))}
                   </div>

@@ -159,9 +159,9 @@ export default function RecurringBookingDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} style={style_button}>
+          {/* <Button variant="outline" onClick={onClose} style={style_button}>
             Cancel
-          </Button>
+          </Button> */}
           <Button onClick={handleSave} style={style_button}>Save recurrence</Button>
         </DialogFooter>
       </DialogContent>

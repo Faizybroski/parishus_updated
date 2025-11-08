@@ -335,9 +335,9 @@ export default function FeatureDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} style={style_button}>
+          {/* <Button variant="outline" onClick={onClose} style={style_button}>
             Cancel
-          </Button>
+          </Button> */}
           <Button
             onClick={handleFeatureSave}
             disabled={uploading}
