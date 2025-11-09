@@ -198,7 +198,9 @@ const OurExploreEvents = () => {
       fetchEvents(userProfileId, filters);
       fetchAdminEvents();
     }
-  }, [userProfileId, filters]);
+  // }, [userProfileId, filters]);
+  }, [userProfileId]);
+
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -953,7 +955,9 @@ const OurExploreEvents = () => {
                   // onChange={(e) =>
                   //   setFilters({ ...filters, trending: e.target.value })
                   // }
-                  onChange={(e) => handleFilterChange("trending", e.target.value)}
+                  onChange={(e) =>
+                    handleFilterChange("trending", e.target.value)
+                  }
                   className="w-full bg-black/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-white"
                 >
                   {trendingOptions.map((opt) => (
@@ -983,7 +987,9 @@ const OurExploreEvents = () => {
                   // onChange={(e) =>
                   //   setFilters({ ...filters, timeframe: e.target.value })
                   // }
-                  onChange={(e) => handleFilterChange("timeframe", e.target.value)}
+                  onChange={(e) =>
+                    handleFilterChange("timeframe", e.target.value)
+                  }
                   className="w-full bg-black/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-white"
                 >
                   {timeframeOptions.map((opt) => (
@@ -1027,14 +1033,14 @@ const OurExploreEvents = () => {
               />
             </div> */}
             <button
-  onClick={() => {
-    fetchEvents(userProfileId, filters);
-    setFilterOpen(false);
-  }}
-  className="mt-4 w-full bg-white text-black px-6 py-2 rounded-full font-semibold"
->
-  Apply Filters
-</button>
+              onClick={() => {
+                fetchEvents(userProfileId, filters);
+                setFilterOpen(false);
+              }}
+              className="mt-4 w-full bg-white text-black px-6 py-2 rounded-full font-semibold"
+            >
+              Apply Filters
+            </button>
           </div>
         </div>
       )}
@@ -1058,7 +1064,7 @@ const OurExploreEvents = () => {
             <Link
               key={index}
               to={`/event/${event.id}/details`}
-              className="block relative font-sans font-serif rounded-lg overflow-hidden shadow-md border border-gray-200 hover:border-gray-700 hover:bg-white/10 hover:cursor-pointer transition-all duration-300 w-full sm:w-[90%] md:w-[45%] lg:w-[30%] max-w-[420px]"
+              className="block relative font-sans font-serif rounded-[4%] overflow-hidden shadow-md border border-gray-200 hover:border-gray-700 hover:bg-white/10 hover:cursor-pointer transition-all duration-300 w-full sm:w-[90%] md:w-[45%] lg:w-[32%] max-w-[475px]"
             >
               <div className="relative">
                 {/* Image */}

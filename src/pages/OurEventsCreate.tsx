@@ -38,6 +38,7 @@ import {
   Calendar,
   Clock,
   MapPin,
+  Repeat2,
   Eye,
   Edit2,
   Trash2,
@@ -723,8 +724,9 @@ const OurEventsCreate = () => {
   const isFormValid =
     formData.name &&
     formData.description &&
-    formData.start_time &&
-    formData.start_date &&
+    // formData.start_time &&
+    // formData.start_date &&
+    formData.start_datetime &&
     formData.location_name &&
     formData.flyer_url;
   if (authLoading || profileLoading) {
@@ -764,7 +766,7 @@ const OurEventsCreate = () => {
         {
           "--accent-bg": lightenColor(selectedColor),
           background:
-            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
+            "var(--accent-bg)",
           transition: "background 0.5s ease",
         } as React.CSSProperties
       }
@@ -833,7 +835,7 @@ const OurEventsCreate = () => {
                       className={`rounded-full flex-1 px-4 text-sm font-medium transition-all duration-200 
                         hover:none hover:bg-transparent hover:!text-inherit hover:!shadow-none ${
                           mode === "sell"
-                            ? "bg-primary hover:bg-primary text-primary-foreground shadow-lg text-lg"
+                            ? "text-primary-foreground shadow-lg text-lg bg-transparent hover:bg-transparent backdrop-blur-md bg-white/10"
                             : "bg-transparent text-muted-foreground"
                         }`}
                     >
@@ -847,7 +849,7 @@ const OurEventsCreate = () => {
                       className={`rounded-full flex-1 px-4 text-sm font-medium transition-all duration-200 
                         hover:none hover:bg-transparent hover:!text-inherit hover:!shadow-none ${
                           mode === "rsvp"
-                            ? "bg-primary hover:bg-primary text-primary-foreground shadow-lg text-lg"
+                            ? "text-primary-foreground shadow-lg text-lg bg-transparent hover:bg-transparent backdrop-blur-md bg-white/10"
                             : "bg-transparent text-muted-foreground"
                         }`}
                     >
@@ -889,14 +891,7 @@ const OurEventsCreate = () => {
                       handleInputChange("description", e.target.value)
                     }
                     rows={1}
-                    style={
-                      {
-                        "--accent-bg": lightenColor(selectedColor),
-                        background:
-                          "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                        transition: "background 0.5s ease",
-                      } as React.CSSProperties
-                    }
+                    className="bg-transparent"
                   />
                 </div>
               </CardContent>
@@ -904,14 +899,14 @@ const OurEventsCreate = () => {
 
             <Card className="space-y-2 bg-transparent shadow-none border-none">
               <div className="border-t border-gray-300 mx-6" />
-              <CardHeader >
+              <CardHeader>
                 <CardTitle className="flex gap-3">
                   <Calendar className="h-5 w-5" /> Dates
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
-                  <div className="border py-3 px-4 rounded-md flex justify-between items-center bg-transparent">
+                  <div className="border py-3 px-4 rounded-md flex flex-col sm:flex-row sm:justify-between sm:items-center justify-between items-center bg-transparent backdrop-blur-md bg-white/10">
                     <Label
                       htmlFor="start_datetime"
                       className="text-sm font-medium"
@@ -926,7 +921,7 @@ const OurEventsCreate = () => {
                       onChange={(e) =>
                         handleInputChange("start_datetime", e.target.value)
                       }
-                      className="pl-10 w-fit bg-transparent backdrop-blur-md bg-white/10"
+                      className="mt-2 sm:mt-0 w-fit bg-transparent backdrop-blur-md bg-white/10"
                     />
                   </div>
                 </div>
@@ -980,7 +975,7 @@ const OurEventsCreate = () => {
                   </div> */}
 
                 <div className="space-y-2">
-                  <div className="border py-3 px-4 rounded-md flex justify-between items-center bg-transparent">
+                  <div className="border py-3 px-4 rounded-md flex flex-col sm:flex-row sm:justify-between sm:items-center justify-between items-center bg-transparent backdrop-blur-md bg-white/10">
                     <Label
                       htmlFor="end_datetime"
                       className="text-sm font-medium"
@@ -995,7 +990,7 @@ const OurEventsCreate = () => {
                       onChange={(e) =>
                         handleInputChange("end_datetime", e.target.value)
                       }
-                      className="pl-10 w-fit bg-transparent backdrop-blur-md bg-white/10"
+                      className="mt-2 sm:mt-0 w-fit bg-transparent backdrop-blur-md bg-white/10"
                     />
                   </div>
                 </div>
@@ -1051,7 +1046,7 @@ const OurEventsCreate = () => {
                 </div> */}
 
                 <div className="space-y-2">
-                  <div className="border py-3 px-4 rounded-md flex justify-between items-center bg-transparent">
+                  <div className="border py-3 px-4 rounded-md flex flex-col sm:flex-row sm:justify-between sm:items-center justify-between items-center bg-transparent backdrop-blur-md bg-white/10">
                     <Label
                       htmlFor="rsvp_deadline"
                       className="text-sm font-medium"
@@ -1066,7 +1061,7 @@ const OurEventsCreate = () => {
                       onChange={(e) =>
                         handleInputChange("rsvp_deadline", e.target.value)
                       }
-                      className="pl-10 w-fit bg-transparent backdrop-blur-md bg-white/10"
+                      className="mt-2 sm:mt-0 w-fit bg-transparent backdrop-blur-md bg-white/10"
                     />
                   </div>
                 </div>
@@ -1118,6 +1113,31 @@ const OurEventsCreate = () => {
                 </div> */}
 
                 <div className="space-y-2">
+                  <div className="border py-3 px-4 rounded-md flex flex-col sm:flex-row sm:justify-between sm:items-center justify-between items-center bg-transparent backdrop-blur-md bg-white/10">
+                    <Label
+                      htmlFor="max_attendees"
+                      className="text-sm font-medium"
+                    >
+                      Maximum Attendees
+                    </Label>
+                    <Input
+                      id="max_attendees"
+                      type="number"
+                      min="2"
+                      max="50"
+                      value={formData.max_attendees}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "max_attendees",
+                          parseInt(e.target.value)
+                        )
+                      }
+                      className="mt-2 sm:mt-0 sm:ml-4 flex-1 min-w-0 max-w-28 bg-transparent backdrop-blur-md bg-white/10"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="max_attendees">Maximum Attendees *</Label>
                   <Input
                     id="max_attendees"
@@ -1131,12 +1151,18 @@ const OurEventsCreate = () => {
                         parseInt(e.target.value)
                       )
                     }
-                    className="bg-transparent"
+                    className="bg-transparent bg-transparent backdrop-blur-md bg-white/10"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="recurring">Recurring Series *</Label>
-                  <div className="border py-3 px-4 rounded-md">
+                  <Label
+                    htmlFor="recurring"
+                    className="flex gap-3 items-center"
+                  >
+                    <Repeat2 className="h-5 w-5" />
+                    Recurring Series *
+                  </Label>
+                  <div className="border py-3 px-4 rounded-md bg-transparent t backdrop-blur-md bg-white/10">
                     <div className="flex justify-between items-center">
                       <Label htmlFor="recurring">
                         {formData.recurring == true ? "Yes" : "No"}
@@ -1147,20 +1173,12 @@ const OurEventsCreate = () => {
                         onCheckedChange={(checked) => {
                           handleInputChange("recurring", checked);
                         }}
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
                       />
                     </div>
                     {formData.recurring && (
                       <div className="space-y-4 mt-2 rounded-lg p-3">
                         {formData.recurrenceDates.length === 0 ? (
-                          <div className="flex justify-between items-center border rounded-lg px-4 py-3">
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border rounded-lg px-4 py-3 gap-2 sm:gap-0 bg-transparent backdrop-blur-md bg-white/10">
                             <p className="text-sm text-muted-foreground italic">
                               No event recurring dates added yet.
                             </p>
@@ -1168,21 +1186,13 @@ const OurEventsCreate = () => {
                               variant="outline"
                               size="sm"
                               type="button"
-                              onClick={() => {
-                                setShowRecurringDialog(true);
-                              }}
-                              className="rounded-full"
-                              style={
-                                selectedColor
-                                  ? {
-                                      backgroundColor: selectedColor,
-                                      borderColor: selectedColor,
-                                    }
-                                  : {}
-                              }
+                              onClick={() => setShowRecurringDialog(true)}
+                              className="rounded-full mt-2 sm:mt-0 flex flex-wrap justify-center items-center bg-transparent hover:bg-transparent backdrop-blur-md bg-white/10"
                             >
-                              <PlusCircle className="w-4 h-4 mr-1" />
-                              Add Recurrence date
+                              <PlusCircle className="w-4 h-4 mr-1 flex-shrink-0" />
+                              <span className="break-words text-center">
+                                Add Recurrence date
+                              </span>
                             </Button>
                           </div>
                         ) : (
@@ -1191,16 +1201,7 @@ const OurEventsCreate = () => {
                               {formData.recurrenceDates.map((date, i) => (
                                 <div
                                   key={i}
-                                  className="bg-secondary border rounded-xl p-4 flex justify-between items-center hover:shadow-md transition-all"
-                                  style={
-                                    {
-                                      "--accent-bg":
-                                        lightenColor(selectedColor),
-                                      background:
-                                        "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                                      transition: "background 0.5s ease",
-                                    } as React.CSSProperties
-                                  }
+                                  className="border rounded-xl p-4 flex justify-between items-center hover:shadow-md transition-all bg-transparent backdrop-blur-md bg-white/10"
                                 >
                                   <div className="flex items-center space-x-4">
                                     {new Date(date).toLocaleDateString(
@@ -1247,16 +1248,8 @@ const OurEventsCreate = () => {
               </CardContent>
             </Card>
 
-            <Card
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
+            <Card className="space-y-2 bg-transparent shadow-none border-none">
+              <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
                 <CardTitle>Location</CardTitle>
               </CardHeader>
@@ -1266,14 +1259,14 @@ const OurEventsCreate = () => {
                     Choose Restaurant (Optional)
                   </Label>
                   <RestaurantSearchDropdown
-                    style={
-                      {
-                        "--accent-bg": lightenColor(selectedColor),
-                        background:
-                          "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                        transition: "background 0.5s ease",
-                      } as React.CSSProperties
-                    }
+                    // style={
+                    //   {
+                    //     background:
+                    //       " bg-transparent backdrop-blur-md bg-white/10",
+                    //     transition: "background 0.5s ease",
+                    //   } as React.CSSProperties
+                    // }
+                    className="bg-transparent backdrop-blur-md bg-white/10 hover:bg-transparent"
                     placeholder="Search and select a restaurant"
                     restaurants={restaurants}
                     value={formData.restaurant_id}
@@ -1304,14 +1297,7 @@ const OurEventsCreate = () => {
                   />
                 </div>
                 <GooglePlacesEventsForm
-                  style={
-                    {
-                      "--accent-bg": lightenColor(selectedColor),
-                      background:
-                        "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                      transition: "background 0.5s ease",
-                    } as React.CSSProperties
-                  }
+                  className="bg-transparent backdrop-blur-md bg-white/10"
                   formData={formData}
                   onChange={handleInputChange}
                 />
@@ -1319,16 +1305,8 @@ const OurEventsCreate = () => {
             </Card>
 
             {mode === "sell" && (
-              <Card
-                style={
-                  {
-                    "--accent-bg": lightenColor(selectedColor),
-                    background:
-                      "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                    transition: "background 0.5s ease",
-                  } as React.CSSProperties
-                }
-              >
+              <Card className="space-y-2 bg-transparent shadow-none border-none">
+                <div className="border-t border-gray-300 mx-6" />
                 <CardHeader>
                   <CardTitle>Payment Settings</CardTitle>
                 </CardHeader>
@@ -1350,16 +1328,8 @@ const OurEventsCreate = () => {
                             parseFloat(e.target.value)
                           )
                         }
-                        className="pl-10"
+                        className="pl-10 bg-transparent backdrop-blur-md bg-white/10"
                         required={mode === "sell"}
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
                       />
                     </div>
                   </div>
@@ -1367,16 +1337,8 @@ const OurEventsCreate = () => {
               </Card>
             )}
 
-            <Card
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
+            <Card className="space-y-2 bg-transparent shadow-none border-none">
+              <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Users className="h-5 w-5" />
@@ -1391,18 +1353,14 @@ const OurEventsCreate = () => {
                       name="guest_invitation_type"
                       value="manual"
                       checked={formData.guest_invitation_type === "manual"}
-                      onCheckedChange={(e) =>
+                      onCheckedChange={() =>
                         handleInputChange("guest_invitation_type", "manual")
                       }
-                      className="w-4 h-4"
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
+                      className={`w-4 h-4 ${
+                        formData.guest_invitation_type === "manual"
+                          ? "backdrop-blur-md bg-white/10"
+                          : "bg-transparent"
+                      }`}
                     />
                     <Label htmlFor="manual">Manually Invite Guests</Label>
                   </div>
@@ -1414,21 +1372,17 @@ const OurEventsCreate = () => {
                       checked={
                         formData.guest_invitation_type === "crossed_paths"
                       }
-                      onCheckedChange={(e) =>
+                      onCheckedChange={() =>
                         handleInputChange(
                           "guest_invitation_type",
                           "crossed_paths"
                         )
                       }
-                      className="w-4 h-4"
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
+                      className={`w-4 h-4 ${
+                        formData.guest_invitation_type === "crossed_paths"
+                          ? "backdrop-blur-md bg-white/10"
+                          : "bg-transparent"
+                      }`}
                     />
                     <Label htmlFor="crossed_paths">
                       Suggest from Crossed Paths
@@ -1442,16 +1396,8 @@ const OurEventsCreate = () => {
               </CardContent>
             </Card>
 
-            <Card
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
+           <Card className="space-y-2 bg-transparent shadow-none border-none">
+              <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   Extras
@@ -2321,8 +2267,7 @@ const OurEventsCreate = () => {
           style={
             {
               "--accent-bg": lightenColor(selectedColor),
-              background:
-                "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
+              background: "var(--accent-bg)",
               transition: "background 0.5s ease",
             } as React.CSSProperties
           }
@@ -2340,8 +2285,9 @@ const OurEventsCreate = () => {
             setShowRecurringDialog(false);
             handleInputChange("recurring", true);
           }}
-          start_date={formData.start_date}
-          start_time={formData.start_time}
+          // start_date={formData.start_date}
+          // start_time={formData.start_time}
+          start_time={formData.start_datetime}
           onSubmit={(data) => {
             console.log("Recurrence Data:", data);
             handleInputChange("recurrenceDates", data);

@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MapPin } from "lucide-react";
@@ -23,10 +24,16 @@ declare global {
 interface Props {
   formData: FormData;
   onChange: (field: keyof FormData, value: string) => void;
-  style: React.CSSProperties;
+  style?: React.CSSProperties;
+  className?: string;
 }
 
-const GooglePlacesEventsForm: React.FC<Props> = ({ formData, onChange, style }) => {
+const GooglePlacesEventsForm: React.FC<Props> = ({
+  formData,
+  onChange,
+  style,
+  className,
+}) => {
   const { profile, loading } = useProfile();
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<any>(null);
@@ -142,7 +149,7 @@ const GooglePlacesEventsForm: React.FC<Props> = ({ formData, onChange, style }) 
           <Input
             id="location_name"
             ref={inputRef}
-            className="pl-10"
+            className={cn("pl-10", className)}
             placeholder="e.g., The Garden Cafe"
             value={formData.location_name}
             onChange={(e) => onChange("location_name", e.target.value)}
@@ -158,6 +165,7 @@ const GooglePlacesEventsForm: React.FC<Props> = ({ formData, onChange, style }) 
           placeholder="Enter Your Address"
           value={formData.location_address}
           readOnly
+          className={cn(className)}
           style={style}
         />
       </div>
@@ -170,6 +178,7 @@ const GooglePlacesEventsForm: React.FC<Props> = ({ formData, onChange, style }) 
             placeholder="Enter Latitude"
             value={formData.location_lat}
             readOnly
+            className={cn(className)}
             style={style}
           />
         </div>
@@ -179,6 +188,7 @@ const GooglePlacesEventsForm: React.FC<Props> = ({ formData, onChange, style }) 
             id="location_lng"
             placeholder="Enter Longitude"
             value={formData.location_lng}
+            className={cn(className)}
             readOnly
             style={style}
           />

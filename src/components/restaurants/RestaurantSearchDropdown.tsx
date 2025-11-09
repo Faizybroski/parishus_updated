@@ -56,7 +56,7 @@ export function RestaurantSearchDropdown({
           role="combobox"
           aria-expanded={open}
           className={cn("w-full justify-between relative", className)}
-          style={props.style}
+          style={props?.style}
         >
           {selectedRestaurant ? (
             <span className="truncate">
@@ -69,18 +69,20 @@ export function RestaurantSearchDropdown({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0" align="start">
-        <Command style={props.style}>
-          <div className="flex items-center border-b px-3">
+        <Command style={props?.style} className={cn(className)}>
+          <div style={props?.style} className={cn("flex items-center border-b px-3", className)}>
             <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
             <CommandInput
               placeholder="Search restaurants..."
               value={searchValue}
               onValueChange={setSearchValue}
-              className="flex h-10 w-full bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
-              
+              className={cn(
+                "flex h-10 w-full py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
+                className
+              )}
             />
           </div>
-          <CommandList style={props.style}>
+          <CommandList style={props?.style}>
             <CommandEmpty>No restaurants found.</CommandEmpty>
             <CommandGroup>
               {value && (
@@ -91,8 +93,10 @@ export function RestaurantSearchDropdown({
                     setOpen(false);
                     setSearchValue("");
                   }}
-                  style={{ ...props.style, cursor: "pointer" }}
-                  className="text-muted-foreground text-black hover:text-black"
+                  className={cn(
+                    "text-muted-foreground text-black hover:text-black cursor-pointer",
+                    className
+                  )}
                 >
                   Clear selection
                 </CommandItem>
@@ -101,22 +105,24 @@ export function RestaurantSearchDropdown({
                 <CommandItem
                   key={restaurant.id}
                   value={restaurant.id}
-                  className="bg-background"
+                  className={cn("cursor-pointer", className)}
                   onSelect={() => {
                     onSelect(restaurant);
                     setOpen(false);
                     setSearchValue("");
                   }}
-                  style={{ ...props.style, cursor: "pointer" }}
                 >
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value === restaurant.id ? "opacity-100" : "opacity-0"
+                      value === restaurant.id ? "opacity-100" : "opacity-0",
+                      className
                     )}
                   />
                   <div className="flex flex-col">
-                    <span className="font-medium text-black">{restaurant.name}</span>
+                    <span className="font-medium text-black">
+                      {restaurant.name}
+                    </span>
                     <span className="text-sm text-muted-foreground">
                       {restaurant.city}, {restaurant.state_province}
                     </span>
