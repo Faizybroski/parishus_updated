@@ -17,7 +17,7 @@ type RecurringBookingDialogProps = {
   style_button: string;
   open: boolean;
   onClose: () => void;
-  start_date: string;
+  // start_date: string;
   start_time: string;
   onSubmit: (data: string[]) => void;
 };
@@ -27,20 +27,50 @@ export default function RecurringBookingDialog({
   style_button,
   open,
   onClose,
-  start_date,
+  // start_date,
   start_time,
   onSubmit,
 }: RecurringBookingDialogProps) {
-  const formattedStartDate = start_date;
+  // const formattedStartDate = start_date;
+  // const eventStart = new Date(start_time); // start_time now includes date + time
+
+  // const formattedStartDate = eventStart.toISOString().split("T")[0];
+  const eventStart = start_time ? new Date(start_time) : null;
+
+const formattedStartDate = eventStart
+  ? eventStart.toISOString().split("T")[0]
+  : ""; // fallback if invalid
 
   const [dates, setDates] = useState<string[]>([formattedStartDate]);
 
   const handleDateChange = (index: number, value: string) => {
     const today = new Date();
     const selected = new Date(value);
-    const min = new Date(start_date);
+    // const min = new Date(start_date);
 
     // 🛑 Validation: no past or before start_date
+    // if (selected < today.setHours(0, 0, 0, 0)) {
+    //   toast({
+    //     title: "Invalid date",
+    //     description: "You can’t select a past date.",
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
+
+    // if (selected < min) {
+    //   toast({
+    //     title: "Invalid recurrence date",
+    //     description: "Date cannot be before the event’s start date.",
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
+
+    // const updated = [...dates];
+    // updated[index] = value;
+    // setDates(updated);
+
     if (selected < today.setHours(0, 0, 0, 0)) {
       toast({
         title: "Invalid date",
@@ -50,7 +80,7 @@ export default function RecurringBookingDialog({
       return;
     }
 
-    if (selected < min) {
+    if (selected < eventStart) {
       toast({
         title: "Invalid recurrence date",
         description: "Date cannot be before the event’s start date.",
@@ -88,31 +118,44 @@ export default function RecurringBookingDialog({
       return;
     }
 
-    if (validDates.some((d) => new Date(d) < new Date(start_date))) {
-      toast({
-        title: "Invalid recurrence",
-        description: "Some selected dates are before the start date.",
-        variant: "destructive",
-      });
-      return;
-    }
+    // if (validDates.some((d) => new Date(d) < new Date(start_date))) {
+    //   toast({
+    //     title: "Invalid recurrence",
+    //     description: "Some selected dates are before the start date.",
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
+
+    // const fullDateTimes = validDates.map((d) => {
+    //   // Ensure the time string has full HH:mm:ss format
+    //   const normalizedTime =
+    //     start_time.length === 5 ? `${start_time}:00` : start_time;
+
+    //   // Merge date and time into ISO-compatible format
+    //   const combinedString = `${d}T${normalizedTime}`;
+
+    //   const combined = new Date(combinedString);
+
+    //   if (isNaN(combined.getTime())) {
+    //     console.warn("Invalid date-time combination:", combinedString);
+    //     throw new Error(`Invalid date-time: ${combinedString}`);
+    //   }
+
+    //   return combined.toISOString(); // full UTC ISO string
+    // });
 
     const fullDateTimes = validDates.map((d) => {
-      // Ensure the time string has full HH:mm:ss format
-      const normalizedTime =
-        start_time.length === 5 ? `${start_time}:00` : start_time;
-
-      // Merge date and time into ISO-compatible format
-      const combinedString = `${d}T${normalizedTime}`;
-
-      const combined = new Date(combinedString);
+      // Extract time from start_time
+      const timeString = eventStart.toTimeString().slice(0, 8); // HH:MM:SS
+      const combined = new Date(`${d}T${timeString}`);
 
       if (isNaN(combined.getTime())) {
-        console.warn("Invalid date-time combination:", combinedString);
-        throw new Error(`Invalid date-time: ${combinedString}`);
+        console.warn("Invalid date-time combination:", `${d}T${timeString}`);
+        throw new Error(`Invalid date-time: ${d}T${timeString}`);
       }
 
-      return combined.toISOString(); // full UTC ISO string
+      return combined.toISOString();
     });
 
     onSubmit(fullDateTimes);
@@ -121,7 +164,10 @@ export default function RecurringBookingDialog({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto" style={style}>
+      <DialogContent
+        className="max-w-lg max-h-[90vh] overflow-y-auto"
+        style={style}
+      >
         <DialogHeader>
           <DialogTitle>Recurring Series</DialogTitle>
           <DialogDescription>
@@ -138,10 +184,15 @@ export default function RecurringBookingDialog({
                 value={date}
                 min={formattedStartDate} // ⬅ prevents earlier selection in the picker
                 onChange={(e) => handleDateChange(idx, e.target.value)}
-                style={style}
+                // style={style}
+                className="bg-transparent backdrop-blur-md bg-white/10"
               />
               {idx === dates.length - 1 && (
-                <Button onClick={addDateField} variant="ghost" className="hover:bg-transparent">
+                <Button
+                  onClick={addDateField}
+                  variant="ghost"
+                  className="hover:bg-transparent"
+                >
                   <Plus className="h-4 w-4" />
                 </Button>
               )}
@@ -162,7 +213,9 @@ export default function RecurringBookingDialog({
           {/* <Button variant="outline" onClick={onClose} style={style_button}>
             Cancel
           </Button> */}
-          <Button onClick={handleSave} style={style_button}>Save recurrence</Button>
+          <Button onClick={handleSave} style={style_button}>
+            Save recurrence
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
