@@ -2225,7 +2225,7 @@ const OurEventsCreate = () => {
             </Card>
             <Button
               type="submit"
-              disabled={!isFormValid || loading}
+              disabled={loading}
               className="bg-primary hover:bg-secondary"
               style={
                 selectedColor
