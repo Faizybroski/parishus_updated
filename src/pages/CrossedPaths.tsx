@@ -41,7 +41,7 @@ interface CrossedPath {
 }
 
 const CrossedPaths = () => {
-  // const [crossedPaths, setCrossedPaths] = useState<CrossedPath[]>([]);
+  const [crossedPaths, setCrossedPaths] = useState<CrossedPath[]>([]);
   const [dummyPaths, setDummyPaths] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -166,91 +166,7 @@ const CrossedPaths = () => {
         })
       );
 
-      // setCrossedPaths(enrichedPaths);
-      const crossedPaths = [
-        {
-          id: 1,
-          matched_at: "2025-10-10T12:30:00Z",
-          total_crosses: 3,
-          payment_status: "completed",
-          locations: ["Café Aroma", "Central Park", "Book Haven"],
-          matched_user: {
-            username: "sarah_j",
-            first_name: "Sarah",
-            last_name: "Johnson",
-            profile_photo_url:
-              "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=500&q=80",
-            job_title: "UX Designer at PixelWorks",
-            location_city: "New York",
-          },
-        },
-        {
-          id: 2,
-          matched_at: "2025-09-25T18:00:00Z",
-          total_crosses: 1,
-          payment_status: "free",
-          locations: ["Riverside Mall"],
-          matched_user: {
-            username: "mike_tech",
-            first_name: "Michael",
-            last_name: "Lee",
-            profile_photo_url:
-              "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=500&q=80",
-            job_title: "Software Engineer at Meta",
-            location_city: "San Francisco",
-          },
-        },
-        {
-          id: 3,
-          matched_at: "2025-10-03T09:15:00Z",
-          total_crosses: 5,
-          payment_status: "completed",
-          locations: ["City Library", "Fitness Hub"],
-          matched_user: {
-            username: "elena_art",
-            first_name: "Elena",
-            last_name: "Martinez",
-            profile_photo_url:
-              "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=500&q=80",
-            job_title: "Art Director at Visionary Studio",
-            location_city: "Los Angeles",
-          },
-        },
-        {
-          id: 4,
-          matched_at: "2025-08-14T20:45:00Z",
-          total_crosses: 2,
-          payment_status: "free",
-          locations: ["Downtown Plaza", "Starbucks Central"],
-          matched_user: {
-            username: "david_p",
-            first_name: "David",
-            last_name: "Park",
-            profile_photo_url:
-              "https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=500&q=80",
-            job_title: "Marketing Strategist at Brandify",
-            location_city: "Chicago",
-          },
-        },
-        {
-          id: 5,
-          matched_at: "2025-10-12T14:50:00Z",
-          total_crosses: 4,
-          payment_status: "completed",
-          locations: ["Ocean View Café", "Tech Expo 2025"],
-          matched_user: {
-            username: "nina_dev",
-            first_name: "Nina",
-            last_name: "Patel",
-            profile_photo_url:
-              "https://images.unsplash.com/photo-1552058544-f2b08422138a?auto=format&fit=crop&w=500&q=80",
-            job_title: "Frontend Developer at CodeFlow",
-            location_city: "Seattle",
-          },
-        },
-      ];
-
-      setDummyPaths(crossedPaths);
+      setCrossedPaths(enrichedPaths);
     } catch (error: any) {
       console.error("Error in fetchCrossedPaths:", error);
       setCrossedPaths([]);
@@ -308,8 +224,8 @@ const CrossedPaths = () => {
             </p>
           </div>
 
-          {/* {crossedPaths.length === 0 ? ( */}
-          {dummyPaths.length === 0 ? (
+          {crossedPaths.length === 0 ? (
+          // {dummyPaths.length === 0 ? (
             <Card className="shadow-card border-border w-full">
               <CardContent className="py-8 sm:py-12 px-4 sm:px-6 text-center">
                 <Users className="h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground mx-auto mb-4" />
@@ -324,8 +240,8 @@ const CrossedPaths = () => {
             </Card>
           ) : (
             <div className="grid gap-4 sm:gap-6">
-              {/* {crossedPaths.map((path) => ( */}
-              {dummyPaths.map((path) => (
+              {crossedPaths.map((path) => (
+              // {dummyPaths.map((path) => (
                 <Card
                   key={path.id}
                   className="shadow-card border-border w-full hover:shadow-lg transition-all duration-300"

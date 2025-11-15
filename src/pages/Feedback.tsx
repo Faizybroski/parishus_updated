@@ -27,8 +27,8 @@ interface FeedbackData {
 }
 
 const Feedback = () => {
-  // const [attendedEvents, setAttendedEvents] = useState<Event[]>([]);
-  const [dummyEvent, setDummyEvents] = useState([]);
+  const [attendedEvents, setAttendedEvents] = useState<Event[]>([]);
+  // const [dummyEvent, setDummyEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [feedback, setFeedback] = useState<FeedbackData>({
     event_id: "",
@@ -81,51 +81,9 @@ const Feedback = () => {
 
       const events =
         data?.map((rsvp: any) => rsvp.events).filter(Boolean) || [];
-      // setAttendedEvents(events);
+      setAttendedEvents(events);
 
-      const attendedEvents = [
-        {
-          id: 1,
-          name: "The Maple Harvest Dinner",
-          date_time: "2025-09-30T19:00:00Z",
-          location_name: "The Willow Room, Toronto",
-          cover_photo_url:
-            "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1000&q=80",
-        },
-        {
-          id: 2,
-          name: "Vancouver Tech Meetup",
-          date_time: "2025-10-05T17:30:00Z",
-          location_name: "Innovation Hub, Vancouver",
-          cover_photo_url:
-            "https://images.unsplash.com/photo-1551782450-a2132b4ba21d?auto=format&fit=crop&w=1000&q=80",
-        },
-        {
-          id: 3,
-          name: "Calgary Art & Coffee Night",
-          date_time: "2025-09-22T20:00:00Z",
-          location_name: "Artisan Café, Calgary",
-          cover_photo_url:
-            "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&w=1000&q=80",
-        },
-        {
-          id: 4,
-          name: "Ottawa Entrepreneurs Gathering",
-          date_time: "2025-10-01T18:00:00Z",
-          location_name: "ByWard Market Hall, Ottawa",
-          cover_photo_url:
-            "https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=1000&q=80",
-        },
-        {
-          id: 5,
-          name: "Halifax Music & Brunch",
-          date_time: "2025-09-28T11:00:00Z",
-          location_name: "Seaside Lounge, Halifax",
-          cover_photo_url:
-            "https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=1000&q=80",
-        },
-      ];
-      setDummyEvents(attendedEvents);
+      // setDummyEvents(attendedEvents);
     } catch (error: any) {
       console.error("Error in fetchAttendedEvents:", error);
       setAttendedEvents([]);
@@ -345,8 +303,8 @@ const Feedback = () => {
             </Card>
           ) : (
             <div className="space-y-6">
-              {/* {attendedEvents.length === 0 ? ( */}
-              {dummyEvent.length === 0 ? (
+              {attendedEvents.length === 0 ? (
+              // {dummyEvent.length === 0 ? (
                 <Card className="shadow-card border-border">
                   <CardContent className="py-12 text-center">
                     <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -360,8 +318,8 @@ const Feedback = () => {
                 </Card>
               ) : (
                 <div className="grid gap-6">
-                  {/* {attendedEvents.map((event) => ( */}
-                  {dummyEvent.map((event) => (
+                  {attendedEvents.map((event) => (
+                  // {dummyEvent.map((event) => (
                     <Card
                       key={event.id}
                       className="shadow-card border-border hover:shadow-lg transition-shadow cursor-pointer transition-shadow hover:bg-secondary transition-all duration-300"

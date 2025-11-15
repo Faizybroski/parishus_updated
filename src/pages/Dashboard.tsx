@@ -159,122 +159,60 @@ const Dashboard = () => {
       }
 
       // Now get aggregated data from crossed_paths_log for each pair
-      // const enrichedPaths = await Promise.all(
-      //   (crossedPathsData || []).map(async (path: any) => {
-      //     const otherUserId =
-      //       path.user1_id === profile.user_id
-      //         ? path.user2.user_id
-      //         : path.user1.user_id;
-      //     const userAId =
-      //       profile.user_id < otherUserId ? profile.user_id : otherUserId;
-      //     const userBId =
-      //       profile.user_id < otherUserId ? otherUserId : profile.user_id;
+      const enrichedPaths = await Promise.all(
+        (crossedPathsData || []).map(async (path: any) => {
+          const otherUserId =
+            path.user1_id === profile.user_id
+              ? path.user2.user_id
+              : path.user1.user_id;
+          const userAId =
+            profile.user_id < otherUserId ? profile.user_id : otherUserId;
+          const userBId =
+            profile.user_id < otherUserId ? otherUserId : profile.user_id;
 
-      //     // Get all crossed path logs for this user pair
-      //     const { data: logData } = await supabase
-      //       .from("crossed_paths_log")
-      //       .select("restaurant_name, cross_count")
-      //       .eq("user_a_id", userAId)
-      //       .eq("user_b_id", userBId);
+          // Get all crossed path logs for this user pair
+          const { data: logData } = await supabase
+            .from("crossed_paths_log")
+            .select("restaurant_name, cross_count")
+            .eq("user_a_id", userAId)
+            .eq("user_b_id", userBId);
 
-      //     const locations =
-      //       logData?.map((log) => log.restaurant_name).filter(Boolean) || [];
-      //     const totalCrosses =
-      //       logData?.reduce((sum, log) => sum + (log.cross_count || 1), 0) || 1;
+          const locations =
+            logData?.map((log) => log.restaurant_name).filter(Boolean) || [];
+          const totalCrosses =
+            logData?.reduce((sum, log) => sum + (log.cross_count || 1), 0) || 1;
 
-      //     // Create location_details array with proper structure
-      //     const locationDetails =
-      //       logData?.reduce((acc, log) => {
-      //         if (!log.restaurant_name) return acc;
+          // Create location_details array with proper structure
+          const locationDetails =
+            logData?.reduce((acc, log) => {
+              if (!log.restaurant_name) return acc;
 
-      //         const existing = acc.find(
-      //           (item) => item.name === log.restaurant_name
-      //         );
-      //         if (existing) {
-      //           existing.cross_count += log.cross_count || 1;
-      //         } else {
-      //           acc.push({
-      //             name: log.restaurant_name,
-      //             cross_count: log.cross_count || 1,
-      //           });
-      //         }
-      //         return acc;
-      //       }, [] as Array<{ name: string; cross_count: number }>) || [];
+              const existing = acc.find(
+                (item) => item.name === log.restaurant_name
+              );
+              if (existing) {
+                existing.cross_count += log.cross_count || 1;
+              } else {
+                acc.push({
+                  name: log.restaurant_name,
+                  cross_count: log.cross_count || 1,
+                });
+              }
+              return acc;
+            }, [] as Array<{ name: string; cross_count: number }>) || [];
 
-      //     return {
-      //       ...path,
-      //       matched_user:
-      //         path.user1_id === profile.user_id ? path.user2 : path.user1,
-      //       total_crosses: totalCrosses,
-      //       locations: [...new Set(locations)], // Remove duplicates
-      //       location_details: locationDetails,
-      //     };
-      //   })
-      // );
+          return {
+            ...path,
+            matched_user:
+              path.user1_id === profile.user_id ? path.user2 : path.user1,
+            total_crosses: totalCrosses,
+            locations: [...new Set(locations)], // Remove duplicates
+            location_details: locationDetails,
+          };
+        })
+      );
 
-      const crossedPaths = [
-        {
-          id: 1,
-          matched_user: {
-            first_name: "Sophie",
-            last_name: "Nguyen",
-            username: "sophie_n",
-          },
-          locations: ["Toronto", "Tim Hortons, Queen St"],
-          total_crosses: 3,
-          matched_at: "2025-10-12T14:20:00Z",
-        },
-        {
-          id: 2,
-          matched_user: {
-            first_name: "Ethan",
-            last_name: "Patel",
-            username: "ethan_p",
-          },
-          locations: ["Vancouver", "Stanley Park Café"],
-          total_crosses: 5,
-          matched_at: "2025-10-10T09:45:00Z",
-        },
-        {
-          id: 3,
-          matched_user: {
-            first_name: "Amelia",
-            last_name: "Johnson",
-            username: "ameliaj",
-          },
-          locations: ["Montreal", "Old Port Market"],
-          total_crosses: 2,
-          matched_at: "2025-10-15T18:30:00Z",
-        },
-      ];
-      const myUpcomingEvents = [
-        {
-          id: 1,
-          name: "Maple Leaf Gala Dinner",
-          date_time: "2025-10-20T19:30:00Z",
-          location_name: "Canoe Restaurant, Toronto",
-          creator_id: 101, // you’re the creator
-          rsvp_count: 18,
-        },
-        {
-          id: 2,
-          name: "Vancouver Sunset Social",
-          date_time: "2025-10-22T17:00:00Z",
-          location_name: "English Bay Beach, Vancouver",
-          creator_id: 102,
-          rsvp_count: 26,
-        },
-        {
-          id: 3,
-          name: "Montreal Midnight Coffee Circle",
-          date_time: "2025-10-25T23:00:00Z",
-          location_name: "Café Olimpico, Montreal",
-          creator_id: 101, // your user id
-          rsvp_count: 9,
-        },
-      ];
-
-      setCrossedPaths(crossedPaths);
+      setCrossedPaths(enrichedPaths);
       setDummyEvents(myUpcomingEvents);
     } catch (error: any) {
       console.error("Error in fetchCrossedPaths:", error);
@@ -420,18 +358,17 @@ const Dashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* {loading ? (
+                {loading ? (
                   <p className="text-muted-foreground">
                     Loading your events...
                   </p>
-                ) : dummyEvents.length === 0 ? (
+                ) : myUpcomingEvents.length === 0 ? (
                   <p className="text-muted-foreground">
                     No upcoming events found.
                   </p>
-                ) : ( */}
-                {
-                  // myUpcomingEvents.map((event) => (
-                  dummyEvents.map((event) => (
+                ) : (
+                  myUpcomingEvents.map((event) => (
+                    // dummyEvents.map((event) => (
                     <Link to={`/event/${event.id}/details`} key={event.id}>
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 py-4 px-2 bg-dark-surface rounded-lg hover:bg-muted transition-colors duration-200">
                         <div className="flex flex-col space-y-1 min-w-0">
@@ -477,8 +414,7 @@ const Dashboard = () => {
                       </div>
                     </Link>
                   ))
-                  // )
-                }
+                )}
               </CardContent>
             </Card>
 
@@ -505,63 +441,69 @@ const Dashboard = () => {
                 </CardDescription> */}
               </CardHeader>
               <CardContent className="space-y-4">
-                {crossedPaths.map((path) => (
-                  <div
-                    key={path.id}
-                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 py-2 bg-dark-surface rounded-lg"
-                  >
-                    <div className="flex items-center space-x-4 min-w-0">
-                      <div className="h-10 w-10 rounded-full flex items-center justify-center">
-                        <span className="font-semibold">
-                          {path.matched_user.first_name?.[0]}
-                          {path.matched_user.last_name?.[0]}
-                        </span>
-                      </div>
-                      <div className="min-w-0">
-                        <h3 className="font-semibold text-foreground truncate">
-                          {path.matched_user.first_name}{" "}
-                          {path.matched_user.last_name}
-                        </h3>
-                        <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-muted-foreground">
-                          <MapPin className="h-3 w-3" />
-                          {path.locations.length > 0 && (
-                            <span className="truncate max-w-[180px]">
-                              {path.locations.join(", ")}
-                            </span>
-                          )}
-                          <Badge
-                            variant="outline"
-                            className="text-xs font-medium"
-                          >
-                            {path.total_crosses}x
-                          </Badge>
-                          <span>•</span>
-                          <span>
-                            {new Date(path.matched_at).toLocaleDateString()}
+                {crossedPaths.length === 0 ? (
+                  <p className="text-muted-foreground">
+                    No crossed paths found.
+                  </p>
+                ) : (
+                  crossedPaths.map((path) => (
+                    <div
+                      key={path.id}
+                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 py-2 bg-dark-surface rounded-lg"
+                    >
+                      <div className="flex items-center space-x-4 min-w-0">
+                        <div className="h-10 w-10 rounded-full flex items-center justify-center">
+                          <span className="font-semibold">
+                            {path.matched_user.first_name?.[0]}
+                            {path.matched_user.last_name?.[0]}
                           </span>
                         </div>
+                        <div className="min-w-0">
+                          <h3 className="font-semibold text-foreground truncate">
+                            {path.matched_user.first_name}{" "}
+                            {path.matched_user.last_name}
+                          </h3>
+                          <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-muted-foreground">
+                            <MapPin className="h-3 w-3" />
+                            {path.locations.length > 0 && (
+                              <span className="truncate max-w-[180px]">
+                                {path.locations.join(", ")}
+                              </span>
+                            )}
+                            <Badge
+                              variant="outline"
+                              className="text-xs font-medium"
+                            >
+                              {path.total_crosses}x
+                            </Badge>
+                            <span>•</span>
+                            <span>
+                              {new Date(path.matched_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 sm:shrink-0">
+                        <Button
+                          onClick={() => handleInviteToDinner(path)}
+                          variant="outline"
+                          size="sm"
+                          className="border"
+                        >
+                          Invite
+                        </Button>
+                        <Link to={`/profile/${path.matched_user.username}`}>
+                          <Button
+                            // variant="outline"
+                            size="sm"
+                          >
+                            <User className="h-4 w-4" />
+                          </Button>
+                        </Link>
                       </div>
                     </div>
-                    <div className="flex gap-2 sm:shrink-0">
-                      <Button
-                        onClick={() => handleInviteToDinner(path)}
-                        variant="outline"
-                        size="sm"
-                        className="border"
-                      >
-                        Invite
-                      </Button>
-                      <Link to={`/profile/${path.matched_user.username}`}>
-                        <Button
-                          // variant="outline"
-                          size="sm"
-                        >
-                          <User className="h-4 w-4" />
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </CardContent>
             </Card>
           </div>

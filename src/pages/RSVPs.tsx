@@ -82,53 +82,6 @@ const RSVPs = () => {
     }
   }, [user]);
 
-  function generateDummyRsvp(id, name, location, status, host) {
-    const randomDaysOffset = host.length * 3;
-    return {
-      id,
-      status,
-      created_at: new Date(
-        Date.now() - randomDaysOffset * 86400000
-      ).toISOString(),
-      events: {
-        id: id,
-        name,
-        description: `Join us for ${name.toLowerCase()} at ${location}. Expect fun and good vibes.`,
-        date_time: new Date(
-          Date.now() - randomDaysOffset * 86400000
-        ).toISOString(),
-        location_name: location,
-        cover_photo_url: `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=1000&q=80`,
-        profiles: {
-          first_name: host.split(" ")[0],
-          last_name: host.split(" ")[1],
-        },
-      },
-    };
-  }
-  const filteredRsvps = [
-    generateDummyRsvp(
-      "1504674900247-0877df9cc836",
-      "Tech Leaders Summit",
-      "Ottawa Convention Centre",
-      "Confirmed",
-      "Emily Carter"
-    ),
-    generateDummyRsvp(
-      "1528605248644-14dd04022da1",
-      "Sushi Night Social",
-      "Downtown Vancouver",
-      "Pending",
-      "Lucas Wang"
-    ),
-    generateDummyRsvp(
-      "1551782450-a2132b4ba21d",
-      "Startup Mixer",
-      "Toronto Innovation Hub",
-      "Cancelled",
-      "Ava Patel"
-    ),
-  ];
   const fetchRSVPs = async () => {
     if (!user) return;
 
@@ -258,30 +211,30 @@ const RSVPs = () => {
   };
 
   // -----------------------DEVELOPMENT DUMMY COMMENTS, SHOULD BE UMCOMMENTED ON LIVE ---------------------------------------------------
-  // const filteredRsvps = rsvps.filter((rsvp) => {
-  //   const matchesSearch =
-  //     searchTerm === "" ||
-  //     rsvp.events.name
-  //       .toLowerCase()
-  //       .includes(searchTerm.toLowerCase().trim()) ||
-  //     rsvp.events.description.includes(searchTerm.toLowerCase().trim()) ||
-  //     rsvp.events.location_name
-  //       .trim()
-  //       ?.toLowerCase()
-  //       .includes(searchTerm.toLowerCase().trim());
+  const filteredRsvps = rsvps.filter((rsvp) => {
+    const matchesSearch =
+      searchTerm === "" ||
+      rsvp.events.name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase().trim()) ||
+      rsvp.events.description.includes(searchTerm.toLowerCase().trim()) ||
+      rsvp.events.location_name
+        .trim()
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase().trim());
 
-  //   const matchesStatus =
-  //     statusFilter === "all" || rsvp.status === statusFilter;
+    const matchesStatus =
+      statusFilter === "all" || rsvp.status === statusFilter;
 
-  //   const eventDate = new Date(rsvp.events.date_time);
-  //   const now = new Date();
-  //   const matchesDate =
-  //     dateFilter === "all" ||
-  //     (dateFilter === "upcoming" && eventDate > now) ||
-  //     (dateFilter === "past" && eventDate <= now);
+    const eventDate = new Date(rsvp.events.date_time);
+    const now = new Date();
+    const matchesDate =
+      dateFilter === "all" ||
+      (dateFilter === "upcoming" && eventDate > now) ||
+      (dateFilter === "past" && eventDate <= now);
 
-  //   return matchesSearch && matchesStatus && matchesDate;
-  // });
+    return matchesSearch && matchesStatus && matchesDate;
+  });
 
   const clearFilters = () => {
     setSearchTerm("");
@@ -594,7 +547,7 @@ const RSVPs = () => {
                                     className="w-40"
                                   >
                                     {/* DEVELOPER COMMENTS THIS. WILL BE UNCOMMENT IN LIVE */}
-                                    {/* {isCreator && (
+                                    {/* {isCreator && ( */}
                                     <DropdownMenuItem asChild>
                                       <Link
                                         to={`/event/${rsvp.events.id}/edit`}
@@ -605,7 +558,7 @@ const RSVPs = () => {
                                         <span>Edit Event</span>
                                       </Link>
                                     </DropdownMenuItem>
-                                    )} */}
+                                    {/* )} */}
 
                                     <DropdownMenuItem
                                       onClick={(e) => {
@@ -758,26 +711,6 @@ const RSVPs = () => {
                                           "Location not specified"}
                                       </span>
                                     </p>
-
-                                    {/* DEVELOPER COMMENTS THIS. WILL BE UNCOMMENT IN LIVE */}
-                                    {/* {isCreator && (
-                                        <Link to={`/event/${event.id}/edit`}>
-                                          <Button variant="outline" size="icon" className="">
-                                            <Edit className="h-4 w-4" />
-                                          </Button>
-                                        </Link>
-                                      )}
-
-                                      {isCreator && (
-                                        <Button
-                                          variant="outline"
-                                          size="icon"
-                                          onClick={() => deleteEvent && deleteEvent(event.id)}
-                                          className="text-red-500 hover:text-red-600"
-                                        >
-                                          <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                      )} */}
                                   </div>
                                 </div>
                               </div>

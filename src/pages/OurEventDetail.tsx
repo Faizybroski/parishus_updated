@@ -1,3 +1,4 @@
+import React, { useEffect, useRef, useState } from "react";
 import EventAnalyticsDashboard from "@/components/analytics/EventAnalytics";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -21,13 +22,13 @@ import { sendEventInvite } from "@/lib/sendInvite";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import {
-  ArrowLeft,
   Calendar,
   Clock,
   CreditCard,
   Upload,
   Edit,
   Heart,
+  ArrowLeft,
   ArrowRight,
   Loader2,
   MapPin,
@@ -37,14 +38,19 @@ import {
   UserCheck,
   Users,
 } from "lucide-react";
-import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { TikTokPlayer } from "@/components/tiktok/TikTokPlayer";
 import MapContainer from "@/components/map/MapContainer";
 import { Input } from "@/components/ui/input";
 import bcrypt from "bcryptjs";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Pagination, EffectFade } from "swiper/modules";
+import {
+  Autoplay,
+  Navigation,
+  Pagination,
+  EffectFade,
+  EffectCreative,
+} from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-fade";
 import "swiper/css/pagination";
@@ -142,6 +148,9 @@ const OurEventDetails = () => {
   const [password, setPassword] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
 
+  const prevRef = useRef<HTMLDivElement>(null);
+  const nextRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const fetchPayments = async () => {
       const getPaymentsByEventId = async (eventId) => {
@@ -203,17 +212,17 @@ const OurEventDetails = () => {
   }, [profile, eventId]);
 
   useEffect(() => {
-  const url = event?.cover_photo_url;
-  if (!url) return;
+    const url = event?.cover_photo_url;
+    if (!url) return;
 
-  setIsLoaded(false); // optional: reset when URL changes
+    setIsLoaded(false); // optional: reset when URL changes
 
-  const img = new Image();
-  img.crossOrigin = "anonymous";
-  img.src = url;
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = url;
 
-  img.onload = () => setIsLoaded(true);
-}, [event?.cover_photo_url]);
+    img.onload = () => setIsLoaded(true);
+  }, [event?.cover_photo_url]);
 
   const handleInterest = async () => {
     if (!profile) {
@@ -1173,7 +1182,7 @@ const OurEventDetails = () => {
             // Remove blur here since we want the background color to blur
           }}
         >
-          <div className="absolute inset-0 backdrop-blur-xl"></div>
+          <div className="absolute inset-0 backdrop-blur-lg"></div>
           <div
             className="absolute bottom-0 w-full"
             style={{
@@ -1242,41 +1251,32 @@ const OurEventDetails = () => {
             <Card className="space-y-2 bg-transparent border-none shadow-none">
               <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <CardTitle
-                        className={`flex flex-col justify-between bg-transparent`}
-                      >
-                        <div className="flex items-center space-x-2">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage
-                              src={event.profiles.profile_photo_url}
-                            />
-                            <AvatarFallback>
-                              {event.profiles.first_name[0]}
-                              {event.profiles.last_name[0]}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span className="text-lg text-black">
-                            {!isCreator && (
-                              <Link to={`/profile/${event.profiles.username}`}>
-                                {event.profiles.first_name}{" "}
-                                {event.profiles.last_name}
-                              </Link>
-                            )}
-                            {isCreator && (
-                              <Link to={`/profile`}>
-                                {event.profiles.first_name}{" "}
-                                {event.profiles.last_name}
-                              </Link>
-                            )}
-                          </span>
-                        </div>
-                      </CardTitle>
-                    </div>
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  {/* LEFT SIDE */}
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Avatar className="h-10 w-10 sm:h-12 sm:w-12">
+                      <AvatarImage src={event.profiles.profile_photo_url} />
+                      <AvatarFallback className="text-lg sm:text-xl">
+                        {event.profiles.first_name[0]}
+                        {event.profiles.last_name[0]}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <span className="text-base sm:text-lg md:text-xl font-medium truncate text-black">
+                      {!isCreator ? (
+                        <Link to={`/profile/${event.profiles.username}`}>
+                          {event.profiles.first_name} {event.profiles.last_name}
+                        </Link>
+                      ) : (
+                        <Link to="/profile">
+                          {event.profiles.first_name} {event.profiles.last_name}
+                        </Link>
+                      )}
+                    </span>
                   </div>
-                  <div className="flex space-x-2">
+
+                  {/* RIGHT SIDE */}
+                  <div className="flex items-center space-x-2 flex-shrink-0">
                     {!isCreator && isBeforeDeadline && (
                       <Button
                         onClick={handleInterest}
@@ -1293,7 +1293,7 @@ const OurEventDetails = () => {
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                           <Heart
-                            className={`h-5 w-5 transition-all duration-200 ${
+                            className={`h-5 w-5 transition-all duration-200${
                               isInterested
                                 ? "fill-red-500 text-red-500"
                                 : "fill-background text-black"
@@ -1302,14 +1302,15 @@ const OurEventDetails = () => {
                         )}
                       </Button>
                     )}
+
                     {!event.is_paid && (
                       <Button
                         variant="outline"
-                        size="sm"
-                        onClick={shareEvent}
+                        size="icon"
                         className="bg-transparent text-black hover:bg-transparent border-none"
+                        onClick={shareEvent}
                       >
-                        <Share2 className="h-4 w-4" />
+                        <Share2 className="h-5 w-5" />
                       </Button>
                     )}
 
@@ -1317,30 +1318,29 @@ const OurEventDetails = () => {
                       <Link to={`/event/${event.id}/edit`}>
                         <Button
                           variant="outline"
-                          size="sm"
+                          size="icon"
                           className="bg-transparent text-black hover:bg-transparent border-none"
                         >
-                          <Edit className="h-4 w-4" />
+                          <Edit className="h-5 w-5" />
                         </Button>
                       </Link>
                     )}
+
                     <Button
                       variant="outline"
-                      size="sm"
+                      size="icon"
                       className="bg-transparent text-black hover:bg-transparent border-none"
                       onClick={handleCopy}
                     >
-                      <Upload className="h-4 w-4" />
+                      <Upload className="h-5 w-5" />
                     </Button>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div
-                  style={{
-                    fontFamily: event.title_font,
-                  }}
-                  className={`font-${event.title_font} my-5 border-none ring-0 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none sm:text-[4rem] xsm:text-[3rem] md:text-[3rem] lg:text-[3rem] h-[5rem]`}
+                  style={{ fontFamily: event.title_font }}
+                  className="my-5 leading-tight text-[2.2rem] xsm:text-[2.8rem] sm:text-[2.5rem] md:text-[3rem] lg:text-[3rem] xl:text-[4rem]"
                 >
                   {event.name}
                 </div>
@@ -1356,16 +1356,18 @@ const OurEventDetails = () => {
                     {event.location_name}
                   </Link>
                 </div>
-                <div className="flex items-center text-[1.2rem] font-semibold">
-                  {format(eventDate, "EE, MMM d")}
-                  {" at "}
-                  {format(eventDate, "h:mm a")}
+                <div className="flex flex-wrap items-center gap-2 text-[1.1rem] sm:text-[1.2rem] font-semibold leading-snug">
+                  <span>
+                    {format(eventDate, "EE, MMM d")} at{" "}
+                    {format(eventDate, "h:mm a")}
+                  </span>
                   {event.eventEndDateTime && (
                     <>
                       <ArrowRight className="w-4 h-4" />
-                      {format(eventEndDate, "EE, MMM d")}
-                      {" at "}
-                      {format(eventEndDate, "h:mm a")}
+                      <span>
+                        {format(eventEndDate, "EE, MMM d")} at{" "}
+                        {format(eventEndDate, "h:mm a")}
+                      </span>
                     </>
                   )}
                 </div>
@@ -1629,35 +1631,55 @@ const OurEventDetails = () => {
                 <div className="border-t border-gray-300 mx-6" />
                 <CardHeader className="pt-1" />
                 <CardContent>
-                  <div className="w-full">
+                  <div className="relative w-full max-w-sm mx-auto">
                     <Swiper
-                      modules={[Autoplay, Pagination, EffectFade]}
+                      modules={[Navigation, EffectFade, Pagination]}
                       effect="fade"
+                      speed={700}
                       fadeEffect={{ crossFade: true }}
                       slidesPerView={1}
                       loop={true}
-                      centeredSlides={true}
-                      autoplay={{
-                        delay: 3000,
-                        disableOnInteraction: false,
+                      allowTouchMove={false} // disables swipe/drag
+                      navigation={{
+                        prevEl: prevRef.current,
+                        nextEl: nextRef.current,
                       }}
                       pagination={{
                         type: "fraction",
                       }}
+                      onBeforeInit={(swiper) => {
+                        if (typeof swiper.params.navigation !== "boolean") {
+                          swiper.params.navigation.prevEl = prevRef.current;
+                          swiper.params.navigation.nextEl = nextRef.current;
+                        }
+                      }}
                       className="w-full"
                     >
                       {event.imageGalleryLinks.map((img, i) => (
-                        <SwiperSlide key={i}>
-                          <div className="relative aspect-[4/5] mx-auto w-full max-w-sm rounded-md overflow-hidden bg-secondary">
-                            <img
-                              src={img}
-                              alt={`image ${i}`}
-                              className="absolute inset-0 w-full h-full object-cover rounded-md transition-opacity duration-700"
-                            />
-                          </div>
+                        <SwiperSlide key={i} className="relative w-full h-full">
+                          <img
+                            src={img}
+                            alt={`slide-${i}`}
+                            className="w-full h-full object-cover rounded-md transition-opacity duration-700"
+                          />
                         </SwiperSlide>
                       ))}
                     </Swiper>
+
+                    {/* Custom buttons */}
+                    <div
+                      ref={prevRef}
+                      className="absolute top-1/2 left-2 -translate-y-1/2 z-20 cursor-pointer text-black bg-white/20 backdrop-blur-md p-2 lg:p-3 md:p-3 sm:p-3 rounded-full hover:bg-white/30 transition-colors duration-200 flex items-center justify-center shadow-md"
+                    >
+                      <ArrowLeft className="w-3 h-3 lg:w-5 lg:h-5 md:w-4 md:h-4" />
+                    </div>
+
+                    <div
+                      ref={nextRef}
+                      className="absolute top-1/2 right-2 -translate-y-1/2 z-20 cursor-pointer text-black bg-white/20 backdrop-blur-md p-2 lg:p-3 md:p-3 sm:p-3 rounded-full hover:bg-white/30 transition-colors duration-200 flex items-center justify-center shadow-md"
+                    >
+                      <ArrowRight className="w-3 h-3 lg:w-5 lg:h-5 md:w-4 md:h-4" />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
