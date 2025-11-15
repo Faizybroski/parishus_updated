@@ -5,6 +5,7 @@ import { useRestaurants } from "@/hooks/useRestaurants";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronLeft, CreditCard, Loader2 } from "lucide-react";
@@ -114,29 +115,28 @@ const RSVPDetails = () => {
     if (!eventId) return;
     try {
       const { data, error } = await supabase
-        .from("dummyevents")
+        .from("events")
         .select(
           `
-              *
-            `
+          *,
+          rsvps (
+            id,
+            user_id,
+            status,
+            created_at,
+            profiles:user_id (
+              first_name,
+              last_name,
+              profile_photo_url,
+              email
+            )
+          )
+        `
         )
         .eq("id", eventId)
         .single();
       if (error) throw error;
       setEvent(data);
-      // ,
-      //         rsvps (
-      //           id,
-      //           user_id,
-      //           status,
-      //           created_at,
-      //           profiles:user_id (
-      //             first_name,
-      //             last_name,
-      //             profile_photo_url,
-      //             email
-      //           )
-      //         )
     } catch {
       toast({
         title: "Error",
@@ -710,7 +710,7 @@ const RSVPDetails = () => {
           {!isPastEvent && isBeforeDeadline && (
             <h2 className="text-xl font-semibold">
               RSVP for <span className="text-[#c4b0a2]">{event.name}</span> till{" "}
-              <span className="text-primary">
+              <span className="text-[#c4b0a2]">
                 {format(rsvpDeadline, "eeee")}
               </span>
               !
@@ -858,7 +858,7 @@ const RSVPDetails = () => {
                       handlePaidRSVP();
                     }}
                     disabled={isPaying}
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-muted-foreground flex items-center justify-center"
+                    className="w-full bg-primary hover:bg-secondary text-muted-foreground flex items-center justify-center"
                   >
                     {isPaying ? (
                       <>
@@ -894,11 +894,7 @@ const RSVPDetails = () => {
                 // If event is FREE
                 !event.event_fee || event.event_fee == 0 ? (
                   hasRSVP ? (
-                    <Button
-                      onClick={handleRSVP}
-                      className="w-full"
-                      style={{ backgroundColor: event.accent_color }}
-                    >
+                    <Button onClick={handleRSVP} className="w-full">
                       <UserCheck className="h-4 w-4 mr-2" />
                       Going - Cancel RSVP
                     </Button>
@@ -912,7 +908,6 @@ const RSVPDetails = () => {
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="Enter password to RSVP"
                           className="w-full mb-2"
-                          style={{ backgroundColor: event.accent_bg }}
                         />
                       )}
                       <Button
@@ -928,7 +923,6 @@ const RSVPDetails = () => {
                           handleRSVP();
                         }}
                         className="w-full"
-                        style={{ backgroundColor: event.accent_color }}
                       >
                         <Heart className="h-4 w-4 mr-2" />
                         RSVP to Event
@@ -937,11 +931,7 @@ const RSVPDetails = () => {
                   )
                 ) : // If event is PAID
                 hasRSVP ? (
-                  <Button
-                    onClick={handleRSVP}
-                    className="w-full"
-                    style={{ backgroundColor: event.accent_color }}
-                  >
+                  <Button onClick={handleRSVP} className="w-full">
                     <UserCheck className="h-4 w-4 mr-2" />
                     Going - Cancel RSVP
                   </Button>
@@ -955,7 +945,6 @@ const RSVPDetails = () => {
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Enter password to RSVP"
                         className="w-full mb-2"
-                        style={{ backgroundColor: event.accent_bg }}
                       />
                     )}
 
@@ -985,7 +974,6 @@ const RSVPDetails = () => {
                       }}
                       disabled={isPaying}
                       className="w-full text-white flex items-center justify-center"
-                      style={{ backgroundColor: event.accent_color }}
                     >
                       {isPaying ? (
                         <>
@@ -1005,7 +993,6 @@ const RSVPDetails = () => {
                 <Button
                   disabled
                   className="w-full bg-gray-400 text-white cursor-not-allowed"
-                  style={{ backgroundColor: event.accent_color }}
                 >
                   <Clock className="h-4 w-4 mr-2" />
                   RSVP Closed
