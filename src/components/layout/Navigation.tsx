@@ -68,7 +68,7 @@ const Navigation = () => {
   return (
     // <nav className="bg-background border-b z-10 relative border-border">
     <nav className="fixed top-0 left-0 w-full z-30">
-      <div className="backdrop-blur-sm  border-b border-white/20">
+      <div className="backdrop-blur-2xl border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             {/* Logo */}
@@ -97,7 +97,7 @@ const Navigation = () => {
             ) : (
               <>
                 {/* Desktop Menu */}
-                <div className="hidden nav:flex items-center space-x-6">
+                <div className="hidden nav:flex items-center space-x-6 font-script">
                   {navItems.map((item) => {
                     const Icon = item.icon;
                     const isActive = location.pathname === item.path;
@@ -108,11 +108,11 @@ const Navigation = () => {
                         className="flex items-center"
                       >
                         <Button
-                          variant="ghost"
-                          className={`flex items-center group space-x-1 ${
+                          variant="outline"
+                          className={`border-none bg-transparent hover:bg-transparent flex items-center group space-x-1 ${
                             isActive
-                              ? ""
-                              : "text-muted-foreground hover:text-foreground"
+                              ? "text-black"
+                              : "text-muted-foreground hover:text-primary"
                           }`}
                         >
                           <Icon className="h-5 w-5 icon-animate" />
@@ -124,11 +124,11 @@ const Navigation = () => {
                 </div>
 
                 {/* Right Side */}
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2 sm:space-x-4">
                   <Button
                     ref={searchButtonRef}
-                    className="group"
-                    variant="ghost"
+                    className="group border-none bg-transparent hover:bg-transparent hover:text-primary text-muted-foreground"
+                    variant="outline"
                     size="icon"
                     onClick={() => setSearchVisible((prev) => !prev)}
                     aria-label="Search"
@@ -196,8 +196,8 @@ const Navigation = () => {
                   {/* Hamburger Icon */}
                   <div className="nav:hidden">
                     <Button
-                      className="group"
-                      variant="ghost"
+                      className="group border-none bg-transparent hover:bg-transparent hover:text-primary text-muted-foreground"
+                      variant="outline"
                       size="icon"
                       onClick={() => setIsOpen(!isOpen)}
                     >
@@ -215,7 +215,7 @@ const Navigation = () => {
 
           {/* Mobile Menu */}
           {isOpen && (
-            <div className="nav:hidden mt-2 space-y-1">
+            <div className="nav:hidden my-2 space-y-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
@@ -230,6 +230,7 @@ const Navigation = () => {
                       onClick={() => {
                         setIsOpen(false);
                       }}
+                      variant="outline"
                       className={`w-full flex justify-start items-center px-4 py-2 text-left ${
                         isActive
                           ? ""

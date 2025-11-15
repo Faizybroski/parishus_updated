@@ -150,7 +150,7 @@ const NotificationCenter = () => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="sm" className="relative group">
+        <Button variant="outline" size="sm" className="relative group border-none bg-transparent hover:bg-transparent hover:text-primary text-muted-foreground">
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
             <Badge 
@@ -164,7 +164,10 @@ const NotificationCenter = () => {
       <SheetContent className="w-[370px] sm:w-[540px]" id='notificationSheet'>
         <SheetHeader>
           <SheetTitle className="flex items-center justify-between">
+            <span className="font-script">
+
             Notifications
+            </span>
             {unreadCount > 0 && (
               <Button
                 variant="ghost"

@@ -510,7 +510,7 @@ const Dashboard = () => {
 
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="shadow-card border-border cursor-pointer hover:shadow-glow group hover:bg-secondary transition-all duration-300 hover:shadow-glow">
+            <Card className="shadow-card border-border cursor-pointer hover:shadow-glow group hover:bg-primary transition-all duration-300 hover:shadow-glow">
               <Link to={`/create-event/`}>
                 <CardContent className="p-6 text-center">
                   <div className="h-12 w-12 rounded-full flex items-center justify-center mx-auto mb-2">
@@ -524,7 +524,7 @@ const Dashboard = () => {
               </Link>
             </Card>
 
-            <Card className="shadow-card border-border cursor-pointer hover:shadow-glow hover:bg-secondary transition-all duration-500 hover:shadow-glow group">
+            <Card className="shadow-card border-border cursor-pointer hover:shadow-glow hover:bg-primary transition-all duration-500 hover:shadow-glow group">
               <Link to={`/explore`}>
                 <CardContent className="p-6 text-center">
                   <div className="h-12 w-12 bg rounded-full flex items-center justify-center mx-auto mb-2">
@@ -538,7 +538,7 @@ const Dashboard = () => {
               </Link>
             </Card>
 
-            <Card className="shadow-card border-border cursor-pointer hover:shadow-glow hover:bg-secondary transition-all duration-500 hover:shadow-glow group">
+            <Card className="shadow-card border-border cursor-pointer hover:shadow-glow hover:bg-primary transition-all duration-500 hover:shadow-glow group">
               <Link to={`/feedback/`}>
                 <CardContent className="p-6 text-center">
                   <div className="h-12 w-12 bg-mystery-purple/20 rounded-full flex items-center justify-center mx-auto mb-2">

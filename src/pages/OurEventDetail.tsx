@@ -1251,7 +1251,7 @@ const OurEventDetails = () => {
             <Card className="space-y-2 bg-transparent border-none shadow-none">
               <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
-                <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="flex flex-wrap items-center justify-between gap-y-1.5 lg:gap-y-2">
                   {/* LEFT SIDE */}
                   <div className="flex items-center gap-3 min-w-0">
                     <Avatar className="h-10 w-10 sm:h-12 sm:w-12">
@@ -1281,29 +1281,36 @@ const OurEventDetails = () => {
                       <Button
                         onClick={handleInterest}
                         disabled={loading}
-                        variant="ghost"
+                        variant="outline"
                         size="icon"
-                        className={`p-2 rounded-full border transition-colors duration-200 ${
-                          isInterested
-                            ? "bg-red-500/10 border-red-500 text-red-600 hover:bg-red-500/20"
-                            : "bg-background border-foreground/20 hover:bg-muted"
-                        }`}
+                        className="p-2 bg-transparent hover:bg-transparent border-none transition-colors duration-200"
                       >
                         {loading ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                           <Heart
-                            className={`h-5 w-5 transition-all duration-200${
+                            className={`h-5 w-5 transition-all duration-200 ${
                               isInterested
                                 ? "fill-red-500 text-red-500"
-                                : "fill-background text-black"
+                                : "fill-transparent text-black"
                             }`}
                           />
                         )}
                       </Button>
                     )}
 
-                    {!event.is_paid && (
+                    {!event.is_paid && !isCreator && (
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="bg-transparent text-black hover:bg-transparent border-none"
+                        onClick={shareEvent}
+                      >
+                        <Share2 className="h-5 w-5" />
+                      </Button>
+                    )}
+
+                    {isCreator && (
                       <Button
                         variant="outline"
                         size="icon"
@@ -1340,7 +1347,7 @@ const OurEventDetails = () => {
               <CardContent className="space-y-4">
                 <div
                   style={{ fontFamily: event.title_font }}
-                  className="my-5 leading-tight text-[2.2rem] xsm:text-[2.8rem] sm:text-[2.5rem] md:text-[3rem] lg:text-[3rem] xl:text-[4rem]"
+                  className="mb-5 leading-tight text-[2.2rem] xsm:text-[2.8rem] sm:text-[2.5rem] md:text-[3rem] lg:text-[3rem] xl:text-[4rem]"
                 >
                   {event.name}
                 </div>

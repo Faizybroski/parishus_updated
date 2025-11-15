@@ -915,13 +915,13 @@ const [showCityList, setShowCityList] = useState(false);
     );
   };
 
-  // if (loading || profileLoading) {
-  //   return (
-  //     <div className="min-h-screen pt-16 flex items-center justify-center bg-background">
-  //       <LoaderText text="Parish" />
-  //     </div>
-  //   );
-  // }
+  if (loading || profileLoading) {
+    return (
+      <div className="min-h-screen pt-16 flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
+      </div>
+    );
+  }
 
   return (
     // <div className="min-h-screen bg-background text-white pt-16">
