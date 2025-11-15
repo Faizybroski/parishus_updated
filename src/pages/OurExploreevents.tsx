@@ -79,7 +79,7 @@ const OurExploreEvents = () => {
   const [rsvps, setRsvps] = useState([]);
   const [attendeeCounts, setAttendeeCounts] = useState({});
   const [eventsLoading, setEventsLoading] = useState(false);
-const [showCityList, setShowCityList] = useState(false);
+  const [showCityList, setShowCityList] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -1129,7 +1129,7 @@ const [showCityList, setShowCityList] = useState(false);
                       </p>
                       <Link to={`/rsvp/${event.id}/details`}>
                         <button className="bg-white text-black px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold hover:bg-gray-200 transition-all duration-200">
-                          Get Tickets
+                          RSVP
                         </button>
                       </Link>
                     </div>
