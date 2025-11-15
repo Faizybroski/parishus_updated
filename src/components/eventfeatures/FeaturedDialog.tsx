@@ -16,8 +16,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
 export default function FeatureDialog({
-  style,
-  style_button,
   open,
   onClose,
   onChange,
@@ -190,10 +188,7 @@ export default function FeatureDialog({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent
-        className="max-h-[90vh] overflow-y-auto sm:max-w-[500px]"
-        style={style}
-      >
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[500px] backdrop-blur-md">
         <DialogHeader>
           <DialogTitle>
             {isEditMode ? "Edit Feature" : "Add Feature"}
@@ -208,10 +203,7 @@ export default function FeatureDialog({
               onClick={() => fileInputRef.current?.click()}
             >
               {uploading ? (
-                <div
-                  className="flex items-center justify-center w-full h-full text-gray-500"
-                  style={style}
-                >
+                <div className="flex items-center justify-center w-full h-full text-gray-500">
                   <Loader2 className="h-8 w-8 animate-spin" />
                 </div>
               ) : feature.image ? (
@@ -221,10 +213,7 @@ export default function FeatureDialog({
                   className="object-cover w-full h-full rounded-full"
                 />
               ) : (
-                <div
-                  className="flex items-center justify-center w-full h-full text-gray-500 bg-primary"
-                  style={style}
-                >
+                <div className="flex items-center rounded-full justify-center w-full h-full text-gray-500 bg-secondary border border-dashed border-muted-foreground">
                   <Image className="h-10 w-10 opacity-70" />
                 </div>
               )}
@@ -247,7 +236,7 @@ export default function FeatureDialog({
               value={feature.title}
               onChange={handleFieldChange}
               placeholder="e.g., Live Concert"
-              style={style}
+              className="focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:outline-none"
             />
           </div>
 
@@ -260,7 +249,7 @@ export default function FeatureDialog({
               value={feature.url}
               onChange={handleFieldChange}
               placeholder="https://example.com"
-              style={style}
+              className="focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:outline-none"
             />
           </div>
 
@@ -270,50 +259,54 @@ export default function FeatureDialog({
             <Switch
               checked={showDates}
               onCheckedChange={setShowDates}
-              style={style_button}
+              // style={style_button}
             />
           </div>
 
           {showDates && (
             <div className="grid grid-cols-2 gap-4 mt-2">
               <div className="space-y-1">
-                <Label>Start Date</Label>
+                <Label htmlFor="start_D">Start Date</Label>
                 <Input
+                  id="start_D"
                   type="date"
                   name="start_date"
                   value={feature.start_date}
                   onChange={handleFieldChange}
-                  style={style}
+                  className="focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:outline-none"
                 />
               </div>
               <div className="space-y-1">
-                <Label>Start Time</Label>
+                <Label htmlFor="start_T">Start Time</Label>
                 <Input
+                id="start_T"
                   type="time"
                   name="start_time"
                   value={feature.start_time}
                   onChange={handleFieldChange}
-                  style={style}
+                  className="focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:outline-none"
                 />
               </div>
               <div className="space-y-1">
-                <Label>End Date</Label>
+                <Label htmlFor="end_D">End Date</Label>
                 <Input
+                id="end_D"
                   type="date"
                   name="end_date"
                   value={feature.end_date}
                   onChange={handleFieldChange}
-                  style={style}
+                  className="focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:outline-none"
                 />
               </div>
               <div className="space-y-1">
-                <Label>End Time</Label>
+                <Label htmlFor="end_T">End Time</Label>
                 <Input
+                id="end_T"
                   type="time"
                   name="end_time"
                   value={feature.end_time}
                   onChange={handleFieldChange}
-                  style={style}
+                  className="focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:outline-none"
                 />
               </div>
             </div>
@@ -329,7 +322,7 @@ export default function FeatureDialog({
               value={feature.description}
               onChange={handleFieldChange}
               placeholder="Write a short description..."
-              style={style}
+              className="focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:outline-none"
             />
           </div>
         </div>
@@ -341,7 +334,7 @@ export default function FeatureDialog({
           <Button
             onClick={handleFeatureSave}
             disabled={uploading}
-            style={style_button}
+            // style={style_button}
           >
             {isEditMode ? "Save Changes" : "Add Feature"}
           </Button>

@@ -633,14 +633,15 @@ const AdminCreateEvent = () => {
 
   return (
     <div
-      className="min-h-screen bg-background font-serif"
+      className="min-h-screen bg-background"
       style={
-        {
-          "--accent-bg": lightenColor(selectedColor),
-          background:
-            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-          transition: "background 0.5s ease",
-        } as React.CSSProperties
+        selectedColor
+          ? ({
+              "--accent-bg": lightenColor(selectedBgColor),
+              background: "var(--accent-bg)",
+              transition: "background 0.5s ease",
+            } as React.CSSProperties)
+          : ({ transition: "background 0.5s ease" } as React.CSSProperties)
       }
     >
       {/* <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -2205,22 +2206,6 @@ const AdminCreateEvent = () => {
           </div>
         </div>
         <FeatureDialog
-          style={
-            {
-              "--accent-bg": lightenColor(selectedColor),
-              background:
-                "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-              transition: "background 0.5s ease",
-            } as React.CSSProperties
-          }
-          style_button={
-            selectedColor
-              ? {
-                  backgroundColor: selectedColor,
-                  borderColor: selectedColor,
-                }
-              : {}
-          }
           open={showFeatures}
           onClose={() => setShowFeatures(false)}
           onChange={handleInputChange}
@@ -2228,30 +2213,21 @@ const AdminCreateEvent = () => {
           editFeatureIndex={editFeatureIndex}
         />
         <RecurringEventDialog
-          style={
-            {
-              "--accent-bg": lightenColor(selectedColor),
-              background:
-                "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-              transition: "background 0.5s ease",
-            } as React.CSSProperties
-          }
-          style_button={
-            selectedColor
-              ? {
-                  backgroundColor: selectedColor,
-                  borderColor: selectedColor,
-                }
-              : {}
-          }
           open={showRecurringDialog}
           onClose={() => {
             // when dialog closes, keep it "Yes"
             setShowRecurringDialog(false);
             handleInputChange("recurring", true);
           }}
-          start_date={formData.start_date}
-          start_time={formData.start_time}
+          // start_date={formData.start_date}
+          // start_time={formData.start_time}
+          start_time={
+            formData.start_date && formData.start_time
+              ? new Date(
+                  `${formData.start_date}T${formData.start_time}`
+                ).toISOString()
+              : null
+          }
           onSubmit={(data) => {
             console.log("Recurrence Data:", data);
             handleInputChange("recurrenceDates", data);

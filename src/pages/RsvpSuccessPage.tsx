@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 export default function RsvpSuccessPage() {
   const navigate = useNavigate();
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-5">
+    <div className="min-h-screen flex items-center justify-center px-4 py-5 pt-16">
       <div className="max-w-sm w-full p-6 rounded-3xl shadow-lg border border flex flex-col items-center space-y-6">
         <h1
           className="text-center mt-4 font-script"

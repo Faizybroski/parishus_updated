@@ -27,16 +27,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { InfoTooltip } from "@/components/tooltip/InfoTooltip";
 import {
   Calendar,
   Clock,
   MapPin,
+  Repeat2,
   Eye,
   Edit2,
+  Salad,
+  ChefHat,
+  SlidersHorizontal,
+  UserCheck,
+  Send,
+  Mail,
+  Settings2,
+  Lock,
+  Settings,
+  Shield,
+  Tags,
+  Hash,
+  Bookmark,
+  Tag,
+  Sparkles,
   Trash2,
+  UtensilsCrossed,
   PlusCircle,
   EyeOff,
   Upload,
+  UsersRound,
   Camera,
   Plus,
   X,
@@ -76,8 +95,9 @@ const EventEdit = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    start_date: "",
-    start_time: "",
+    // start_time: "",
+    // start_date: "",
+    start_datetime: "",
     location_name: "",
     location_address: "",
     location_lat: "",
@@ -86,8 +106,9 @@ const EventEdit = () => {
     max_attendees: 10,
     dining_style: "",
     dietary_theme: "",
-    rsvp_deadline_date: "",
-    rsvp_deadline_time: "",
+    // rsvp_deadline_date: "",
+    // rsvp_deadline_time: "",
+    rsvp_deadline: "",
     tags: [] as string[],
     is_mystery_dinner: false,
     guest_invitation_type: "",
@@ -106,8 +127,10 @@ const EventEdit = () => {
     eventFeatures: [],
     recurring: false,
     recurrenceDates: [],
-    end_date: "",
-    end_time: "",
+    // end_date: "",
+    // end_time: "",
+    end_datetime: "",
+    bg_color: false,
   });
   const [newTag, setNewTag] = useState("");
   const { user, loading: authLoading } = useAuth();
@@ -123,21 +146,31 @@ const EventEdit = () => {
   const [showFeatures, setShowFeatures] = useState(false);
   const [editFeatureIndex, setEditFeatureIndex] = useState(null);
   const [colors, setColors] = useState([]);
-  const [selectedFont, setSelectedFont] = useState("");
+  const [selectedFont, setSelectedFont] = useState("Dancing Script");
   const [selectedColor, setSelectedColor] = useState("#E4D7CD");
   const [selectedBgColor, setSelectedBgColor] = useState("#F8F6F1");
   const [showRecurringDialog, setShowRecurringDialog] = useState(false);
   const [mode, setMode] = useState<"sell" | "rsvp">("sell");
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    if (!formData.flyer_url) return;
+    const url = formData.flyer_url;
+    if (!url) return;
+    // Start with not loaded
+    setIsLoaded(false);
     const img = new Image();
-    img.crossOrigin = "Anonymous";
-    img.src = formData.flyer_url;
+    img.crossOrigin = "anonymous";
+    img.src = url;
+    const timer = setTimeout(() => {
+      // Fallback animation even if image loads slowly
+      setIsLoaded(true);
+    }, 200);
     img.onload = () => {
       const colorThief = new ColorThief();
       const palette = colorThief.getPalette(img, 10);
       setColors(palette.map(([r, g, b]) => `rgb(${r},${g},${b})`));
+      clearTimeout(timer);
+      setIsLoaded(true);
     };
   }, [formData.flyer_url]);
 
@@ -203,8 +236,9 @@ const EventEdit = () => {
       setFormData({
         name: data.name.trim() || "",
         description: data.description.trim() || "",
-        start_date: eventDate.toISOString().split("T")[0],
-        start_time: eventDate.toTimeString().slice(0, 5),
+        // start_date: eventDate.toISOString().split("T")[0],
+        // start_time: eventDate.toTimeString().slice(0, 5),
+        start_datetime: eventDate.toISOString().slice(0, 16),
         location_name: data.location_name.trim() || "",
         location_address: data.location_address.trim() || "",
         location_lat: data.location_lat || "",
@@ -216,11 +250,14 @@ const EventEdit = () => {
         guest_invitation_type: data.guest_invitation_type,
         is_paid: data.is_paid,
         event_fee: data.event_fee,
-        rsvp_deadline_date: rsvpDeadline
-          ? rsvpDeadline.toISOString().split("T")[0]
-          : "",
-        rsvp_deadline_time: rsvpDeadline
-          ? rsvpDeadline.toTimeString().slice(0, 5)
+        // rsvp_deadline_date: rsvpDeadline
+        //   ? rsvpDeadline.toISOString().split("T")[0]
+        //   : "",
+        // rsvp_deadline_time: rsvpDeadline
+        //   ? rsvpDeadline.toTimeString().slice(0, 5)
+        //   : "",
+        rsvp_deadline: rsvpDeadline
+          ? rsvpDeadline.toISOString().slice(0, 16)
           : "",
         tags: data.tags || [],
         flyer_url: data.cover_photo_url || "",
@@ -232,18 +269,28 @@ const EventEdit = () => {
         eventFeatures: data.eventFeatures || [],
         recurring: data.recurrence || false,
         recurrenceDates: data.recurrence_dates || [],
-        end_date: eventEndDateTime
-          ? eventEndDateTime.toISOString().split("T")[0]
-          : "",
-        end_time: eventEndDateTime
-          ? eventEndDateTime.toTimeString().slice(0, 5)
+        // end_date: eventEndDateTime
+        //   ? eventEndDateTime.toISOString().split("T")[0]
+        //   : "",
+        // end_time: eventEndDateTime
+        //   ? eventEndDateTime.toTimeString().slice(0, 5)
+        //   : "",
+        end_datetime: eventEndDateTime
+          ? eventEndDateTime.toISOString().slice(0, 16)
           : "",
         tiktok: data.tiktok || false,
         tiktokLink: data.tiktok_Link || "",
         guestList: data.guest_list || true,
         features: data.features || false,
         eventFeatures: data.event_features || [],
+        bg_color: data.bg_color,
       });
+
+      console.log(
+        formData.start_datetime,
+        formData.end_datetime,
+        formData.rsvp_deadline
+      );
     } catch (error) {
       console.error("Error fetching event:", error);
       toast({
@@ -303,7 +350,11 @@ const EventEdit = () => {
   const handleColorChange = (color: string) => {
     setSelectedColor(color);
     const bgColor = lightenColor(color, 30);
-    setSelectedBgColor(bgColor);
+    if (formData.bg_color) {
+      setSelectedBgColor("#F8F6F1");
+    } else {
+      setSelectedBgColor(bgColor);
+    }
 
     handleInputChange("accent_color", color);
     handleInputChange("accent_bg", bgColor);
@@ -410,19 +461,28 @@ const EventEdit = () => {
       return;
     }
 
-    if (!formData.start_date) {
-      toast({
-        title: "Validation Error",
-        description: "Please select event start date.",
-        variant: "destructive",
-      });
-      return;
-    }
+    // if (!formData.start_date) {
+    //   toast({
+    //     title: "Validation Error",
+    //     description: "Please select event start date.",
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
 
-    if (!formData.start_time) {
+    // if (!formData.start_time) {
+    //   toast({
+    //     title: "Validation Error",
+    //     description: "Please select event start time.",
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
+
+    if (!formData.start_datetime) {
       toast({
         title: "Validation Error",
-        description: "Please select event start time.",
+        description: "Please select event start date and time.",
         variant: "destructive",
       });
       return;
@@ -437,9 +497,18 @@ const EventEdit = () => {
       return;
     }
 
-    if (
-      new Date(`${formData.start_date}T${formData.start_time}`) < new Date()
-    ) {
+    // if (
+    //   new Date(`${formData.start_date}T${formData.start_time}`) < new Date()
+    // ) {
+    //   toast({
+    //     title: "Validation Error",
+    //     description: "Event start date and time must be in the future.",
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
+
+    if (new Date(`${formData.start_datetime}`) < new Date()) {
       toast({
         title: "Validation Error",
         description: "Event start date and time must be in the future.",
@@ -563,26 +632,55 @@ const EventEdit = () => {
         passwordHashed = await bcrypt.hash(trimmedPassword, salt);
       }
 
-      const eventDateTime = new Date(
-        `${formData.start_date}T${formData.start_time}`
-      );
+      // const eventDateTime = new Date(
+      //   `${formData.start_date}T${formData.start_time}`
+      // );
+
+      const eventDateTime = new Date(formData.start_datetime);
 
       let eventEndDateTime: Date | null = null;
 
-      if (formData.end_date || formData.end_time) {
-        if (!formData.end_date || !formData.end_time) {
-          toast({
-            title: "Invalid end time",
-            description: "Please provide both end date and end time.",
-            variant: "destructive",
-          });
-          return;
-        }
+      // if (formData.end_date || formData.end_time) {
+      //   if (!formData.end_date || !formData.end_time) {
+      //     toast({
+      //       title: "Invalid end time",
+      //       description: "Please provide both end date and end time.",
+      //       variant: "destructive",
+      //     });
+      //     return;
+      //   }
 
-        const endDateTime = new Date(
-          `${formData.end_date}T${formData.end_time}`
-        );
+      //   const endDateTime = new Date(
+      //     `${formData.end_date}T${formData.end_time}`
+      //   );
 
+      //   if (isNaN(endDateTime.getTime())) {
+      //     toast({
+      //       title: "Invalid date or time format",
+      //       description: "Please ensure the end date and time are valid.",
+      //       variant: "destructive",
+      //     });
+      //     return;
+      //   }
+
+      //   const now = new Date();
+      //   if (endDateTime < now) {
+      //     toast({
+      //       title: "End time in the past",
+      //       description: "End date and time cannot be in the past.",
+      //       variant: "destructive",
+      //     });
+      //     return;
+      //   }
+
+      //   eventEndDateTime = endDateTime;
+      // }
+
+      if (formData.end_datetime) {
+        const endDateTime = new Date(formData.end_datetime);
+        const now = new Date();
+
+        // Validate datetime parsing
         if (isNaN(endDateTime.getTime())) {
           toast({
             title: "Invalid date or time format",
@@ -592,8 +690,8 @@ const EventEdit = () => {
           return;
         }
 
-        const now = new Date();
-        if (endDateTime < now) {
+        // Validate that it’s not in the past
+        if (endDateTime <= now) {
           toast({
             title: "End time in the past",
             description: "End date and time cannot be in the past.",
@@ -605,16 +703,42 @@ const EventEdit = () => {
         eventEndDateTime = endDateTime;
       }
 
-      let rsvpDeadline = null;
+      // let rsvpDeadline = null;
 
-      if (formData.rsvp_deadline_date && formData.rsvp_deadline_time) {
-        rsvpDeadline = new Date(
-          `${formData.rsvp_deadline_date}T${formData.rsvp_deadline_time}`
-        );
-      } else if (formData.rsvp_deadline_date) {
-        rsvpDeadline = new Date(`${formData.rsvp_deadline_date}T23:59`);
+      // if (formData.rsvp_deadline_date && formData.rsvp_deadline_time) {
+      //   rsvpDeadline = new Date(
+      //     `${formData.rsvp_deadline_date}T${formData.rsvp_deadline_time}`
+      //   );
+      // } else if (formData.rsvp_deadline_date) {
+      //   rsvpDeadline = new Date(`${formData.rsvp_deadline_date}T23:59`);
+      // } else {
+      //   rsvpDeadline = eventDateTime;
+      // }
+
+      let rsvpDeadline: Date | null = null;
+
+      if (formData.rsvp_deadline) {
+        const parsed = new Date(formData.rsvp_deadline);
+        if (isNaN(parsed.getTime())) {
+          toast({
+            title: "Invalid RSVP deadline",
+            description: "Please provide a valid RSVP deadline date and time.",
+            variant: "destructive",
+          });
+          return;
+        }
+        rsvpDeadline = parsed;
       } else {
         rsvpDeadline = eventDateTime;
+      }
+
+      if (rsvpDeadline && rsvpDeadline > eventDateTime) {
+        toast({
+          title: "Invalid RSVP deadline",
+          description: "RSVP deadline cannot be after the event starts.",
+          variant: "destructive",
+        });
+        return;
       }
 
       const { data, error } = await supabase
@@ -658,6 +782,7 @@ const EventEdit = () => {
           title_font: selectedFont,
           accent_color: selectedColor,
           accent_bg: selectedBgColor,
+          bg_color: formData.bg_color,
           recurrence: formData.recurring,
           recurrence_dates: formData.recurring
             ? formData.recurrenceDates
@@ -721,18 +846,18 @@ const EventEdit = () => {
     handleInputChange("eventFeatures", updated);
   };
 
-  const isFormValid =
-    formData.name &&
-    formData.description &&
-    formData.start_time &&
-    formData.start_date &&
-    formData.location_name &&
-    formData.flyer_url;
+  // const isFormValid =
+  //   formData.name &&
+  //   formData.description &&
+  //   formData.start_time &&
+  //   formData.start_date &&
+  //   formData.location_name &&
+  //   formData.flyer_url;
 
   // Show loading while authentication or profile is loading
   if (authLoading || profileLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen pt-16 flex items-center justify-center bg-background">
         <LoaderText text="Parish" />
       </div>
     );
@@ -749,7 +874,7 @@ const EventEdit = () => {
   if (!profile) {
     console.log("No profile found");
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen pt-16 bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
           <h2 className="text-xl font-semibold text-foreground">
             Profile Required
@@ -767,42 +892,52 @@ const EventEdit = () => {
 
   return (
     <div
-      className="min-h-screen bg-background font-serif"
+      className="min-h-screen font-serif relative z-0 pt-16"
       style={
         {
-          "--accent-bg": lightenColor(selectedColor),
-          background:
-            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
+          "--accent-bg": lightenColor(selectedBgColor),
+          background: `var(--accent-bg)`,
           transition: "background 0.5s ease",
         } as React.CSSProperties
       }
     >
-      <div className="max-w-4xl mx-auto py-8">
-        <h1 className="text-3xl font-bold text-foreground font-script">
-          Edit Event
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Update your dining experience details
-        </p>
-      </div>
+      {/* Fixed top 45vh background image */}
+      {formData.flyer_url && (
+        <div
+          className={`fixed top-0 left-0 w-full z-[-1] transition-opacity duration-500 ease-out ${
+            isLoaded ? "opacity-100" : "opacity-0"
+          }`}
+          style={{
+            height: "45vh",
+            backgroundImage: `url(${formData.flyer_url})`,
+            backgroundSize: "cover",
+            backgroundPosition: "top",
+            backgroundRepeat: "no-repeat",
+            zIndex: -1,
+            // Remove blur here since we want the background color to blur
+          }}
+        >
+          <div className="absolute inset-0 backdrop-blur-xl"></div>
+          {/* Fade overlay: disperses image into background */}
+          <div
+            className="absolute bottom-0 w-full"
+            style={{
+              height: "50vh", // adjust how gradual the fade is
+              background: `linear-gradient(to bottom, rgba(255,255,255,0) 0%, var(--accent-bg) 100%)`,
+            }}
+          />
+        </div>
+      )}
 
+      {/* Full-page blurred background color */}
+      <div
+        className="absolute top-0 left-0 w-full h-full z-[-2]"
+        style={{
+          background: `var(--accent-bg)`,
+          filter: "blur(8px)",
+        }}
+      />
       <EmailInviteModal
-        style={
-          {
-            "--accent-bg": lightenColor(selectedColor),
-            background:
-              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-            transition: "background 0.5s ease",
-          } as React.CSSProperties
-        }
-        style_button={
-          selectedColor
-            ? {
-                backgroundColor: selectedColor,
-                borderColor: selectedColor,
-              }
-            : {}
-        }
         open={emailInviteModelOpen}
         onClose={() => setEmailInviteModelOpen(false)}
         onInviteResolved={(guestIds) => setInvitedGuestIds(guestIds)}
@@ -811,111 +946,235 @@ const EventEdit = () => {
       />
 
       <CrossedPathInviteModal
-        style={
-          {
-            "--accent-bg": lightenColor(selectedColor),
-            background:
-              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-            transition: "background 0.5s ease",
-          } as React.CSSProperties
-        }
-        style_button={
-          selectedColor
-            ? {
-                backgroundColor: selectedColor,
-                borderColor: selectedColor,
-              }
-            : {}
-        }
         open={crossedPathInviteModelOpen}
         onClose={() => setCrossedPathInviteModelOpen(false)}
         onInviteResolved={(guestIds) => setInvitedGuestIds(guestIds)}
         subscriptionStatus={subscriptionStatus}
       />
 
-      <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="flex justify-center">
-          <div
-            className="flex items-center space-x-1 mt-3 px-1 py-1 bg-secondary rounded-full"
-            style={
-              selectedBgColor
-                ? {
-                    backgroundColor: selectedBgColor,
-                  }
-                : {}
-            }
-          >
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => setMode("sell")}
-              className={`rounded-full px-4 text-sm font-medium transition-all duration-200 ${
-                mode === "sell"
-                  ? "bg-primary text-primary-foreground shadow-lg text-lg"
-                  : "bg-transparent text-muted-foreground hover:text-foreground"
-              }`}
-              style={{
-                backgroundColor:
-                  mode === "sell" ? "var(--accent-color)" : "transparent",
-                borderColor: "var(--accent-color)",
-              }}
-            >
-              Sell Tickets
-            </Button>
-
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => setMode("rsvp")}
-              className={`rounded-full px-4 text-sm font-medium transition-all duration-200 ${
-                mode === "rsvp"
-                  ? "bg-primary text-primary-foreground shadow-lg text-lg"
-                  : "bg-transparent text-muted-foreground hover:text-foreground"
-              }`}
-              style={{
-                backgroundColor:
-                  mode === "rsvp" ? "var(--accent-color)" : "transparent",
-                borderColor: "var(--accent-color)",
-              }}
-            >
-              RSVP
-            </Button>
-          </div>
-        </div>
-
+      <form onSubmit={handleSubmit} className="relative z-10">
         <div className="flex flex-col lg:flex-row gap-6 p-6">
-          <div className="flex-1 space-y-6 min-w-0">
-            <Card
-              className="space-y-2 bg-background"
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
-              <CardHeader>
-                <CardTitle>Name & Description</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
+          <div className="flex-1 space-y-6 min-w-0 order-first lg:order-none">
+            <div>
+              <div className="block lg:hidden mb-4 flex justify-center">
+                <FlyerUpload
+                  value={formData.flyer_url}
+                  onChange={handleFlyerChange}
+                />
+              </div>
+              <Card className="block lg:hidden space-y-2 bg-transparent backdrop-blur-md bg-white/40 shadow-none border-none">
+                <CardHeader>
+                  <CardTitle>Customize Event Style</CardTitle>
+                </CardHeader>
+
+                <CardContent className="space-y-4">
+                  {/* Font Selector */}
+                  <div className="flex flex-col gap-1">
+                    <Label>Title Font</Label>
+                    <Select
+                      value={selectedFont}
+                      onValueChange={(font) => {
+                        setSelectedFont(font);
+                        handleFontChange(font);
+                      }}
+                    >
+                      <SelectTrigger className="rounded-lg border-none bg-background/60 hover:bg-transparent transition bg-transparent backdrop-blur-md bg-white/40 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none">
+                        <SelectValue
+                          placeholder="Select font"
+                          className="capitalize"
+                        />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-60 overflow-y-auto">
+                        {FONT_OPTIONS.map((font) => (
+                          <SelectItem
+                            key={font}
+                            value={font}
+                            className="cursor-pointer"
+                          >
+                            <span
+                              className="block text-base"
+                              style={{ fontFamily: font }}
+                            >
+                              {font}
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    {/* Font Preview */}
+                    {selectedFont && (
+                      <p
+                        className="text-sm text-muted-foreground mt-1 pl-1 italic transition-all"
+                        style={{ fontFamily: selectedFont }}
+                      >
+                        The quick brown fox jumps over the lazy dog
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Divider */}
+                  <div className="h-px bg-border/40 my-2" />
+
+                  {/* Color Selector */}
+                  <div className="flex flex-col gap-1">
+                    <Label>Accent Color</Label>
+                    {formData.flyer_url ? (
+                      <>
+                        <div className="flex flex-wrap gap-2">
+                          {colors.map((color, i) => (
+                            <Button
+                              type="button"
+                              size="icon"
+                              key={i}
+                              className={`w-7 h-7 rounded-md border transition-all hover:scale-105 ${
+                                selectedColor === color
+                                  ? "ring-2 ring-offset-2 ring-primary"
+                                  : "ring-0"
+                              }`}
+                              style={{ backgroundColor: color }}
+                              onClick={() => {
+                                setSelectedColor(color);
+                                handleColorChange(color);
+                                handleInputChange("color", color);
+                              }}
+                            />
+                          ))}
+                          <div
+                            className="w-8 h-8 rounded-md border cursor-pointer shadow-sm hover:ring-2 hover:ring-primary transition-all"
+                            style={{ backgroundColor: selectedColor }}
+                            onClick={() =>
+                              document.getElementById("color-picker").click()
+                            }
+                          >
+                            {" "}
+                            <Label className="w-7 h-7 flex items-center justify-center text-xs text-primary cursor-pointer">
+                              +
+                            </Label>
+                          </div>
+                          <Input
+                            id="color-picker"
+                            type="color"
+                            value={selectedColor}
+                            onChange={(e) => {
+                              setSelectedColor(e.target.value);
+                              handleColorChange(e.target.value);
+                              handleInputChange("color", e.target.value);
+                            }}
+                            className="hidden"
+                          />
+                        </div>
+
+                        {/* Color Preview */}
+                        {selectedColor && (
+                          <>
+                            <div className="mt-2 text-xs text-muted-foreground pl-1 flex items-center gap-2">
+                              <div
+                                className="w-4 h-4 rounded border"
+                                style={{ backgroundColor: selectedColor }}
+                              ></div>
+                              <span>{selectedColor}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <Label
+                                className="flex gap-3 items-center"
+                                htmlFor="bg_color"
+                              >
+                                Apply Accent Color to Background
+                              </Label>
+                              <Checkbox
+                                id="bg_color"
+                                checked={formData.bg_color}
+                                onCheckedChange={(checked) => {
+                                  handleInputChange("bg_color", checked);
+                                  handleColorChange(selectedColor);
+                                }}
+                                className={`w-4 h-4 border  ${
+                                  formData.bg_color
+                                    ? "backdrop-blur-md bg-white/40 border-black"
+                                    : "bg-transparent border-red"
+                                }`}
+                              />
+                            </div>
+                          </>
+                        )}
+                      </>
+                    ) : (
+                      <span>Flyer is not selected</span>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+              {/* <Button
+                      type="submit"
+                      // disabled={!isFormValid || loading}
+                      disabled={loading}
+                      className="block lg:hidden bg-primary hover:bg-secondary lg:static fixed bottom-4 left-0 right-0 mx-6 lg:mx-0 lg:mt-4"
+                      style={
+                        selectedColor
+                          ? {
+                              backgroundColor: selectedColor,
+                              borderColor: selectedColor,
+                            }
+                          : {}
+                      }
+                    >
+                      {loading ? "Creating..." : "Create Event"}
+                    </Button> */}
+            </div>
+
+            <Card className="space-y-2 bg-transparent border-none shadow-none">
+              <CardContent className="space-y-6 pt-4">
+                <div className="flex justify-center">
+                  <div
+                    className="flex items-center w-full space-x-1 mt-3 px-1 py-1 
+                             rounded-full backdrop-blur-md bg-white/40" // <- blur + translucent bg
+                  >
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => setMode("sell")}
+                      className={`rounded-full flex-1 px-4 text-sm font-medium transition-all duration-200 
+                              hover:none hover:bg-transparent hover:!text-inherit hover:!shadow-none ${
+                                mode === "sell"
+                                  ? "text-primary-foreground shadow-lg text-lg bg-transparent hover:bg-transparent backdrop-blur-md bg-white/10"
+                                  : "bg-transparent text-muted-foreground"
+                              }`}
+                    >
+                      Sell Tickets
+                    </Button>
+
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => setMode("rsvp")}
+                      className={`rounded-full flex-1 px-4 text-sm font-medium transition-all duration-200 
+                              hover:none hover:bg-transparent hover:!text-inherit hover:!shadow-none ${
+                                mode === "rsvp"
+                                  ? "text-primary-foreground shadow-lg text-lg bg-transparent hover:bg-transparent backdrop-blur-md bg-white/10"
+                                  : "bg-transparent text-muted-foreground"
+                              }`}
+                    >
+                      RSVP
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="space-y-2 bg-transparent border-none shadow-none">
+              <CardContent className="space-y-6 pt-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Event Name *</Label>
-                  <Input
+                  <Textarea
                     id="name"
-                    placeholder="e.g., Wine Tasting Social"
+                    placeholder="My Event Name"
                     value={formData.name}
-                    onChange={(e) => handleInputChange("name", e.target.value)}
-                    style={
-                      {
-                        "--accent-bg": lightenColor(selectedColor),
-                        background:
-                          "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                        transition: "background 0.5s ease",
-                        fontFamily: selectedFont,
-                      } as React.CSSProperties
-                    }
+                    onChange={(e) => {
+                      handleAutoGrow(e);
+                      handleInputChange("name", e.target.value);
+                    }}
+                    required
+                    className={`!leading-[1.2] p-0 resize-none overflow-hidden px-2 text-black placeholder:text-black/90 bg-transparent font-${selectedFont} border-none ring-0 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none xsm:text-[2.8rem] sm:text-[3rem] md:text-[3rem] lg:text-[3.5rem] xl:text-[4rem] min-h-[2.5rem]`}
+                    style={{ fontFamily: selectedFont }}
                   />
                 </div>
 
@@ -923,215 +1182,272 @@ const EventEdit = () => {
                   <Label htmlFor="description">Description *</Label>
                   <Textarea
                     id="description"
-                    placeholder="Describe your event, what to expect, dress code, etc."
+                    placeholder="a brief description of the event."
+                    maxLength={140}
                     value={formData.description}
+                    required
                     onChange={(e) =>
                       handleInputChange("description", e.target.value)
                     }
-                    rows={4}
-                    style={
-                      {
-                        "--accent-bg": lightenColor(selectedColor),
-                        background:
-                          "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                        transition: "background 0.5s ease",
-                      } as React.CSSProperties
-                    }
+                    rows={1}
+                    className="bg-transparent backdrop-blur-md bg-white/40 border-none focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
                   />
                 </div>
               </CardContent>
             </Card>
 
-            <Card
-              className="space-y-2"
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
+            <Card className="space-y-2 bg-transparent shadow-none border-none">
+              <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
-                <CardTitle>Date & Time</CardTitle>
+                <CardTitle className="flex gap-3">
+                  <Calendar className="h-5 w-5" /> Dates
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="start_date">Start date *</Label>
-                    <div className="relative">
-                      <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="start_date"
-                        type="date"
-                        min={today}
-                        value={formData.start_date}
-                        onChange={(e) =>
-                          handleInputChange("start_date", e.target.value)
-                        }
-                        className="pl-10"
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="start_time">Time Start *</Label>
-                    <div className="relative">
-                      <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="start_time"
-                        type="time"
-                        value={formData.start_time}
-                        onChange={(e) =>
-                          handleInputChange("start_time", e.target.value)
-                        }
-                        className="pl-10"
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="end_date">End Date</Label>
-                    <div className="relative">
-                      <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="end_date"
-                        type="date"
-                        min={today}
-                        className="pl-10"
-                        value={formData.end_date}
-                        onChange={(e) =>
-                          handleInputChange("end_date", e.target.value)
-                        }
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="end_time">Time End</Label>
-                    <div className="relative">
-                      <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="end_time"
-                        type="time"
-                        value={formData.end_time}
-                        onChange={(e) =>
-                          handleInputChange("end_time", e.target.value)
-                        }
-                        className="pl-10"
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="rsvp_deadline_date">
-                      RSVP Deadline Date
+                <div className="space-y-2">
+                  <div className="border-none py-3 px-4 rounded-md flex flex-col sm:flex-row sm:justify-between sm:items-center justify-between items-center bg-transparent backdrop-blur-md bg-white/40">
+                    <Label
+                      htmlFor="start_datetime"
+                      // className="text-sm font-medium"
+                    >
+                      Start
                     </Label>
                     <Input
-                      id="rsvp_deadline_date"
-                      type="date"
-                      min={today}
-                      value={formData.rsvp_deadline_date}
+                      id="start_datetime"
+                      type="datetime-local"
+                      min={new Date().toISOString().slice(0, 16)}
+                      value={formData.start_datetime}
+                      required
                       onChange={(e) =>
-                        handleInputChange("rsvp_deadline_date", e.target.value)
+                        handleInputChange("start_datetime", e.target.value)
                       }
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="rsvp_deadline_time">
-                      RSVP Deadline Time
-                    </Label>
-                    <Input
-                      id="rsvp_deadline_time"
-                      type="time"
-                      value={formData.rsvp_deadline_time}
-                      onChange={(e) =>
-                        handleInputChange("rsvp_deadline_time", e.target.value)
-                      }
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
+                      className="mt-2 sm:mt-0 w-fit border-none bg-transparent backdrop-blur-md bg-white/10 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
                     />
                   </div>
                 </div>
+                {/* <div className="space-y-2">
+                          <Label htmlFor="start_date">Start date *</Label>
+                          <div className="relative">
+                            <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              id="start_date"
+                              type="date"
+                              min={today}
+                              value={formData.start_date}
+                              onChange={(e) =>
+                                handleInputChange("start_date", e.target.value)
+                              }
+                              className="pl-10"
+                              style={
+                                {
+                                  "--accent-bg": lightenColor(selectedColor),
+                                  background:
+                                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
+                                  transition: "background 0.5s ease",
+                                } as React.CSSProperties
+                              }
+                            />
+                          </div>
+                        </div>
+      
+                        <div className="space-y-2">
+                          <Label htmlFor="start_time">Time Start *</Label>
+                          <div className="relative">
+                            <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              id="start_time"
+                              type="time"
+                              value={formData.start_time}
+                              onChange={(e) =>
+                                handleInputChange("start_time", e.target.value)
+                              }
+                              className="pl-10"
+                              style={
+                                {
+                                  "--accent-bg": lightenColor(selectedColor),
+                                  background:
+                                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
+                                  transition: "background 0.5s ease",
+                                } as React.CSSProperties
+                              }
+                            />
+                          </div>
+                        </div> */}
+
                 <div className="space-y-2">
-                  <Label htmlFor="max_attendees">Maximum Attendees *</Label>
-                  <Input
-                    id="max_attendees"
-                    type="number"
-                    min="2"
-                    max="50"
-                    value={formData.max_attendees}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "max_attendees",
-                        parseInt(e.target.value)
-                      )
-                    }
-                    style={
-                      {
-                        "--accent-bg": lightenColor(selectedColor),
-                        background:
-                          "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                        transition: "background 0.5s ease",
-                      } as React.CSSProperties
-                    }
-                  />
+                  <div className="border-none py-3 px-4 rounded-md flex flex-col sm:flex-row sm:justify-between sm:items-center justify-between items-center bg-transparent backdrop-blur-md bg-white/40">
+                    <Label htmlFor="end_datetime">End</Label>
+                    <Input
+                      id="end_datetime"
+                      type="datetime-local"
+                      min={new Date().toISOString().slice(0, 16)}
+                      value={formData.end_datetime}
+                      onChange={(e) =>
+                        handleInputChange("end_datetime", e.target.value)
+                      }
+                      className="mt-2 sm:mt-0 w-fit border-none bg-transparent backdrop-blur-md bg-white/10 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
+                    />
+                  </div>
                 </div>
+
+                {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="end_date">End Date</Label>
+                          <div className="relative">
+                            <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              id="end_date"
+                              type="date"
+                              min={today}
+                              className="pl-10"
+                              value={formData.end_date}
+                              onChange={(e) =>
+                                handleInputChange("end_date", e.target.value)
+                              }
+                              style={
+                                {
+                                  "--accent-bg": lightenColor(selectedColor),
+                                  background:
+                                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
+                                  transition: "background 0.5s ease",
+                                } as React.CSSProperties
+                              }
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="end_time">Time End</Label>
+                          <div className="relative">
+                            <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              id="end_time"
+                              type="time"
+                              value={formData.end_time}
+                              onChange={(e) =>
+                                handleInputChange("end_time", e.target.value)
+                              }
+                              className="pl-10"
+                              style={
+                                {
+                                  "--accent-bg": lightenColor(selectedColor),
+                                  background:
+                                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
+                                  transition: "background 0.5s ease",
+                                } as React.CSSProperties
+                              }
+                            />
+                          </div>
+                        </div>
+                      </div> */}
+
                 <div className="space-y-2">
-                  <Label htmlFor="recurring">Recurring Series *</Label>
-                  <div className="border py-3 px-4 rounded-md">
+                  <div className="border-none py-3 px-4 rounded-md flex flex-col sm:flex-row sm:justify-between sm:items-center justify-between items-center bg-transparent backdrop-blur-md bg-white/40">
+                    <Label htmlFor="rsvp_deadline">RSVP Deadline</Label>
+                    <Input
+                      id="rsvp_deadline"
+                      type="datetime-local"
+                      min={new Date().toISOString().slice(0, 16)}
+                      value={formData.rsvp_deadline}
+                      onChange={(e) =>
+                        handleInputChange("rsvp_deadline", e.target.value)
+                      }
+                      className="mt-2 sm:mt-0 w-fit border-none bg-transparent backdrop-blur-md bg-white/10 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="rsvp_deadline_date">
+                            RSVP Deadline Date
+                          </Label>
+                          <Input
+                            id="rsvp_deadline_date"
+                            type="date"
+                            min={today}
+                            value={formData.rsvp_deadline_date}
+                            onChange={(e) =>
+                              handleInputChange("rsvp_deadline_date", e.target.value)
+                            }
+                            style={
+                              {
+                                "--accent-bg": lightenColor(selectedColor),
+                                background:
+                                  "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
+                                transition: "background 0.5s ease",
+                              } as React.CSSProperties
+                            }
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="rsvp_deadline_time">
+                            RSVP Deadline Time
+                          </Label>
+                          <Input
+                            id="rsvp_deadline_time"
+                            type="time"
+                            value={formData.rsvp_deadline_time}
+                            onChange={(e) =>
+                              handleInputChange("rsvp_deadline_time", e.target.value)
+                            }
+                            style={
+                              {
+                                "--accent-bg": lightenColor(selectedColor),
+                                background:
+                                  "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
+                                transition: "background 0.5s ease",
+                              } as React.CSSProperties
+                            }
+                          />
+                        </div>
+                      </div> */}
+
+                <div className="space-y-2">
+                  <div className="border-none py-3 px-4 rounded-md flex flex-col sm:flex-row sm:justify-between sm:items-center justify-between items-center bg-transparent backdrop-blur-md bg-white/40">
+                    <Label htmlFor="max_attendees">Maximum Attendees</Label>
+                    <Input
+                      id="max_attendees"
+                      type="number"
+                      min="2"
+                      max="50"
+                      value={formData.max_attendees}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "max_attendees",
+                          parseInt(e.target.value)
+                        )
+                      }
+                      className="mt-2 sm:mt-0 sm:ml-4 border-none flex-1 min-w-0 max-w-28 bg-transparent backdrop-blur-md bg-white/10 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* <div className="space-y-2">
+                        <Label htmlFor="max_attendees">Maximum Attendees *</Label>
+                        <Input
+                          id="max_attendees"
+                          type="number"
+                          min="2"
+                          max="50"
+                          value={formData.max_attendees}
+                          onChange={(e) =>
+                            handleInputChange(
+                              "max_attendees",
+                              parseInt(e.target.value)
+                            )
+                          }
+                          className="bg-transparent bg-transparent backdrop-blur-md bg-white/40"
+                        />
+                      </div> */}
+                <div className="space-y-2">
+                  <div className="border-none py-3 px-4 rounded-md bg-transparent t backdrop-blur-md bg-white/40">
                     <div className="flex justify-between items-center">
-                      <Label htmlFor="recurring">
-                        {formData.recurring == true ? "Yes" : "No"}
+                      <Label
+                        className="flex gap-3 items-center"
+                        htmlFor="recurring"
+                      >
+                        <Repeat2 className="h-5 w-5" />
+                        Recurring Series
                       </Label>
                       <Checkbox
                         id="recurring"
@@ -1139,20 +1455,17 @@ const EventEdit = () => {
                         onCheckedChange={(checked) => {
                           handleInputChange("recurring", checked);
                         }}
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
+                        className={`w-4 h-4 border  ${
+                          formData.recurring
+                            ? "backdrop-blur-md bg-white/40 border-black"
+                            : "bg-transparent border-red"
+                        }`}
                       />
                     </div>
                     {formData.recurring && (
                       <div className="space-y-4 mt-2 rounded-lg p-3">
                         {formData.recurrenceDates.length === 0 ? (
-                          <div className="flex justify-between items-center border rounded-lg px-4 py-3">
+                          <div className="border-none flex flex-col sm:flex-row sm:justify-between sm:items-center border rounded-lg px-4 py-3 gap-2 sm:gap-0 bg-transparent backdrop-blur-md bg-white/40">
                             <p className="text-sm text-muted-foreground italic">
                               No event recurring dates added yet.
                             </p>
@@ -1160,21 +1473,13 @@ const EventEdit = () => {
                               variant="outline"
                               size="sm"
                               type="button"
-                              onClick={() => {
-                                setShowRecurringDialog(true);
-                              }}
-                              className="rounded-full"
-                              style={
-                                selectedColor
-                                  ? {
-                                      backgroundColor: selectedColor,
-                                      borderColor: selectedColor,
-                                    }
-                                  : {}
-                              }
+                              onClick={() => setShowRecurringDialog(true)}
+                              className="border-none rounded-full mt-2 sm:mt-0 flex flex-wrap justify-center items-center bg-transparent hover:bg-transparent hover:backdrop-blur-md hover:bg-white/40 backdrop-blur-md bg-white/40"
                             >
-                              <PlusCircle className="w-4 h-4 mr-1" />
-                              Add Recurrence date
+                              <PlusCircle className="w-4 h-4 mr-1 flex-shrink-0" />
+                              <span className="break-words text-center">
+                                Add Recurrence date
+                              </span>
                             </Button>
                           </div>
                         ) : (
@@ -1183,16 +1488,7 @@ const EventEdit = () => {
                               {formData.recurrenceDates.map((date, i) => (
                                 <div
                                   key={i}
-                                  className="bg-secondary border rounded-xl p-4 flex justify-between items-center hover:shadow-md transition-all"
-                                  style={
-                                    {
-                                      "--accent-bg":
-                                        lightenColor(selectedColor),
-                                      background:
-                                        "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                                      transition: "background 0.5s ease",
-                                    } as React.CSSProperties
-                                  }
+                                  className="border-none rounded-xl p-4 flex justify-between items-center hover:shadow-md transition-all bg-transparent backdrop-blur-md bg-white/10"
                                 >
                                   <div className="flex items-center space-x-4">
                                     {new Date(date).toLocaleDateString(
@@ -1216,18 +1512,9 @@ const EventEdit = () => {
                                 onClick={() => {
                                   setShowRecurringDialog(true);
                                 }}
-                                className="rounded-full mt-2"
-                                style={
-                                  selectedColor
-                                    ? {
-                                        backgroundColor: selectedColor,
-                                        borderColor: selectedColor,
-                                      }
-                                    : {}
-                                }
+                                className="rounded-full mt-2 bg-transparent hover:bg-transparent border-none"
                               >
-                                <PlusCircle className="w-4 h-4 mr-1" />
-                                Add Recurrence Date
+                                <Plus className="w-4 h-4" />
                               </Button>
                             </div>
                           </>
@@ -1239,33 +1526,27 @@ const EventEdit = () => {
               </CardContent>
             </Card>
 
-            <Card
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
+            <Card className="space-y-2 bg-transparent shadow-none border-none">
+              <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
-                <CardTitle>Location</CardTitle>
+                <CardTitle className="flex gap-3">
+                  <MapPin className="h-5 w-5" /> Location
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="sspace-y-2 relative">
+                <div className="space-y-2 relative">
                   <Label htmlFor="restaurant">
                     Choose Restaurant (Optional)
                   </Label>
                   <RestaurantSearchDropdown
-                    style={
-                      {
-                        "--accent-bg": lightenColor(selectedColor),
-                        background:
-                          "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                        transition: "background 0.5s ease",
-                      } as React.CSSProperties
-                    }
+                    // style={
+                    //   {
+                    //     background:
+                    //       " bg-transparent backdrop-blur-md bg-white/40",
+                    //     transition: "background 0.5s ease",
+                    //   } as React.CSSProperties
+                    // }
+                    className="border-none bg-transparent backdrop-blur-md bg-white/40 hover:bg-transparent text-black placeholder:text-black"
                     placeholder="Search and select a restaurant"
                     restaurants={restaurants}
                     value={formData.restaurant_id}
@@ -1296,14 +1577,8 @@ const EventEdit = () => {
                   />
                 </div>
                 <GooglePlacesEventsForm
-                  style={
-                    {
-                      "--accent-bg": lightenColor(selectedColor),
-                      background:
-                        "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                      transition: "background 0.5s ease",
-                    } as React.CSSProperties
-                  }
+                  required={true}
+                  className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black text-black focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
                   formData={formData}
                   onChange={handleInputChange}
                 />
@@ -1311,24 +1586,17 @@ const EventEdit = () => {
             </Card>
 
             {mode === "sell" && (
-              <Card
-                style={
-                  {
-                    "--accent-bg": lightenColor(selectedColor),
-                    background:
-                      "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                    transition: "background 0.5s ease",
-                  } as React.CSSProperties
-                }
-              >
+              <Card className="space-y-2 bg-transparent shadow-none border-none">
+                <div className="border-t border-gray-300 mx-6" />
                 <CardHeader>
-                  <CardTitle>Payment Settings</CardTitle>
+                  <CardTitle className="flex gap-3">
+                    <DollarSign className="w-5 h-5" /> Payment Settings
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
                     <Label htmlFor="event_fee">Event Fee (USD) *</Label>
-                    <div className="relative">
-                      <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <div className="">
                       <Input
                         id="event_fee"
                         type="number"
@@ -1342,16 +1610,8 @@ const EventEdit = () => {
                             parseFloat(e.target.value)
                           )
                         }
-                        className="pl-10"
+                        className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
                         required={mode === "sell"}
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
                       />
                     </div>
                   </div>
@@ -1359,46 +1619,44 @@ const EventEdit = () => {
               </Card>
             )}
 
-            <Card
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
+            <Card className="space-y-2 bg-transparent shadow-none border-none">
+              <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Users className="h-5 w-5" />
-                  <span>Guest Invitation Type</span>
+                <CardTitle className="flex gap-3">
+                  <UsersRound className="h-5 w-5" />
+                  Guest Invitation Type
                 </CardTitle>
+                <CardDescription>
+                  Crossed Paths suggests users you've recently visited the same
+                  restaurants with
+                </CardDescription>
               </CardHeader>
+
               <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
+                <div className="border-none py-2 rounded-md bg-transparent backdrop-blur-md bg-white/40">
+                  <div className="flex justify-between items-center px-4">
+                    <Label htmlFor="manual">Manually Invite Guests</Label>
                     <Checkbox
                       id="manual"
                       name="guest_invitation_type"
                       value="manual"
                       checked={formData.guest_invitation_type === "manual"}
-                      onCheckedChange={(e) =>
+                      onCheckedChange={() =>
                         handleInputChange("guest_invitation_type", "manual")
                       }
-                      className="w-4 h-4"
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
+                      className={`w-4 h-4 ${
+                        formData.guest_invitation_type === "manual"
+                          ? "backdrop-blur-md bg-white/40 border-black"
+                          : "bg-transparent"
+                      }`}
                     />
-                    <Label htmlFor="manual">Manually Invite Guests</Label>
                   </div>
-                  <div className="flex items-center space-x-2">
+                </div>
+                <div className="border-none py-2 rounded-md bg-transparent backdrop-blur-md bg-white/40">
+                  <div className="flex justify-between items-center px-4">
+                    <Label htmlFor="crossed_paths">
+                      Suggest from Crossed Paths
+                    </Label>
                     <Checkbox
                       id="crossed_paths"
                       name="guest_invitation_type"
@@ -1406,67 +1664,53 @@ const EventEdit = () => {
                       checked={
                         formData.guest_invitation_type === "crossed_paths"
                       }
-                      onCheckedChange={(e) =>
+                      onCheckedChange={() =>
                         handleInputChange(
                           "guest_invitation_type",
                           "crossed_paths"
                         )
                       }
-                      className="w-4 h-4"
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
+                      className={`w-4 h-4 border  ${
+                        formData.guest_invitation_type === "crossed_paths"
+                          ? "backdrop-blur-md bg-white/40 border-black"
+                          : "bg-transparent"
+                      }`}
                     />
-                    <Label htmlFor="crossed_paths">
-                      Suggest from Crossed Paths
-                    </Label>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    Crossed Paths suggests users you've recently visited the
-                    same restaurants with
-                  </p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
+            <Card className="space-y-2 bg-transparent shadow-none border-none">
+              <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
+                <CardTitle className="flex gap-3">
+                  <Sparkles className="w-5 h-5" />
                   Extras
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="border py-2 rounded-md">
+                <div className="border-none py-2 rounded-md bg-transparent backdrop-blur-md bg-white/40">
                   <div className="flex justify-between items-center px-4">
-                    <Label htmlFor="guestList">Guestlist</Label>
+                    <Label
+                      htmlFor="guestList"
+                      className="flex items-center gap-2"
+                    >
+                      Guestlist
+                      <InfoTooltip content="Show how is going to your event." />
+                    </Label>
+
                     <Checkbox
                       id="guestList"
                       checked={formData.guestList}
                       onCheckedChange={(checked) =>
                         handleInputChange("guestList", checked)
                       }
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
+                      className={`w-4 h-4 border  ${
+                        formData.guestList
+                          ? "backdrop-blur-md bg-white/40 border-black"
+                          : "bg-transparent"
+                      }`}
                     />
                   </div>
 
@@ -1487,30 +1731,34 @@ const EventEdit = () => {
                   )}
                 </div>
 
-                <div className="border px-4 py-2 rounded-md">
+                <div className="border-none px-4 py-2 rounded-md bg-transparent backdrop-blur-md bg-white/40">
                   <div className="flex justify-between items-center">
-                    <Label htmlFor="features">Event Features</Label>
+                    <Label
+                      htmlFor="features"
+                      className="flex items-center gap-2"
+                    >
+                      Event Features
+                      <InfoTooltip content="Showcase your event's performers, sponcers and more." />
+                    </Label>
                     <Checkbox
                       id="features"
                       checked={formData.features}
                       onCheckedChange={(checked) =>
                         handleInputChange("features", checked)
                       }
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
+                      className={`w-4 h-4 border  ${
+                        formData.features
+                          ? "backdrop-blur-md bg-white/40 border-black"
+                          : "bg-transparent"
+                      }`}
                     />
                   </div>
                   {formData.features && (
-                    <div className="space-y-4 mt-2 rounded-lg p-3">
+                    <div className="space-y-4 mt-2 rounded-lg py-3">
                       {/* Empty state */}
                       {formData.eventFeatures.length === 0 ? (
-                        <div className="flex justify-between items-center border rounded-lg px-4 py-3">
+                        // <div className="flex justify-between items-center border rounded-lg px-4 py-3">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-none rounded-lg px-4 py-3 gap-2 sm:gap-0 bg-transparent backdrop-blur-md bg-white/10">
                           <p className="text-sm text-muted-foreground italic">
                             No event features added yet.
                           </p>
@@ -1522,15 +1770,8 @@ const EventEdit = () => {
                               setEditFeatureIndex(null);
                               setShowFeatures(true);
                             }}
-                            className="rounded-full"
-                            style={
-                              selectedColor
-                                ? {
-                                    backgroundColor: selectedColor,
-                                    borderColor: selectedColor,
-                                  }
-                                : {}
-                            }
+                            // className="rounded-full"
+                            className="border-none rounded-full mt-2 sm:mt-0 flex flex-wrap justify-center items-center bg-transparent hover:bg-transparent backdrop-blur-md bg-white/20"
                           >
                             <PlusCircle className="w-4 h-4 mr-1" />
                             Add Feature
@@ -1542,22 +1783,14 @@ const EventEdit = () => {
                             {formData.eventFeatures.map((feature, i) => (
                               <div
                                 key={i}
-                                className="bg-secondary border rounded-xl p-4 flex justify-between items-center hover:shadow-md transition-all"
-                                style={
-                                  {
-                                    "--accent-bg": lightenColor(selectedColor),
-                                    background:
-                                      "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                                    transition: "background 0.5s ease",
-                                  } as React.CSSProperties
-                                }
+                                className="bg-transparent backdrop-blur-md bg-white/10 border-none rounded-xl p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center hover:shadow-md transition-all"
                               >
                                 {/* Feature content */}
                                 <div className="flex items-center space-x-4">
                                   <img
                                     src={feature.image || "/placeholder.png"}
                                     alt={feature.title || "Feature image"}
-                                    className="w-20 h-20 object-cover rounded-full border"
+                                    className="w-14 h-14 object-cover rounded-full border"
                                     onError={(e) =>
                                       (e.currentTarget.src = "/placeholder.png")
                                     }
@@ -1566,21 +1799,21 @@ const EventEdit = () => {
                                     <h3 className="font-semibold text-lg">
                                       {feature.title || "Untitled Feature"}
                                     </h3>
-                                    {feature.description && (
-                                      <p className="text-sm text-muted-foreground line-clamp-2">
-                                        {feature.description}
-                                      </p>
-                                    )}
-                                    {feature.url && (
-                                      <Link
-                                        to={feature.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-xs text-blue-600 hover:underline break-all"
-                                      >
-                                        {feature.url}
-                                      </Link>
-                                    )}
+                                    {/* {feature.description && (
+                                            <p className="text-sm text-muted-foreground line-clamp-2">
+                                              {feature.description}
+                                            </p>
+                                          )} */}
+                                    {/* {feature.url && (
+                                            <Link
+                                              to={feature.url}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="text-xs text-blue-600 hover:underline break-all"
+                                            >
+                                              {feature.url}
+                                            </Link>
+                                          )} */}
                                     {feature.start_date &&
                                       feature.start_time && (
                                         <div className="text-xs text-muted-foreground mt-1">
@@ -1617,21 +1850,7 @@ const EventEdit = () => {
                                             };
 
                                             return (
-                                              <span
-                                                className="bg-background border px-2 py-1 rounded-md"
-                                                style={
-                                                  {
-                                                    "--accent-bg":
-                                                      lightenColor(
-                                                        selectedColor
-                                                      ),
-                                                    background:
-                                                      "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                                                    transition:
-                                                      "background 0.5s ease",
-                                                  } as React.CSSProperties
-                                                }
-                                              >
+                                              <span className="pr-2 py-1">
                                                 {formatDateTime(start)}
                                                 {end
                                                   ? ` - ${formatDateTime(end)}`
@@ -1645,7 +1864,15 @@ const EventEdit = () => {
                                 </div>
 
                                 {/* Action buttons */}
-                                <div className="flex space-x-1">
+                                <div className="flex justify-center  items-center gap-2 mt-2 sm:mt-0 sm:justify-start">
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    type="button"
+                                    onClick={() => handleFeatureDelete(i)}
+                                  >
+                                    <Trash2 className="w-4 h-4 text-muted-foreground" />
+                                  </Button>
                                   <Button
                                     size="icon"
                                     variant="ghost"
@@ -1656,14 +1883,6 @@ const EventEdit = () => {
                                     }}
                                   >
                                     <Edit2 className="w-4 h-4 text-muted-foreground" />
-                                  </Button>
-                                  <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    type="button"
-                                    onClick={() => handleFeatureDelete(i)}
-                                  >
-                                    <Trash2 className="w-4 h-4 text-destructive" />
                                   </Button>
                                 </div>
                               </div>
@@ -1680,18 +1899,10 @@ const EventEdit = () => {
                                 setEditFeatureIndex(null);
                                 setShowFeatures(true);
                               }}
-                              className="rounded-full mt-2"
-                              style={
-                                selectedColor
-                                  ? {
-                                      backgroundColor: selectedColor,
-                                      borderColor: selectedColor,
-                                    }
-                                  : {}
-                              }
+                              // className="rounded-full mt-2"
+                              className="rounded-full mt-2 sm:mt-0 flex flex-wrap justify-center items-center bg-transparent hover:bg-transparent border-none"
                             >
-                              <PlusCircle className="w-4 h-4 mr-1" />
-                              Add Feature
+                              <Plus className="w-4 h-4" />
                             </Button>
                           </div>
                         </>
@@ -1700,102 +1911,75 @@ const EventEdit = () => {
                   )}
                 </div>
 
-                <div className="border px-4 py-2 rounded-md">
+                <div className="border-none px-4 py-2 rounded-md bg-transparent backdrop-blur-md bg-white/40">
                   <div className="flex justify-between items-center">
-                    <Label htmlFor="tiktok">TikTok Video</Label>
+                    <Label htmlFor="tiktok" className="flex items-center gap-2">
+                      TikTok Video
+                      <InfoTooltip content="Embed a video to give guests a preview of what to expect." />
+                    </Label>
                     <Checkbox
                       id="tiktok"
                       checked={formData.tiktok}
                       onCheckedChange={(checked) =>
                         handleInputChange("tiktok", checked)
                       }
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
+                      className={`w-4 h-4 border  ${
+                        formData.tiktok
+                          ? "backdrop-blur-md bg-white/40 border-black"
+                          : "bg-transparent"
+                      }`}
                     />
                   </div>
 
                   {formData.tiktok && (
-                    <div
-                      className="bg-primary rounded-md mt-2 px-4 py-3"
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
-                    >
-                      <div className="space-y-2">
-                        <Label htmlFor="tiktokLink">Link for TikTok *</Label>
-                        <div className="relative">
-                          <Input
-                            id="tiktokLink"
-                            type="url"
-                            value={formData.tiktokLink ?? ""}
-                            onChange={(e) =>
-                              handleInputChange("tiktokLink", e.target.value)
-                            }
-                            placeholder="Enter link *"
-                            style={
-                              {
-                                "--accent-bg": lightenColor(selectedColor),
-                                background:
-                                  "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                                transition: "background 0.5s ease",
-                              } as React.CSSProperties
-                            }
-                          />
-                        </div>
-                      </div>
+                    // <div
+                    //   className="bg-transparent backdrop-blur-md bg-white/40 rounded-md mt-2 px-4 py-3"
+                    // >
+                    <div className="space-y-2">
+                      {/* <Label htmlFor="tiktokLink">Link for TikTok *</Label> */}
+                      {/* <div className="relative"> */}
+                      <Input
+                        id="tiktokLink"
+                        type="url"
+                        value={formData.tiktokLink ?? ""}
+                        onChange={(e) =>
+                          handleInputChange("tiktokLink", e.target.value)
+                        }
+                        placeholder="Enter link *"
+                        className="border-none bg-transparent backdrop-blur-md bg-white/10 mt-2 placeholder:text-black placeholder:text-sm placeholder:font-medium focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
+                      />
                     </div>
+                    // </div>
+                    // </div>
                   )}
                 </div>
 
-                <div className="border px-4 py-2 rounded-md w-full min-w-0">
+                <div className="border-none px-4 py-2 rounded-md w-full min-w-0 bg-transparent backdrop-blur-md bg-white/40">
                   <div className="flex justify-between items-center">
-                    <Label htmlFor="imageGallery">Image Gallery</Label>
+                    <Label
+                      htmlFor="imageGallery"
+                      className="flex ites-center gap-2"
+                    >
+                      Image Gallery
+                      <InfoTooltip content="Add images to showcase your event's vibe." />
+                    </Label>
                     <Checkbox
                       id="imageGallery"
                       checked={formData.imageGallery}
                       onCheckedChange={(checked) =>
                         handleInputChange("imageGallery", checked)
                       }
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
+                      className={`w-4 h-4 border  ${
+                        formData.imageGallery
+                          ? "backdrop-blur-md bg-white/40 border-black"
+                          : "bg-transparent"
+                      }`}
                     />
                   </div>
 
                   {formData.imageGallery && (
                     <ImageGalleryUpload
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
-                      style_button={
-                        selectedColor
-                          ? {
-                              backgroundColor: selectedColor,
-                              borderColor: selectedColor,
-                            }
-                          : {}
-                      }
+                      className="bg-transparent backdrop-blur-md bg-white/40"
                       onImagesUploaded={(urls) => {
                         handleInputChange("imageGalleryLinks", urls);
                       }}
@@ -1806,20 +1990,12 @@ const EventEdit = () => {
               </CardContent>
             </Card>
 
-            <Card
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
+            <Card className="space-y-2 bg-transparent shadow-none border-none">
+              <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Users className="h-5 w-5" />
-                  <span>Event Preferences</span>
+                <CardTitle className="flex gap-3">
+                  <UtensilsCrossed className="h-5 w-5" />
+                  Event Preferences
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -1832,28 +2008,10 @@ const EventEdit = () => {
                         handleInputChange("dining_style", value)
                       }
                     >
-                      <SelectTrigger
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
-                      >
+                      <SelectTrigger className="border-none space-y-2 bg-transparent backdrop-blur-md bg-white/40 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none">
                         <SelectValue placeholder="Select dining style" />
                       </SelectTrigger>
-                      <SelectContent
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
-                      >
+                      <SelectContent>
                         <SelectItem value="adventurous">Adventurous</SelectItem>
                         <SelectItem value="foodie_enthusiast">
                           Foodie Enthusiast
@@ -1879,28 +2037,10 @@ const EventEdit = () => {
                         handleInputChange("dietary_theme", value)
                       }
                     >
-                      <SelectTrigger
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
-                      >
+                      <SelectTrigger className="space-y-2 bg-transparent backdrop-blur-md bg-white/40 border-none focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none">
                         <SelectValue placeholder="Select dietary preferences" />
                       </SelectTrigger>
-                      <SelectContent
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
-                      >
+                      <SelectContent>
                         <SelectItem value="no_restrictions">
                           No Restrictions
                         </SelectItem>
@@ -1919,18 +2059,13 @@ const EventEdit = () => {
               </CardContent>
             </Card>
 
-            <Card
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
+            <Card className="space-y-2 bg-transparent shadow-none border-none">
+              <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
-                <CardTitle>Tags</CardTitle>
+                <CardTitle className="flex gap-3">
+                  <Tags className="w-5 h-5" />
+                  Tags
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex space-x-2">
@@ -1941,14 +2076,7 @@ const EventEdit = () => {
                     onKeyPress={(e) =>
                       e.key === "Enter" && (e.preventDefault(), addTag())
                     }
-                    style={
-                      {
-                        "--accent-bg": lightenColor(selectedColor),
-                        background:
-                          "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                        transition: "background 0.5s ease",
-                      } as React.CSSProperties
-                    }
+                    className="space-y-2 bg-transparent backdrop-blur-md bg-white/40 shadow-none border-none focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
                   />
                   <Button
                     type="button"
@@ -1973,15 +2101,8 @@ const EventEdit = () => {
                       <Badge
                         key={tag}
                         variant="secondary"
-                        className="cursor-pointer hover:bg-destructive/20"
-                        style={
-                          selectedColor
-                            ? {
-                                backgroundColor: selectedColor,
-                                borderColor: selectedColor,
-                              }
-                            : {}
-                        }
+                        className="cursor-pointer bg-transparent backdrop-blur-md bg-white/40"
+
                         // onClick={() => removeTag(tag)}
                       >
                         {tag}
@@ -1995,44 +2116,36 @@ const EventEdit = () => {
               </CardContent>
             </Card>
 
-            <Card
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
+            <Card className="space-y-2 bg-transparent shadow-none border-none pb-4 lg:pb-0">
+              <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
+                <CardTitle className="flex gap-3">
+                  <Settings className="w-5 h-5" />
                   Page Settings
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex justify-between items-center border px-4 py-2 rounded-md mb-2">
-                  <Label htmlFor="explore">Show on Explore</Label>
+                <div className="flex justify-between items-center border-none px-4 py-2 rounded-md mb-2 bg-transparent backdrop-blur-md bg-white/40">
+                  <Label htmlFor="explore" className="flex ites-center gap-2">
+                    Show on Explore
+                    <InfoTooltip content="This lists your event publicly on the Parish Explore Page for increased visibility and sales." />
+                  </Label>
                   <Checkbox
                     id="explore"
                     checked={formData.explore}
                     onCheckedChange={(checked) =>
                       handleInputChange("explore", checked)
                     }
-                    style={
-                      {
-                        "--accent-bg": lightenColor(selectedColor),
-                        background:
-                          "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                        transition: "background 0.5s ease",
-                      } as React.CSSProperties
-                    }
                   />
                 </div>
-                <div className="border px-4 py-2 rounded-md">
+                <div className="border-none px-4 py-2 rounded-md bg-transparent backdrop-blur-md bg-white/40">
                   <div className="flex justify-between items-center">
-                    <Label htmlFor="is_password_protected">
+                    <Label
+                      htmlFor="is_password_protected"
+                      className="flex items-center gap-2"
+                    >
                       Password Protected Event
+                      <InfoTooltip content="Attendees will need a password to access the event page." />
                     </Label>
                     <Checkbox
                       id="is_password_protected"
@@ -2040,43 +2153,22 @@ const EventEdit = () => {
                       onCheckedChange={(checked) =>
                         handleInputChange("is_password_protected", checked)
                       }
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
                     />
                   </div>
 
                   {formData.is_password_protected && (
                     <div className="rounded-md mt-2 px-4 py-3">
-                      <div className="space-y-2 border rounded-lg px-4 py-3">
-                        <Label htmlFor="event_password">Password *</Label>
-                        <div className="relative">
-                          <Input
-                            id="event_password"
-                            type="password"
-                            value={formData.event_password ?? ""}
-                            onChange={(e) =>
-                              handleInputChange(
-                                "event_password",
-                                e.target.value
-                              )
-                            }
-                            placeholder="Enter event password *"
-                            style={
-                              {
-                                "--accent-bg": lightenColor(selectedColor),
-                                background:
-                                  "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                                transition: "background 0.5s ease",
-                              } as React.CSSProperties
-                            }
-                          />
-                        </div>
+                      <div className="relative">
+                        <Input
+                          id="event_password"
+                          type="password"
+                          value={formData.event_password ?? ""}
+                          onChange={(e) =>
+                            handleInputChange("event_password", e.target.value)
+                          }
+                          placeholder="Enter event password *"
+                          className="border-none bg-transparent backdrop-blur-md bg-white/40 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
+                        />
                       </div>
                     </div>
                   )}
@@ -2085,21 +2177,14 @@ const EventEdit = () => {
             </Card>
           </div>
 
-          <div className="lg:w-1/3 flex flex-col space-y-4 lg:sticky lg:top-1 lg:translate-y-[1%] self-start">
+          {/* <div className="lg:w-1/3 flex flex-col space-y-4 lg:sticky lg:top-1 lg:translate-y-[1%] self-start"> */}
+          {/* <div className="flex flex-col space-y-4 order-1 lg:order-2 lg:w-1/3 lg:sticky lg:top-1 lg:translate-y-[1%] self-start"> */}
+          <div className="lg:w-1/3 flex flex-col space-y-4 lg:sticky lg:top-6 lg:self-start order-last lg:order-none hidden lg:flex">
             <FlyerUpload
               value={formData.flyer_url}
               onChange={handleFlyerChange}
             />
-            <Card
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
+            <Card className="space-y-2 bg-transparent backdrop-blur-md bg-white/40 shadow-none border-none">
               <CardHeader>
                 <CardTitle>Customize Event Style</CardTitle>
               </CardHeader>
@@ -2109,43 +2194,24 @@ const EventEdit = () => {
                 <div className="flex flex-col gap-1">
                   <Label>Title Font</Label>
                   <Select
+                    value={selectedFont}
                     onValueChange={(font) => {
                       setSelectedFont(font);
                       handleFontChange(font);
                     }}
                   >
-                    <SelectTrigger
-                      className="rounded-lg border bg-background/60 hover:bg-background transition"
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
-                    >
+                    <SelectTrigger className="rounded-lg border-none bg-background/60 hover:bg-transparent transition bg-transparent backdrop-blur-md bg-white/40 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none">
                       <SelectValue
                         placeholder="Select font"
                         className="capitalize"
                       />
                     </SelectTrigger>
-                    <SelectContent
-                      className="max-h-60 overflow-y-auto"
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
-                    >
+                    <SelectContent className="max-h-60 overflow-y-auto">
                       {FONT_OPTIONS.map((font) => (
                         <SelectItem
                           key={font}
                           value={font}
-                          className="cursor-pointer hover:bg-accent/60"
+                          className="cursor-pointer"
                         >
                           <span
                             className="block text-base"
@@ -2198,8 +2264,8 @@ const EventEdit = () => {
                         ))}
                         {/* Custom Picker */}
                         {/* <Label className="w-7 h-7 rounded-md border flex items-center justify-center text-xs text-muted-foreground cursor-pointer hover:bg-primary transition">
-                                +
-                              </Label> */}
+                            +
+                          </Label> */}
                         <div
                           className="w-8 h-8 rounded-md border cursor-pointer shadow-sm hover:ring-2 hover:ring-primary transition-all"
                           style={{ backgroundColor: selectedColor }}
@@ -2225,42 +2291,65 @@ const EventEdit = () => {
                         />
 
                         {/* <div className="flex items-center gap-3">
-                                <label
-                                  htmlFor="color-picker"
-                                  className="text-sm font-medium"
-                                >
-                                  Choose Color:
-                                </label>
-                                <div
-                                  className="w-8 h-8 rounded-md border cursor-pointer shadow-sm hover:ring-2 hover:ring-primary transition-all"
-                                  style={{ backgroundColor: selectedColor }}
-                                  onClick={() =>
-                                    document.getElementById("color-picker").click()
-                                  }
-                                ></div>
-                                <input
-                                  id="color-picker"
-                                  type="color"
-                                  value={selectedColor}
-                                  onChange={(e) => {
-                                    setSelectedColor(e.target.value);
-                                    handleColorChange(e.target.value);
-                                    handleInputChange("color", e.target.value);
-                                  }}
-                                  className="hidden"
-                                />
-                              </div> */}
+                            <label
+                              htmlFor="color-picker"
+                              className="text-sm font-medium"
+                            >
+                              Choose Color:
+                            </label>
+                            <div
+                              className="w-8 h-8 rounded-md border cursor-pointer shadow-sm hover:ring-2 hover:ring-primary transition-all"
+                              style={{ backgroundColor: selectedColor }}
+                              onClick={() =>
+                                document.getElementById("color-picker").click()
+                              }
+                            ></div>
+                            <input
+                              id="color-picker"
+                              type="color"
+                              value={selectedColor}
+                              onChange={(e) => {
+                                setSelectedColor(e.target.value);
+                                handleColorChange(e.target.value);
+                                handleInputChange("color", e.target.value);
+                              }}
+                              className="hidden"
+                            />
+                          </div> */}
                       </div>
 
                       {/* Color Preview */}
                       {selectedColor && (
-                        <div className="mt-2 text-xs text-muted-foreground pl-1 flex items-center gap-2">
-                          <div
-                            className="w-4 h-4 rounded border"
-                            style={{ backgroundColor: selectedColor }}
-                          ></div>
-                          <span>{selectedColor}</span>
-                        </div>
+                        <>
+                          <div className="mt-2 text-xs text-muted-foreground pl-1 flex items-center gap-2">
+                            <div
+                              className="w-4 h-4 rounded border"
+                              style={{ backgroundColor: selectedColor }}
+                            ></div>
+                            <span>{selectedColor}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <Label
+                              className="flex gap-3 items-center"
+                              htmlFor="bg_color"
+                            >
+                              Apply Accent Color to Background
+                            </Label>
+                            <Checkbox
+                              id="bg_color"
+                              checked={formData.bg_color}
+                              onCheckedChange={(checked) => {
+                                handleInputChange("bg_color", checked);
+                                handleColorChange(selectedColor);
+                              }}
+                              className={`w-4 h-4 border  ${
+                                formData.bg_color
+                                  ? "backdrop-blur-md bg-white/40 border-black"
+                                  : "bg-transparent border-red"
+                              }`}
+                            />
+                          </div>
+                        </>
                       )}
                     </>
                   ) : (
@@ -2271,8 +2360,9 @@ const EventEdit = () => {
             </Card>
             <Button
               type="submit"
-              disabled={!isFormValid || loading}
-              className="bg-primary hover:bg-secondary"
+              // disabled={!isFormValid || loading}
+              disabled={loading}
+              className="bg-primary hover:bg-secondary lg:static fixed bottom-4 left-0 right-0 mx-6 lg:mx-0 lg:mt-4"
               style={
                 selectedColor
                   ? {
@@ -2286,23 +2376,17 @@ const EventEdit = () => {
             </Button>
           </div>
         </div>
+        <div className="lg:hidden fixed bottom-4 left-0 right-0 mx-6 z-50">
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-primary hover:bg-secondary"
+            style={selectedColor ? { backgroundColor: selectedColor } : {}}
+          >
+            {loading ? "Uodating..." : "Update Event"}
+          </Button>
+        </div>
         <FeatureDialog
-          style={
-            {
-              "--accent-bg": lightenColor(selectedColor),
-              background:
-                "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-              transition: "background 0.5s ease",
-            } as React.CSSProperties
-          }
-          style_button={
-            selectedColor
-              ? {
-                  backgroundColor: selectedColor,
-                  borderColor: selectedColor,
-                }
-              : {}
-          }
           open={showFeatures}
           onClose={() => setShowFeatures(false)}
           onChange={handleInputChange}
@@ -2310,30 +2394,15 @@ const EventEdit = () => {
           editFeatureIndex={editFeatureIndex}
         />
         <RecurringEventDialog
-          style={
-            {
-              "--accent-bg": lightenColor(selectedColor),
-              background:
-                "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-              transition: "background 0.5s ease",
-            } as React.CSSProperties
-          }
-          style_button={
-            selectedColor
-              ? {
-                  backgroundColor: selectedColor,
-                  borderColor: selectedColor,
-                }
-              : {}
-          }
           open={showRecurringDialog}
           onClose={() => {
             // when dialog closes, keep it "Yes"
             setShowRecurringDialog(false);
             handleInputChange("recurring", true);
           }}
-          start_date={formData.start_date}
-          start_time={formData.start_time}
+          // start_date={formData.start_date}
+          // start_time={formData.start_time}
+          start_time={formData.start_datetime}
           onSubmit={(data) => {
             console.log("Recurrence Data:", data);
             handleInputChange("recurrenceDates", data);

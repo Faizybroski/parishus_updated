@@ -10,11 +10,10 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function ImageGalleryUpload({
-  style,
-  style_button,
   onImagesUploaded,
   existingImages = [],
   bucketName = "event-photos",
+  className
 }) {
   // const [images, setImages] = useState<string[]>([]);
   const MAX_IMAGES = 10;
@@ -181,11 +180,10 @@ export default function ImageGalleryUpload({
           {Array.from({ length: 10 }).map((_, i) => (
             <div
               key={i}
-              className="relative w-28 aspect-[4/5] rounded-md border border-dashed border-muted-foreground/40 flex-shrink-0 flex items-center justify-center text-muted-foreground bg-secondary hover:bg-secondary/70 transition-colors cursor-pointer"
+              className="relative w-28 aspect-[4/5] rounded-md border border-dashed border-muted-foreground flex-shrink-0 flex items-center justify-center text-muted-foreground bg-transparent transition-colors cursor-pointer"
               onDrop={(e) => handleDrop(e, i)}
               onDragOver={(e) => e.preventDefault()}
               onClick={() => handleFileSelect(i)}
-              style={style}
             >
               {images[i] ? (
                 <>
@@ -202,7 +200,7 @@ export default function ImageGalleryUpload({
                   </button>
                 </>
               ) : (
-                <span className="text-sm font-medium">{i + 1}</span>
+                <span className="text-sm font-medium text-black">{i + 1}</span>
               )}
             </div>
           ))}
@@ -211,7 +209,7 @@ export default function ImageGalleryUpload({
 
       {/* Cropping Modal */}
       <Dialog open={cropModalOpen} onOpenChange={setCropModalOpen}>
-        <DialogContent className="sm:max-w-[600px]" style={style}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Crop Image (4:5)</DialogTitle>
           </DialogHeader>
@@ -234,7 +232,6 @@ export default function ImageGalleryUpload({
             <Button
               onClick={handleUploadCropped}
               disabled={uploading}
-              style={style_button}
             >
               {uploading ? "Uploading..." : "Upload"}
             </Button>

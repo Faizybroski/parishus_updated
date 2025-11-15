@@ -114,7 +114,7 @@ export default function PaymentCheckoutPage() {
     //   </div>
     // </div>
 
- <div className="min-h-screen px-4 py-10 flex flex-col items-center">
+ <div className="min-h-screen px-4 py-10 flex flex-col items-center pt-16">
   <div className="w-full max-w-2xl space-y-6">
 
     {/* User Info Card */}

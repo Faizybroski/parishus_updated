@@ -13,8 +13,6 @@ import { toast } from "@/hooks/use-toast";
 import { Cross, Plus, X } from "lucide-react";
 
 type RecurringBookingDialogProps = {
-  style: string;
-  style_button: string;
   open: boolean;
   onClose: () => void;
   // start_date: string;
@@ -23,8 +21,6 @@ type RecurringBookingDialogProps = {
 };
 
 export default function RecurringBookingDialog({
-  style,
-  style_button,
   open,
   onClose,
   // start_date,
@@ -35,6 +31,9 @@ export default function RecurringBookingDialog({
   // const eventStart = new Date(start_time); // start_time now includes date + time
 
   // const formattedStartDate = eventStart.toISOString().split("T")[0];
+
+  console.log(start_time)
+
   const eventStart = start_time ? new Date(start_time) : null;
 
 const formattedStartDate = eventStart
@@ -165,8 +164,7 @@ const formattedStartDate = eventStart
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
-        className="max-w-lg max-h-[90vh] overflow-y-auto"
-        style={style}
+        className="max-w-lg max-h-[90vh] overflow-y-auto "
       >
         <DialogHeader>
           <DialogTitle>Recurring Series</DialogTitle>
@@ -184,8 +182,8 @@ const formattedStartDate = eventStart
                 value={date}
                 min={formattedStartDate} // ⬅ prevents earlier selection in the picker
                 onChange={(e) => handleDateChange(idx, e.target.value)}
+                className="focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:outline-none"
                 // style={style}
-                className="bg-transparent backdrop-blur-md bg-white/10"
               />
               {idx === dates.length - 1 && (
                 <Button
@@ -213,7 +211,7 @@ const formattedStartDate = eventStart
           {/* <Button variant="outline" onClick={onClose} style={style_button}>
             Cancel
           </Button> */}
-          <Button onClick={handleSave} style={style_button}>
+          <Button onClick={handleSave}>
             Save recurrence
           </Button>
         </DialogFooter>

@@ -23,8 +23,6 @@ interface Profile {
 }
 
 interface CrossedPathInviteModalProps {
-  style: string;
-  style_button: string;
   open: boolean;
   onClose: () => void;
   onInviteResolved: (guestIds: string[]) => void;
@@ -32,8 +30,6 @@ interface CrossedPathInviteModalProps {
 }
 
 export const CrossedPathInviteModal = ({
-  style,
-  style_button,
   open,
   onClose,
   onInviteResolved,
@@ -155,10 +151,7 @@ export const CrossedPathInviteModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent
-        className="max-w-lg max-h-[90vh] overflow-y-auto"
-        style={style}
-      >
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Invite from Crossed Paths</DialogTitle>
         </DialogHeader>
@@ -180,7 +173,6 @@ export const CrossedPathInviteModal = ({
                       ? "bg-primary border-primary text-lg font-bold"
                       : "hover:bg-muted border-border"
                   }`}
-                  style={style_button}
                   onClick={() => toggleUserSelection(user.id)}
                 >
                   <Avatar className="h-8 w-8">
@@ -202,7 +194,7 @@ export const CrossedPathInviteModal = ({
           <div className="text-xs text-muted-foreground pt-2 flex justify-between items-center">
             <span>You’ve reached your invite limit.</span>
             <Link to={"/subscription"}>
-              <Button size="sm" variant="outline" style={style_button}>
+              <Button size="sm" variant="outline">
                 Upgrade
               </Button>
             </Link>
@@ -213,7 +205,6 @@ export const CrossedPathInviteModal = ({
           <Button
             disabled={selectedIds.length === 0 || loading}
             onClick={handleSubmit}
-            style={style_button}
           >
             Invite {selectedIds.length > 0 ? `(${selectedIds.length})` : ""}
           </Button>

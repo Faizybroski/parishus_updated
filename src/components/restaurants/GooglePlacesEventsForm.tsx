@@ -22,6 +22,7 @@ declare global {
 }
 
 interface Props {
+  required?: boolean;
   formData: FormData;
   onChange: (field: keyof FormData, value: string) => void;
   style?: React.CSSProperties;
@@ -33,6 +34,7 @@ const GooglePlacesEventsForm: React.FC<Props> = ({
   onChange,
   style,
   className,
+  ...props
 }) => {
   const { profile, loading } = useProfile();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -145,15 +147,16 @@ const GooglePlacesEventsForm: React.FC<Props> = ({
       <div className="space-y-2">
         <Label htmlFor="location_name">Venue Name *</Label>
         <div className="relative">
-          <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          {/* <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /> */}
           <Input
             id="location_name"
             ref={inputRef}
-            className={cn("pl-10", className)}
+            className={cn(className)}
             placeholder="e.g., The Garden Cafe"
             value={formData.location_name}
             onChange={(e) => onChange("location_name", e.target.value)}
             style={style}
+            required={props?.required}
           />
         </div>
       </div>
@@ -162,11 +165,12 @@ const GooglePlacesEventsForm: React.FC<Props> = ({
         <Label htmlFor="location_address">Address</Label>
         <Input
           id="location_address"
-          placeholder="Enter Your Address"
+          placeholder="Your Address"
           value={formData.location_address}
           readOnly
-          className={cn(className)}
+          className={cn("cursor-default", className)}
           style={style}
+          required={props?.required}
         />
       </div>
 
@@ -175,10 +179,10 @@ const GooglePlacesEventsForm: React.FC<Props> = ({
           <Label htmlFor="location_lat">Latitude</Label>
           <Input
             id="location_lat"
-            placeholder="Enter Latitude"
+            placeholder="Latitude"
             value={formData.location_lat}
             readOnly
-            className={cn(className)}
+            className={cn("cursor-default", className)}
             style={style}
           />
         </div>
@@ -186,9 +190,9 @@ const GooglePlacesEventsForm: React.FC<Props> = ({
           <Label htmlFor="location_lng">Longitude</Label>
           <Input
             id="location_lng"
-            placeholder="Enter Longitude"
+            placeholder="Longitude"
             value={formData.location_lng}
-            className={cn(className)}
+            className={cn("cursor-default", className)}
             readOnly
             style={style}
           />

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import { useProfile } from "@/hooks/useProfile";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import PriceFilter from "@/components/filter/PriceFilter";
@@ -23,7 +24,12 @@ import {
   Share2,
   Trash2,
 } from "lucide-react";
-import { useLocation, useNavigate, Link } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  Link,
+  useSearchParams,
+} from "react-router-dom";
 
 interface Event {
   id: string;
@@ -57,6 +63,7 @@ interface Event {
 }
 
 const OurExploreEvents = () => {
+  const { profile, loading: profileLoading } = useProfile();
   const [loading, setLoading] = useState(false);
   const [adminEvents, setAdminEvents] = useState([]);
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -72,7 +79,7 @@ const OurExploreEvents = () => {
   const [rsvps, setRsvps] = useState([]);
   const [attendeeCounts, setAttendeeCounts] = useState({});
   const [eventsLoading, setEventsLoading] = useState(false);
-
+const [showCityList, setShowCityList] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -105,11 +112,38 @@ const OurExploreEvents = () => {
     Boston: "MA",
     "New Mirpur City": "Mirpur",
   };
-  const [filters, setFilters] = useState({
-    trending: "Newest",
-    timeframe: "All",
-    city: "All",
-  });
+  // const [filters, setFilters] = useState({
+  //   trending: "Newest",
+  //   timeframe: "All",
+  //   city: "All",
+  // });
+  // const [searchParams, setSearchParams] = useSearchParams();
+  // const [filtersReady, setFiltersReady] = useState(false);
+
+  // const filters = {
+  //   trending: searchParams.get("trending") || "Newest",
+  //   timeframe: searchParams.get("timeframe") || "All",
+  //   city: searchParams.get("city") || "All",
+  // };
+
+  // const [filtersReady, setFiltersReady] = useState(false);
+  // const [filters, setFilters] = useState({
+  //   trending: "Newest",
+  //   timeframe: "All",
+  //   city: "All",
+  // });
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const initialFilters = useMemo(
+    () => ({
+      trending: searchParams.get("trending") || "Newest",
+      timeframe: searchParams.get("timeframe") || "All",
+      city: searchParams.get("city") || "All",
+    }),
+    []
+  ); // <-- empty deps so it only runs once
+
+  const [filters, setFilters] = useState(initialFilters);
 
   // const sliderData = [
   //   {
@@ -170,51 +204,152 @@ const OurExploreEvents = () => {
   //   },
   // ];
 
-  useEffect(() => {
-    const getUserProfile = async () => {
-      if (user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("id")
-          .eq("user_id", user.id)
-          .single();
-        setUserProfileId(profile?.id || null);
-        return profile?.id || null;
-      } else {
-        setUserProfileId(null);
-        return null;
-      }
-    };
+  // useEffect(() => {
+  //   const getUserProfile = async () => {
+  //     if (user) {
+  //       const { data: profile } = await supabase
+  //         .from("profiles")
+  //         .select("id")
+  //         .eq("user_id", user.id)
+  //         .single();
+  //       setUserProfileId(profile?.id || null);
+  //       return profile?.id || null;
+  //     } else {
+  //       setUserProfileId(null);
+  //       return null;
+  //     }
+  //   };
 
-    getUserProfile().then((profileId) => {
-      if (profileId) {
-        fetchEvents(profileId);
-      }
-    });
-  }, [user]);
+  //   getUserProfile().then((profileId) => {
+  //     if (profileId) {
+  //       fetchEvents(profileId);
+  //     }
+  //   });
+  // }, [user]);
 
-  useEffect(() => {
-    if (userProfileId) {
-      fetchEvents(userProfileId, filters);
-      fetchAdminEvents();
-    }
-  // }, [userProfileId, filters]);
-  }, [userProfileId]);
+  // useEffect(() => {
+  //   if (userProfileId) {
+  //     fetchEvents(userProfileId, filters);
+  //     fetchAdminEvents();
+  //   }
+  //   // }, [userProfileId, filters]);
+  // }, [userProfileId]);
 
+  // useEffect(() => {
+  //   if (!filtersReady || !userProfileId) return;
+  //   fetchEvents(userProfileId, filters);
+  //   fetchAdminEvents();
+  // }, [filtersReady, userProfileId, searchParams.toString()]);
+
+  // const handleFilterChange = (key, value) => {
+  //   setFilters((prev) => ({ ...prev, [key]: value }));
+  // };
+
+  // const handleFilterChange = (key, value) => {
+  //   const newParams = new URLSearchParams(searchParams);
+  //   newParams.set(key, value);
+  //   setSearchParams(newParams);
+  // };
+
+  // const handleFilterChange = (key, value) => {
+  //   const newFilters = { ...filters, [key]: value };
+  //   setFilters(newFilters);
+
+  //   const newParams = new URLSearchParams();
+  //   Object.entries(newFilters).forEach(([k, v]) => {
+  //     if (v) newParams.set(k, v);
+  //   });
+  //   setSearchParams(newParams);
+  // };
+
+  // useEffect(() => {
+  //   // Ensure default query params exist
+  //   const newParams = new URLSearchParams(searchParams);
+  //   let changed = false;
+
+  //   if (!newParams.has("trending")) {
+  //     newParams.set("trending", "Newest");
+  //     changed = true;
+  //   }
+  //   if (!newParams.has("timeframe")) {
+  //     newParams.set("timeframe", "All");
+  //     changed = true;
+  //   }
+  //   if (!newParams.has("city")) {
+  //     newParams.set("city", "All");
+  //     changed = true;
+  //   }
+
+  //   if (changed) {
+  //     setSearchParams(newParams);
+  //   } else {
+  //     // ✅ Mark filters ready only after defaults are ensured
+  //     setFiltersReady(true);
+  //   }
+  // }, []);
+
+  // // ✅ Fetch events only once when everything is ready
+  // useEffect(() => {
+  //   if (!filtersReady || !userProfileId) return;
+  //   const currentFilters = {
+  //     trending: searchParams.get("trending") || "Newest",
+  //     timeframe: searchParams.get("timeframe") || "All",
+  //     city: searchParams.get("city") || "All",
+  //   };
+  //   fetchEvents(userProfileId, currentFilters);
+  //   fetchAdminEvents();
+  // }, [filtersReady, userProfileId, searchParams.toString()]);
+
+  // useEffect(() => {
+  //   // Wait for searchParams to exist before marking ready
+  //   const urlFilters = {
+  //     trending: searchParams.get("trending") || "Newest",
+  //     timeframe: searchParams.get("timeframe") || "All",
+  //     city: searchParams.get("city") || "All",
+  //   };
+
+  //   // Apply them to state
+  //   setFilters(urlFilters);
+
+  //   // ✅ Mark filters initialized AFTER setting them
+  //   setFiltersReady(true);
+  // }, []);
+
+  // useEffect(() => {
+  //   if (!filtersReady || !userProfileId) return;
+  //   fetchEvents(userProfileId, filters);
+  //   fetchAdminEvents();
+  // }, [filtersReady, userProfileId, filters]);
 
   const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    const newFilters = { ...filters, [key]: value };
+    setFilters(newFilters);
+
+    const newParams = new URLSearchParams();
+    Object.entries(newFilters).forEach(([k, v]) => {
+      if (v) newParams.set(k, v);
+    });
+    setSearchParams(newParams);
   };
 
-  const getUserProfileId = async () => {
-    if (!user) return null;
-    const { data } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("user_id", user.id)
-      .single();
-    return data?.id || null;
-  };
+  // ✅ Fetch only when filters or userProfileId change
+  useEffect(() => {
+    if (!profile?.id) return;
+
+    // your fetchEvents logic here
+    fetchEvents(profile.id, filters);
+    fetchAdminEvents();
+  }, [profile?.id, filters]);
+
+  // const getUserProfileId = async () => {
+  //   if (!user) return null;
+  //   const { data } = await supabase
+  //     .from("profiles")
+  //     .select("id")
+  //     .eq("user_id", user.id)
+  //     .single();
+  //   return data?.id || null;
+  // };
 
   const fetchAdminEvents = async () => {
     try {
@@ -780,149 +915,233 @@ const OurExploreEvents = () => {
     );
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <LoaderText text="Parish" />
-      </div>
-    );
-  }
+  // if (loading || profileLoading) {
+  //   return (
+  //     <div className="min-h-screen pt-16 flex items-center justify-center bg-background">
+  //       <LoaderText text="Parish" />
+  //     </div>
+  //   );
+  // }
 
   return (
-    <div className="min-h-screen bg-background text-white">
-      <div className="w-full relative -mt-[2px]">
-        {/* Nav ABOVE carousel */}
-        <nav className="absolute top-0 left-0 w-full z-30 h-[80px] hidden sm:block">
-          {/* Matte background synced with current slide */}
-          <div
-            className="absolute inset-0 z-0"
-            style={{
-              backgroundImage: adminEvents.length
-                ? `url(${adminEvents[currentSlide]?.cover_photo_url})`
-                : "none",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              filter: "brightness(0.5) blur(8px)",
-            }}
-          ></div>
+    // <div className="min-h-screen bg-background text-white pt-16">
+    //   <div className="w-full relative -mt-[2px]">
+    //     <nav className="absolute top-0 left-0 w-full z-20 h-[80px] hidden sm:block">
+    //       <div
+    //         className="absolute inset-0 z-0"
+    //         style={{
+    //           backgroundImage: adminEvents.length
+    //             ? `url(${adminEvents[currentSlide]?.cover_photo_url})`
+    //             : "none",
+    //           backgroundSize: "cover",
+    //           backgroundPosition: "center",
+    //           filter: "brightness(0.5) blur(8px)",
+    //         }}
+    //       ></div>
 
-          {/* Overlay content (nav controls) */}
-          <div className="relative z-10 backdrop-blur-md bg-black/40">
-            <div className="flex items-center justify-center px-6 py-5">
-              {/* <NavControls
-                trending={trending}
-                setTrending={setTrending}
-                timeframe={timeframe}
-                setTimeframe={setTimeframe}
-                city={city}
-                setCity={setCity}
-                trendingOptions={trendingOptions}
-                timeframeOptions={timeframeOptions}
-                cityOptions={cityOptions}
-                openDropdown={openDropdown}
-                setOpenDropdown={setOpenDropdown}
-              /> */}
-              <NavControls
-                filters={filters}
-                setFilters={handleFilterChange}
-                openDropdown={openDropdown}
-                setOpenDropdown={setOpenDropdown}
-                trendingOptions={trendingOptions}
-                timeframeOptions={timeframeOptions}
-                cityOptions={cityOptions}
-              />
-            </div>
-          </div>
-        </nav>
+    //       <div className="relative z-10 backdrop-blur-md bg-black/40">
+    //         <div className="flex items-center justify-center px-6 py-5">
 
-        {/* Carousel BELOW nav */}
-        <div
-          className="sm:pt-[80px] touch-pan-y"
-          style={{ touchAction: "pan-y" }}
-        >
-          <Carousel
-            showThumbs
-            autoPlay
-            infiniteLoop
-            showStatus={false}
-            interval={4000}
-            showArrows
-            onChange={(index) => setCurrentSlide(index)}
-            swipeable={false}
-            emulateTouch={false}
-            className="rounded-b-xl overflow-hidden"
-          >
-            {adminEvents.map((event, index) => (
+    //           <NavControls
+    //             filters={filters}
+    //             setFilters={handleFilterChange}
+    //             openDropdown={openDropdown}
+    //             setOpenDropdown={setOpenDropdown}
+    //             trendingOptions={trendingOptions}
+    //             timeframeOptions={timeframeOptions}
+    //             cityOptions={cityOptions}
+    //           />
+    //         </div>
+    //       </div>
+    //     </nav>
+
+    //     <div
+    //       className="sm:pt-[80px] touch-pan-y"
+    //       style={{ touchAction: "pan-y" }}
+    //     >
+    //       <Carousel
+    //         showThumbs
+    //         autoPlay
+    //         infiniteLoop
+    //         showStatus={false}
+    //         interval={4000}
+    //         showArrows
+    //         onChange={(index) => setCurrentSlide(index)}
+    //         swipeable={false}
+    //         emulateTouch={false}
+    //         className="rounded-b-xl overflow-hidden"
+    //       >
+    //         {adminEvents.map((event, index) => (
+    //           <div
+    //             key={index}
+    //             className="relative rounded-xl flex flex-col font-sans lg:flex-row items-center justify-center px-4 sm:px-8 lg:px-12 py-6 sm:py-10 gap-6 lg:gap-10 min-h-[60vh] sm:min-h-[70vh] lg:min-h-[80vh]"
+    //             style={{ touchAction: "pan-y" }}
+    //           >
+    //             <div
+    //               className="absolute inset-0 z-0"
+    //               style={{
+    //                 backgroundImage: `url(${event.cover_photo_url})`,
+    //                 backgroundSize: "cover",
+    //                 backgroundPosition: "center",
+    //                 // filter: "brightness(0.4) blur(10px)",
+    //                 filter: "brightness(0.35) blur(8px)",
+    //               }}
+    //             ></div>
+    //             <div className="absolute inset-0 rounded-xl z-0 bg-gradient-to-b from-neutral-100/20 via-neutral-200/5 to-transparent backdrop-blur-lg"></div>
+
+    //             <div className="relative z-10 flex flex-col lg:flex-row items-center justify-center w-full p-7 gap-8">
+
+    //               <div className="w-full sm:w-[70%] md:w-[60%] lg:w-[30%] max-w-[500px]">
+    //                 <img
+    //                   src={event.cover_photo_url}
+    //                   alt={`Event ${index + 1}`}
+    //                   className="w-full h-auto rounded-xl shadow-2xl object-cover"
+    //                 />
+    //               </div>
+
+    //               <div className="text-white flex flex-col justify-center items-center lg:items-start text-center lg:text-left max-w-2xl px-2 sm:px-0">
+    //                 <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 leading-tight">
+    //                   {event.name}
+    //                 </h2>
+    //                 <p className="text-base sm:text-lg md:text-xl mb-2 text-gray-200">
+    //                   {event.location_name}
+    //                 </p>
+    //                 <p className="text-sm sm:text-base md:text-lg text-gray-300 mb-6">
+    //                   {new Date(event.date_time).toLocaleDateString("en-US", {
+    //                     month: "short",
+    //                     day: "numeric",
+    //                   })}{" "}
+    //                   -{" "}
+    //                   {new Date(event.date_time).toLocaleTimeString("en-US", {
+    //                     hour: "numeric",
+    //                     minute: "2-digit",
+    //                   })}
+    //                 </p>
+    //                 <Link to={`/rsvp/${event.id}/details`}>
+    //                   <button className="bg-white text-black px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold hover:bg-gray-200 transition-all duration-200">
+    //                     Get Tickets
+    //                   </button>
+    //                 </Link>
+    //               </div>
+    //             </div>
+    //           </div>
+    //         ))}
+    //       </Carousel>
+    //     </div>
+    //   </div>
+
+    <div className="min-h-screen bg-background text-white relative overflow-hidden">
+      <div className="relative z-10 pt-16">
+        <div className="w-full relative -mt-[2px]">
+          {/* ✅ Page Navbar */}
+          <nav className="absolute top-0 left-0 w-full z-20 h-[80px] hidden sm:block">
+            {/* Background synced with carousel */}
+            {adminEvents.length > 0 && (
               <div
-                key={index}
-                className="relative rounded-xl flex flex-col font-sans lg:flex-row items-center justify-center px-4 sm:px-8 lg:px-12 py-6 sm:py-10 gap-6 lg:gap-10 min-h-[60vh] sm:min-h-[70vh] lg:min-h-[80vh]"
-                style={{ touchAction: "pan-y" }}
-              >
-                {/* Matte background */}
+                className="absolute inset-0 z-0 transition-all duration-700"
+                style={{
+                  backgroundImage: `url(${adminEvents[currentSlide]?.cover_photo_url})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  filter: "brightness(0.4) blur(8px)",
+                }}
+              />
+            )}
+
+            {/* Foreground (NavControls container) */}
+            <div className="relative z-10 bg-black/40 backdrop-blur-md transition-all duration-700">
+              <div className="flex items-center justify-center px-6 py-5">
+                <NavControls
+                  filters={filters}
+                  setFilters={handleFilterChange}
+                  openDropdown={openDropdown}
+                  setOpenDropdown={setOpenDropdown}
+                  trendingOptions={trendingOptions}
+                  timeframeOptions={timeframeOptions}
+                  cityOptions={cityOptions}
+                />
+              </div>
+            </div>
+          </nav>
+
+          {/* CAROUSEL SECTION */}
+          <div
+            className="sm:pt-[80px] touch-pan-y"
+            style={{ touchAction: "pan-y" }}
+          >
+            <Carousel
+              showThumbs
+              autoPlay
+              infiniteLoop
+              showStatus={false}
+              interval={4000}
+              showArrows
+              onChange={(index) => setCurrentSlide(index)}
+              swipeable={false}
+              emulateTouch={false}
+              className="rounded-b-xl overflow-hidden"
+            >
+              {adminEvents.map((event, index) => (
                 <div
-                  className="absolute inset-0 z-0"
-                  style={{
-                    backgroundImage: `url(${event.cover_photo_url})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    // filter: "brightness(0.4) blur(10px)",
-                    filter: "brightness(0.35) blur(8px)",
-                  }}
-                ></div>
-                <div className="absolute inset-0 rounded-xl z-0 bg-gradient-to-b from-neutral-100/20 via-neutral-200/5 to-transparent backdrop-blur-lg"></div>
+                  key={index}
+                  className="relative rounded-xl flex flex-col font-sans lg:flex-row items-center justify-center px-4 sm:px-8 lg:px-12 py-6 sm:py-10 gap-6 lg:gap-10 min-h-[60vh] sm:min-h-[70vh] lg:min-h-[80vh]"
+                  style={{ touchAction: "pan-y" }}
+                >
+                  {/* Carousel background image */}
+                  <div
+                    className="absolute inset-0 z-0"
+                    style={{
+                      backgroundImage: `url(${event.cover_photo_url})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      filter: "brightness(0.35) blur(0px)",
+                    }}
+                  />
+                  <div className="absolute inset-0 rounded-xl z-0 bg-gradient-to-b from-neutral-100/20 via-neutral-200/5 to-transparent backdrop-blur-lg"></div>
 
-                {/* Content wrapper */}
-                <div className="relative z-10 flex flex-col lg:flex-row items-center justify-center w-full p-7 gap-8">
-                  {/* Image container */}
-                  <div className="w-full sm:w-[70%] md:w-[60%] lg:w-[30%] max-w-[500px]">
-                    <img
-                      src={event.cover_photo_url}
-                      alt={`Event ${index + 1}`}
-                      className="w-full h-auto rounded-xl shadow-2xl object-cover"
-                    />
-                  </div>
+                  {/* Carousel content */}
+                  <div className="relative z-10 flex flex-col lg:flex-row items-center justify-center w-full p-7 gap-8">
+                    <div className="w-full sm:w-[70%] md:w-[60%] lg:w-[30%] max-w-[500px]">
+                      <img
+                        src={event.cover_photo_url}
+                        alt={`Event ${index + 1}`}
+                        className="w-full h-auto rounded-xl shadow-2xl object-cover"
+                      />
+                    </div>
 
-                  {/* Text content */}
-                  <div className="text-white flex flex-col justify-center items-center lg:items-start text-center lg:text-left max-w-2xl px-2 sm:px-0">
-                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 leading-tight">
-                      {event.name}
-                    </h2>
-                    <p className="text-base sm:text-lg md:text-xl mb-2 text-gray-200">
-                      {event.location_name}
-                    </p>
-                    <p className="text-sm sm:text-base md:text-lg text-gray-300 mb-6">
-                      {new Date(event.date_time).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                      })}{" "}
-                      -{" "}
-                      {new Date(event.date_time).toLocaleTimeString("en-US", {
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                    <Link to={`/rsvp/${event.id}/details`}>
-                      <button className="bg-white text-black px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold hover:bg-gray-200 transition-all duration-200">
-                        Get Tickets
-                      </button>
-                    </Link>
+                    <div className="text-white flex flex-col justify-center items-center lg:items-start text-center lg:text-left max-w-2xl px-2 sm:px-0">
+                      <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 leading-tight">
+                        {event.name}
+                      </h2>
+                      <p className="text-base sm:text-lg md:text-xl mb-2 text-gray-200">
+                        {event.location_name}
+                      </p>
+                      <p className="text-sm sm:text-base md:text-lg text-gray-300 mb-6">
+                        {new Date(event.date_time).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}{" "}
+                        -{" "}
+                        {new Date(event.date_time).toLocaleTimeString("en-US", {
+                          hour: "numeric",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                      <Link to={`/rsvp/${event.id}/details`}>
+                        <button className="bg-white text-black px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold hover:bg-gray-200 transition-all duration-200">
+                          Get Tickets
+                        </button>
+                      </Link>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </Carousel>
+              ))}
+            </Carousel>
+          </div>
         </div>
       </div>
 
       <div className=" w-full z-50 bg-black/80 backdrop-blur-md flex sm:hidden">
-        <button
-          className={`flex-1 py-3 text-center font-semibold ${
-            showFeatured ? "bg-white text-black" : "text-white"
-          }`}
-          onClick={() => setShowFeatured(!showFeatured)}
-        >
-          Featured Events
-        </button>
         <button
           className="flex-1 py-3 text-center font-semibold text-white"
           onClick={() => setFilterOpen(true)}
@@ -1001,15 +1220,15 @@ const OurExploreEvents = () => {
               </div>
 
               {/* City */}
-              <div>
-                <label className="block mb-1 text-gray-400">City</label>
-                {/* <input
+              {/* <input
                   type="text"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="Enter a City"
                   className="w-full bg-black/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-white"
                 /> */}
+              {/* <div>
+                <label className="block mb-1 text-gray-400">City</label>
 
                 <input
                   type="text"
@@ -1021,6 +1240,47 @@ const OurExploreEvents = () => {
                   placeholder="Enter a City"
                   className="w-full bg-black/50 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-white"
                 />
+              </div> */}
+              <div>
+                <label className="block mb-1 text-gray-400">City</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={filters.city}
+                    onChange={(e) => handleFilterChange("city", e.target.value)}
+                    onFocus={() => setShowCityList(true)}
+                    onBlur={() => setTimeout(() => setShowCityList(false), 150)}
+                    placeholder="Enter or select a city"
+                    className="w-full bg-black/50 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-white"
+                  />
+
+                  {showCityList && (
+                    <ul className="absolute z-50 bg-white text-black rounded-lg mt-1 shadow-md w-full max-h-48 overflow-y-auto">
+                      {cityOptions
+                        .filter((city) =>
+                          city
+                            .toLowerCase()
+                            .includes(filters.city.toLowerCase())
+                        )
+                        .map((city) => (
+                          <li
+                            key={city}
+                            onMouseDown={() => {
+                              handleFilterChange("city", city);
+                              setShowCityList(false);
+                            }}
+                            className={`px-4 py-2 hover:bg-gray-200 cursor-pointer ${
+                              filters.city === city
+                                ? "bg-gray-100 font-semibold"
+                                : ""
+                            }`}
+                          >
+                            {city}
+                          </li>
+                        ))}
+                    </ul>
+                  )}
+                </div>
               </div>
             </div>
             {/* <div className="mt-6">
@@ -1066,11 +1326,10 @@ const OurExploreEvents = () => {
               to={`/event/${event.id}/details`}
               className="block relative font-sans font-serif rounded-[4%] overflow-hidden shadow-md border border-gray-200 hover:border-gray-700 hover:bg-white/10 hover:cursor-pointer transition-all duration-300 w-full sm:w-[90%] md:w-[45%] lg:w-[32%] max-w-[475px]"
             >
-              <div className="relative">
+              <div className="relative  w-full h-[35rem] overflow-hidden rounded-[4%]">
                 {/* Image */}
                 <img
-                  className="w-full object-cover"
-                  style={{ height: "35rem" }}
+                  className="w-full h-full object-cover"
                   src={event.cover_photo_url}
                   alt={event.name}
                 />

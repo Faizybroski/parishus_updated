@@ -66,179 +66,185 @@ const Navigation = () => {
   const navItems = getNavItems();
 
   return (
-    <nav className="bg-background border-b border-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-          {/* Logo */}
-          <Link
-            to={"/"}
-            className="cursor-pointer flex items-center space-x-1 shrink-0"
-          >
-            <img
-              className="w-10 h-8 mr-2 object-contain"
-              src="/Parishus logo.png"
-              alt="Logo"
-            />
-            <h1
-              className="text-2xl font-bold bg-gradient-primary bg-clip-text text-black whitespace-nowrap font-script"
-              style={{ fontSize: "30px" }}
+    // <nav className="bg-background border-b z-10 relative border-border">
+    <nav className="fixed top-0 left-0 w-full z-30">
+      <div className="backdrop-blur-sm  border-b border-white/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            {/* Logo */}
+            <Link
+              to={"/"}
+              className="cursor-pointer flex items-center space-x-1 shrink-0"
             >
-              Parish
-            </h1>
-          </Link>
-          {!user ? (
-            <div className="flex items-center space-x-4">
-              <Button onClick={() => navigate("/")} variant="outline">
-                Sign In
-              </Button>
-            </div>
-          ) : (
-            <>
-              {/* Desktop Menu */}
-              <div className="hidden nav:flex items-center space-x-6">
-                {navItems.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = location.pathname === item.path;
-                  return (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      className="flex items-center"
-                    >
-                      <Button
-                        variant="ghost"
-                        className={`flex items-center group space-x-1 ${
-                          isActive
-                            ? ""
-                            : "text-muted-foreground hover:text-foreground"
-                        }`}
-                      >
-                        <Icon className="h-5 w-5 icon-animate" />
-                        <span>{item.label}</span>
-                      </Button>
-                    </Link>
-                  );
-                })}
-              </div>
-
-              {/* Right Side */}
+              <img
+                className="w-10 h-8 mr-2 object-contain"
+                src="/Parishus logo.png"
+                alt="Logo"
+              />
+              <h1
+                className="text-2xl font-bold bg-gradient-primary bg-clip-text text-black whitespace-nowrap font-script"
+                style={{ fontSize: "30px" }}
+              >
+                Parish
+              </h1>
+            </Link>
+            {!user ? (
               <div className="flex items-center space-x-4">
-                <Button
-                  ref={searchButtonRef}
-                  className="group"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setSearchVisible((prev) => !prev)}
-                  aria-label="Search"
-                >
-                  <Search className="h-5 w-5 icon-animate" />
-                </Button>
-                <NotificationCenter />
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="relative h-8 w-8 rounded-full"
-                    >
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={profile?.profile_photo_url || ""} />
-                        <AvatarFallback className="text-black font-serif">
-                          {profile?.first_name?.[0]}
-                          {profile?.last_name?.[0]}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    className="w-56 font-serif "
-                    align="end"
-                    forceMount
-                  >
-                    <DropdownMenuItem asChild>
+                <Link to={"/login"}>
+                  <Button variant="outline">Sign In</Button>
+                </Link>
+              </div>
+            ) : (
+              <>
+                {/* Desktop Menu */}
+                <div className="hidden nav:flex items-center space-x-6">
+                  {navItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = location.pathname === item.path;
+                    return (
                       <Link
-                        to={"/profile"}
-                        className="flex items-center w-full group"
+                        key={item.path}
+                        to={item.path}
+                        className="flex items-center"
                       >
-                        <User className="mr-2 h-4 w-4 icon-animate" />
-                        Profile
+                        <Button
+                          variant="ghost"
+                          className={`flex items-center group space-x-1 ${
+                            isActive
+                              ? ""
+                              : "text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          <Icon className="h-5 w-5 icon-animate" />
+                          <span>{item.label}</span>
+                        </Button>
                       </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link
-                        to={"/subscription"}
-                        className="flex items-center group w-full"
-                      >
-                        <Receipt className="mr-2 h-4 w-4 icon-animate" />
-                        Subscription
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link
-                        to={"/user/dashboard"}
-                        className="flex items-center w-full group"
-                      >
-                        <LayoutDashboard className="mr-2 h-4 w-4 icon-animate" />
-                        Dashboard
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleSignOut} className="group">
-                      <LogOut className="mr-2 h-4 w-4 icon-animate" />
-                      Sign Out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                    );
+                  })}
+                </div>
 
-                {/* Hamburger Icon */}
-                <div className="nav:hidden">
+                {/* Right Side */}
+                <div className="flex items-center space-x-4">
                   <Button
-                  className="group"
+                    ref={searchButtonRef}
+                    className="group"
                     variant="ghost"
                     size="icon"
-                    onClick={() => setIsOpen(!isOpen)}
+                    onClick={() => setSearchVisible((prev) => !prev)}
+                    aria-label="Search"
                   >
-                    {isOpen ? (
-                      <X className="h-6 w-6 icon-animate" />
-                    ) : (
-                      <Menu className="h-6 w-6 icon-animate" />
-                    )}
+                    <Search className="h-5 w-5 icon-animate" />
                   </Button>
+                  <NotificationCenter />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="relative h-8 w-8 rounded-full"
+                      >
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={profile?.profile_photo_url || ""} />
+                          <AvatarFallback className="text-black font-serif">
+                            {profile?.first_name?.[0]}
+                            {profile?.last_name?.[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      className="w-56 font-serif "
+                      align="end"
+                      forceMount
+                    >
+                      <DropdownMenuItem asChild>
+                        <Link
+                          to={"/profile"}
+                          className="flex items-center w-full group"
+                        >
+                          <User className="mr-2 h-4 w-4 icon-animate" />
+                          Profile
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link
+                          to={"/subscription"}
+                          className="flex items-center group w-full"
+                        >
+                          <Receipt className="mr-2 h-4 w-4 icon-animate" />
+                          Subscription
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link
+                          to={"/user/dashboard"}
+                          className="flex items-center w-full group"
+                        >
+                          <LayoutDashboard className="mr-2 h-4 w-4 icon-animate" />
+                          Dashboard
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={handleSignOut}
+                        className="group"
+                      >
+                        <LogOut className="mr-2 h-4 w-4 icon-animate" />
+                        Sign Out
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  {/* Hamburger Icon */}
+                  <div className="nav:hidden">
+                    <Button
+                      className="group"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setIsOpen(!isOpen)}
+                    >
+                      {isOpen ? (
+                        <X className="h-6 w-6 icon-animate" />
+                      ) : (
+                        <Menu className="h-6 w-6 icon-animate" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </>
+              </>
+            )}
+          </div>
+
+          {/* Mobile Menu */}
+          {isOpen && (
+            <div className="nav:hidden mt-2 space-y-1">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = location.pathname === item.path;
+
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className="flex items-center"
+                  >
+                    <Button
+                      onClick={() => {
+                        setIsOpen(false);
+                      }}
+                      className={`w-full flex justify-start items-center px-4 py-2 text-left ${
+                        isActive
+                          ? ""
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <Icon className="mr-2 h-5 w-5" />
+                      {item.label}
+                    </Button>
+                  </Link>
+                );
+              })}
+            </div>
           )}
         </div>
-
-        {/* Mobile Menu */}
-        {isOpen && (
-          <div className="nav:hidden mt-2 space-y-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.path;
-
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className="flex items-center"
-                >
-                  <Button
-                    onClick={() => {
-                      setIsOpen(false);
-                    }}
-                    className={`w-full flex justify-start items-center px-4 py-2 text-left ${
-                      isActive
-                        ? ""
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    <Icon className="mr-2 h-5 w-5" />
-                    {item.label}
-                  </Button>
-                </Link>
-              );
-            })}
-          </div>
-        )}
       </div>
       {searchVisible && (
         <GlobalSearchBar

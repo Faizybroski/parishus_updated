@@ -80,21 +80,22 @@ export default function EventAnalyticsDashboard({
 
   if (isFreeTier) {
     return (
-      <Card>
+      <Card className="space-y-2 bg-transparent shadow-none border-none">
+        <div className="border-t border-gray-300 mx-6" />
         <CardHeader>
-          <CardTitle className="">
-            Upgrade to Premium
-          </CardTitle>
+          <CardTitle className="">Upgrade to Premium</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground text-base leading-relaxed max-w-md mb-6">
+          <p className="text-base leading-relaxed max-w-md mb-6">
             Analytics are only available for Premium users.
           </p>
           <Link to={"/subscription"}>
-            <Button className="text-surface px-6 py-2 rounded-md font-semibold transition"
-            style={{
-                  backgroundColor: eventColor,
-                }}>
+            <Button
+              className="text-surface px-6 py-2 rounded-md font-semibold transition"
+              style={{
+                backgroundColor: eventColor,
+              }}
+            >
               Go to Subscription
             </Button>
           </Link>
@@ -118,7 +119,8 @@ export default function EventAnalyticsDashboard({
   }
 
   return (
-    <Card className="bg-background shadow-lg rounded-lg max-w-3xl mx-auto p-6">
+    <Card className="space-y-2 bg-transparent shadow-none border-none">
+                  <div className="border-t border-gray-300 mx-6" />
       <CardHeader>
         <CardTitle className="text-2xl font-semibold mb-4">
           Event Analytics

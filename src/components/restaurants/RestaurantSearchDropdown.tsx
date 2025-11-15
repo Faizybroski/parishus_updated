@@ -63,14 +63,29 @@ export function RestaurantSearchDropdown({
               {selectedRestaurant.name} - {selectedRestaurant.city}
             </span>
           ) : (
-            <span className="text-muted-foreground">{placeholder}</span>
+            <span
+              className={cn(
+                "text-muted-foreground",
+                className,
+                "bg-transparent hover:bg-transparent backdrop-blur-0"
+              )}
+              style={{
+                backdropFilter: "none",
+                WebkitBackdropFilter: "none",
+              }}
+            >
+              {placeholder}
+            </span>
           )}
           <ChevronsUpDown className="absolute right-3 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0" align="start">
         <Command style={props?.style} className={cn(className)}>
-          <div style={props?.style} className={cn("flex items-center border-b px-3", className)}>
+          <div
+            style={props?.style}
+            className={cn("flex items-center border-b px-3", className)}
+          >
             <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
             <CommandInput
               placeholder="Search restaurants..."

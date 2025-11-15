@@ -18,14 +18,17 @@ import { useRestaurants } from "@/hooks/useRestaurants";
 import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 import { supabase } from "@/integrations/supabase/client";
 import { sendEventInvite } from "@/lib/sendInvite";
+import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import {
   ArrowLeft,
   Calendar,
   Clock,
   CreditCard,
+  Upload,
   Edit,
   Heart,
+  ArrowRight,
   Loader2,
   MapPin,
   Share2,
@@ -40,6 +43,11 @@ import { TikTokPlayer } from "@/components/tiktok/TikTokPlayer";
 import MapContainer from "@/components/map/MapContainer";
 import { Input } from "@/components/ui/input";
 import bcrypt from "bcryptjs";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Pagination, EffectFade } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/effect-fade";
+import "swiper/css/pagination";
 
 interface Event {
   is_paid: boolean;
@@ -114,7 +122,7 @@ interface Event {
   }>;
 }
 
-const EventDetails = () => {
+const OurEventDetails = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -132,6 +140,7 @@ const EventDetails = () => {
   const subscriptionStatus = useSubscriptionStatus(profile?.id);
   const [isInterested, setIsInterested] = useState(false);
   const [password, setPassword] = useState("");
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     const fetchPayments = async () => {
@@ -192,6 +201,19 @@ const EventDetails = () => {
 
     checkInterest();
   }, [profile, eventId]);
+
+  useEffect(() => {
+  const url = event?.cover_photo_url;
+  if (!url) return;
+
+  setIsLoaded(false); // optional: reset when URL changes
+
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  img.src = url;
+
+  img.onload = () => setIsLoaded(true);
+}, [event?.cover_photo_url]);
 
   const handleInterest = async () => {
     if (!profile) {
@@ -330,6 +352,23 @@ const EventDetails = () => {
     } catch (error) {
       console.error("Error fetching reviews:", error);
       setEventReviews([]);
+    }
+  };
+
+  const handleCopy = async () => {
+    try {
+      const currentUrl = window.location.href;
+      await navigator.clipboard.writeText(currentUrl);
+      toast({
+        title: "Copied!",
+        description: "Copied to clipboard.",
+      });
+    } catch (err) {
+      toast({
+        title: "Failed",
+        description: "Could not copy the page URL.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -1110,157 +1149,131 @@ const EventDetails = () => {
 
   return (
     <div
-      className="min-h-screen bg-background pt-16"
+      className="min-h-screen bg-background relative z-0 pt-16"
       style={
         {
           "--accent-bg": event.accent_bg,
-          background:
-            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
+          background: " var(--accent-bg)",
           transition: "background 0.5s ease",
         } as React.CSSProperties
       }
     >
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8 flex justify-between items-center">
-          {isCreator && (
-            <Link to={"/events"}>
-              <Button
-                variant="ghost"
-                className="mb-4"
-                style={{
-                  backgroundColor: event.accent_color,
-                }}
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Events
-              </Button>
-            </Link>
-          )}
-          {!isCreator && (
-            <Link to={"/explore"}>
-              <Button
-                variant="ghost"
-                className="mb-4"
-                style={{
-                  backgroundColor: event.accent_color,
-                }}
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Events
-              </Button>
-            </Link>
-          )}
-          {/* {!isCreator && isBeforeDeadline && (
-            <Button
-              onClick={handleInterest}
-              disabled={loading}
-              className={isInterested ? "mb-4" : "mb-4"}
-            >
-              {loading
-                ? "Updating..."
-                : isInterested
-                ? "Interested"
-                : "Show Interest"}
-            </Button>
-          )} */}
-        </div>
-
-        {showRSVPConfirm && (
-          <Dialog open={showRSVPConfirm} onOpenChange={setShowRSVPConfirm}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>
-                  {hasRSVP ? "Cancel RSVP?" : "Confirm RSVP?"}
-                </DialogTitle>
-                <DialogDescription>
-                  {hasRSVP
-                    ? "Are you sure you want to cancel your RSVP?"
-                    : "Do you want to RSVP to this event?"}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="flex justify-end gap-2 mt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowRSVPConfirm(false)}
-                  style={{
-                    backgroundColor: event.accent_color,
-                  }}
-                >
-                  No
-                </Button>
-                <Button
-                  variant={hasRSVP ? "destructive" : "default"}
-                  onClick={confirmRSVP}
-                  style={{
-                    backgroundColor: event.accent_color,
-                  }}
-                >
-                  Yes
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        )}
-
-        {/* Event Cover Image */}
-        {event.cover_photo_url && (
+      {event.cover_photo_url && (
+        <div
+          className={`fixed top-0 left-0 w-full z-[-1] transition-opacity duration-500 ease-out ${
+            isLoaded ? "opacity-100" : "opacity-0"
+          }`}
+          style={{
+            height: "45vh",
+            backgroundImage: `url(${event.cover_photo_url})`,
+            backgroundSize: "cover",
+            backgroundPosition: "top",
+            backgroundRepeat: "no-repeat",
+            zIndex: -1,
+            // Remove blur here since we want the background color to blur
+          }}
+        >
+          <div className="absolute inset-0 backdrop-blur-xl"></div>
           <div
-            className="relative w-full flex items-center justify-center bg-primary h-64 mb-8 rounded-lg overflow-hidden group aspect-[4/5]"
-            // className="bg-primary rounded-md flex items-center justify-center relative overflow-hidden cursor-pointer group aspect-[4/5] w-full max-w-sm mx-auto"
+            className="absolute bottom-0 w-full"
             style={{
-              backgroundColor: event.accent_bg,
+              height: "50vh", // adjust how gradual the fade is
+              background: `linear-gradient(to bottom, rgba(255,255,255,0) 0%, var(--accent-bg) 100%)`,
             }}
-          >
-            <img
-              src={event.cover_photo_url}
-              alt={event.name}
-              className="w-full h-full object-contain"
-            />
-          </div>
-        )}
+          />
+        </div>
+      )}
+      <div
+        className="absolute top-0 left-0 w-full h-full z-[-2]"
+        style={{
+          background: `var(--accent-bg)`,
+          filter: "blur(8px)",
+        }}
+      />
+      <div className="relative z-10">
+        <div className="flex flex-col lg:flex-row gap-6 p-6">
+          {showRSVPConfirm && (
+            <Dialog open={showRSVPConfirm} onOpenChange={setShowRSVPConfirm}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>
+                    {hasRSVP ? "Cancel RSVP?" : "Confirm RSVP?"}
+                  </DialogTitle>
+                  <DialogDescription>
+                    {hasRSVP
+                      ? "Are you sure you want to cancel your RSVP?"
+                      : "Do you want to RSVP to this event?"}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="flex justify-end gap-2 mt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowRSVPConfirm(false)}
+                    style={{
+                      backgroundColor: event.accent_color,
+                    }}
+                  >
+                    No
+                  </Button>
+                  <Button
+                    variant={hasRSVP ? "destructive" : "default"}
+                    onClick={confirmRSVP}
+                    style={{
+                      backgroundColor: event.accent_color,
+                    }}
+                  >
+                    Yes
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Event Header */}
-            <Card>
+          <div className="flex-1 space-y-6 min-w-0 order-first lg:order-none">
+            <div className="block lg:hidden mb-4 flex justify-center">
+              <div className="bg-primary rounded-md flex items-center justify-center relative overflow-hidden cursor-pointer group aspect-[4/5] w-full max-w-sm mx-auto">
+                <img
+                  src={event.cover_photo_url}
+                  alt="Event flyer"
+                  className="w-full h-full object-cover rounded-md"
+                />
+              </div>
+            </div>
+            <Card className="space-y-2 bg-transparent border-none shadow-none">
+              <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
                       <CardTitle
-                        className="text-2xl"
-                        style={{
-                          fontFamily: event.title_font,
-                        }}
+                        className={`flex flex-col justify-between bg-transparent`}
                       >
-                        {event.name}
+                        <div className="flex items-center space-x-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage
+                              src={event.profiles.profile_photo_url}
+                            />
+                            <AvatarFallback>
+                              {event.profiles.first_name[0]}
+                              {event.profiles.last_name[0]}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-lg text-black">
+                            {!isCreator && (
+                              <Link to={`/profile/${event.profiles.username}`}>
+                                {event.profiles.first_name}{" "}
+                                {event.profiles.last_name}
+                              </Link>
+                            )}
+                            {isCreator && (
+                              <Link to={`/profile`}>
+                                {event.profiles.first_name}{" "}
+                                {event.profiles.last_name}
+                              </Link>
+                            )}
+                          </span>
+                        </div>
                       </CardTitle>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={event.profiles.profile_photo_url} />
-                        <AvatarFallback>
-                          {event.profiles.first_name[0]}
-                          {event.profiles.last_name[0]}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="text-sm text-muted-foreground">
-                        Hosted by{" "}
-                        {!isCreator && (
-                          <Link to={`/profile/${event.profiles.username}`}>
-                            {event.profiles.first_name}{" "}
-                            {event.profiles.last_name}
-                          </Link>
-                        )}
-                        {isCreator && (
-                          <Link to={`/profile`}>
-                            {event.profiles.first_name}{" "}
-                            {event.profiles.last_name}
-                          </Link>
-                        )}
-                      </span>
                     </div>
                   </div>
                   <div className="flex space-x-2">
@@ -1294,9 +1307,7 @@ const EventDetails = () => {
                         variant="outline"
                         size="sm"
                         onClick={shareEvent}
-                        style={{
-                          backgroundColor: event.accent_color,
-                        }}
+                        className="bg-transparent text-black hover:bg-transparent border-none"
                       >
                         <Share2 className="h-4 w-4" />
                       </Button>
@@ -1307,92 +1318,129 @@ const EventDetails = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          style={{
-                            backgroundColor: event.accent_color,
-                          }}
+                          className="bg-transparent text-black hover:bg-transparent border-none"
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
                       </Link>
                     )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="bg-transparent text-black hover:bg-transparent border-none"
+                      onClick={handleCopy}
+                    >
+                      <Upload className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-muted-foreground">{event.description}</p>
+                <div
+                  style={{
+                    fontFamily: event.title_font,
+                  }}
+                  className={`font-${event.title_font} my-5 border-none ring-0 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none sm:text-[4rem] xsm:text-[3rem] md:text-[3rem] lg:text-[3rem] h-[5rem]`}
+                >
+                  {event.name}
+                </div>
+                <div>
+                  <Link
+                    to={`https://www.google.com/maps?q=${encodeURIComponent(
+                      `${event.location_name}, ${event.location_address}`
+                    )}`}
+                    className="text-[1.2rem] font-semibold"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {event.location_name}
+                  </Link>
+                </div>
+                <div className="flex items-center text-[1.2rem] font-semibold">
+                  {format(eventDate, "EE, MMM d")}
+                  {" at "}
+                  {format(eventDate, "h:mm a")}
+                  {event.eventEndDateTime && (
+                    <>
+                      <ArrowRight className="w-4 h-4" />
+                      {format(eventEndDate, "EE, MMM d")}
+                      {" at "}
+                      {format(eventEndDate, "h:mm a")}
+                    </>
+                  )}
+                </div>
+                {event.event_fee !== null && event.event_fee > 0 && (
+                  <div className="flex">
+                    <h4 className="font-medium mb-2 mr-2">Price: </h4> ${" "}
+                    {event.event_fee}
+                  </div>
+                )}
 
                 {event.tags && event.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {event.tags.map((tag) => (
-                      <Badge key={tag} variant="secondary">
+                      <Badge
+                        key={tag}
+                        variant="secondary"
+                        className="bg-transparent backdrop-blur-md bg-white/10"
+                      >
                         {tag}
                       </Badge>
                     ))}
                   </div>
                 )}
-
-                {event.event_fee !== null && event.event_fee > 0 && (
-                  <div>
-                    <h4 className="font-medium mb-2">Price</h4>
-                    <Badge variant="outline">${event.event_fee}</Badge>
-                  </div>
-                )}
               </CardContent>
             </Card>
 
-            {/* Event Details */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Event Details</CardTitle>
+            <Card className="space-y-2 bg-transparent shadow-none border-none">
+              <div className="border-t border-gray-300 mx-6" />
+              <CardHeader className="space-y-6">
+                <CardTitle>
+                  <p className="bg-transparent">{event.description}</p>
+                </CardTitle>
               </CardHeader>
+            </Card>
+
+            {event.guest_list && confirmedRSVPs.length > 0 && !isCreator && (
+              <Card className="space-y-2 bg-transparent shadow-none border-none">
+                <div className="border-t border-gray-300 mx-6" />
+                <CardHeader className="space-y-6">
+                  <CardTitle>
+                    <p className="text-muted-foreground bg-transparent">
+                      {`${confirmedRSVPs.profiles?.first_name} and ${
+                        confirmedRSVPs.length - 1
+                      } others going`}
+                    </p>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {confirmedRSVPs.slice(0, 10).map((rsvp) => (
+                    <div
+                      key={rsvp.id}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={rsvp.profiles?.profile_photo_url} />
+                          <AvatarFallback>
+                            {rsvp.profiles?.first_name?.[0] || "U"}
+                            {rsvp.profiles?.last_name?.[0] || "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+
+            <Card className="space-y-2 bg-transparent shadow-none border-none">
+              <div className="border-t border-gray-300 mx-6" />
+              <CardHeader className="pt-1"></CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex items-center space-x-3">
-                    <Calendar className="h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium">
-                        {format(eventDate, "EEEE, MMMM d, yyyy")}
-                      </p>
-                      <p className="text-sm text-muted-foreground">Date</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <Clock className="h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium">
-                        {format(eventDate, "h:mm a")}
-                      </p>
-                      <p className="text-sm text-muted-foreground">Time</p>
-                    </div>
-                  </div>
-                  {event.eventEndDateTime && (
-                    <>
-                      <div className="flex items-center space-x-3">
-                        <Calendar className="h-5 w-5 text-muted-foreground" />
-                        <div>
-                          <p className="font-medium">
-                            {format(eventEndDate, "EEEE, MMMM d, yyyy")}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            End Date
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <Clock className="h-5 w-5 text-muted-foreground" />
-                        <div>
-                          <p className="font-medium">
-                            {format(eventEndDate, "h:mm a")}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            End Time
-                          </p>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                  <div className="flex items-center space-x-3">
-                    <MapPin className="h-5 w-5 text-muted-foreground" />
+                    <MapPin className="h-5 w-5 " />
                     <div>
                       <p className="font-medium">
                         <Link
@@ -1407,7 +1455,7 @@ const EventDetails = () => {
                       </p>
 
                       {event.location_address && (
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm ">
                           <Link
                             to={`https://www.google.com/maps?q=${encodeURIComponent(
                               `${event.location_name}, ${event.location_address}`
@@ -1422,13 +1470,13 @@ const EventDetails = () => {
                     </div>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <Users className="h-5 w-5 text-muted-foreground" />
+                    <Users className="h-5 w-5 " />
                     <div>
                       <p className="font-medium">
                         {confirmedRSVPs.length} / {event.max_attendees}{" "}
                         attending
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm">
                         {spotsLeft > 0
                           ? `${spotsLeft} spots left`
                           : "Event full"}
@@ -1439,45 +1487,49 @@ const EventDetails = () => {
 
                 {event.rsvp_deadline && (
                   <div className="flex items-center space-x-3">
-                    <Hourglass className="h-5 w-5 text-muted-foreground" />
+                    <Hourglass className="h-5 w-5" />
                     <div>
                       <p className="font-medium">
-                        {format(
-                          new Date(event.rsvp_deadline),
-                          "EEEE, MMMM d, yyyy h:mm a"
-                        )}
+                        {format(event.rsvp_deadline, "EE, MMM d")}
+                        {" at "}
+                        {format(event.rsvp_deadline, "h:mm a")}
                       </p>
-                      <p className="text-sm text-muted-foreground">
-                        RSVP Deadline
-                      </p>
+                      <p className="text-sm">RSVP Deadline</p>
                     </div>
                   </div>
                 )}
 
-                {event.dining_style && (
-                  <div>
-                    <h4 className="font-medium mb-2">Dining Style</h4>
-                    <Badge variant="outline">
-                      {event.dining_style.replace("_", " ")}
-                    </Badge>
-                  </div>
-                )}
+                <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  {event.dining_style && (
+                    <div>
+                      <h4 className="font-medium mb-2">Dining Style</h4>
+                      <Badge
+                        variant="secondary"
+                        className="bg-transparent backdrop-blur-md bg-white/10"
+                      >
+                        {event.dining_style.replace("_", " ")}
+                      </Badge>
+                    </div>
+                  )}
 
-                {event.dietary_theme && (
-                  <div>
-                    <h4 className="font-medium mb-2">Dietary Theme</h4>
-                    <Badge variant="outline">
-                      {event.dietary_theme.replace("_", " ")}
-                    </Badge>
-                  </div>
-                )}
+                  {event.dietary_theme && (
+                    <div>
+                      <h4 className="font-medium mb-2">Dietary Theme</h4>
+                      <Badge
+                        variant="secondary"
+                        className="bg-transparent backdrop-blur-md bg-white/10"
+                      >
+                        {event.dietary_theme.replace("_", " ")}
+                      </Badge>
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Location</CardTitle>
-              </CardHeader>
+            <Card className="space-y-2 bg-transparent shadow-none border-none">
+              <div className="border-t border-gray-300 mx-6" />
+              <CardHeader className="pt-1"></CardHeader>
               <CardContent>
                 <MapContainer
                   lat={Number(event.location_lat)}
@@ -1488,144 +1540,84 @@ const EventDetails = () => {
               </CardContent>
             </Card>
 
-            {event.recurrence && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Recurrence</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {event.recurrence_dates.map((date, i) => {
-                    const d = new Date(date);
-                    return (
-                      <div
-                        key={i}
-                        className="bg-secondary border rounded-xl p-4 flex justify-between items-center hover:shadow-md transition-all"
-                      >
-                        <div className="flex items-center space-x-4">
-                          <span>
-                            {d.toLocaleDateString("en-US", {
-                              weekday: "short",
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            })}
-                          </span>
-                          <span className="text-muted-foreground">
-                            {d.toLocaleTimeString("en-US", {
+            {event.features && event.event_features.length > 0 && (
+              <Card className="space-y-2 bg-transparent shadow-none border-none">
+                <div className="border-t border-gray-300 mx-6" />
+                <CardHeader className="pt-1"></CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="mt-4 w-full">
+                    <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-4">
+                      {event.event_features.map((feature, i) => {
+                        const start =
+                          feature.start_date && feature.start_time
+                            ? new Date(
+                                `${feature.start_date}T${feature.start_time}`
+                              )
+                            : null;
+                        const end =
+                          feature.end_date && feature.end_time
+                            ? new Date(
+                                `${feature.end_date}T${feature.end_time}`
+                              )
+                            : null;
+
+                        const formatDateTime = (dt: Date) => {
+                          const date = dt.toLocaleDateString("en-GB", {
+                            day: "2-digit",
+                            month: "2-digit",
+                          });
+                          const time = dt
+                            .toLocaleTimeString("en-US", {
                               hour: "2-digit",
                               minute: "2-digit",
-                            })}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </CardContent>
-              </Card>
-            )}
+                              hour12: true,
+                            })
+                            .toLowerCase();
+                          return `${date} ${time}`;
+                        };
 
-            {isCreator && (
-              <EventAnalyticsDashboard
-                eventId={event.id}
-                eventColor={event.accent_color}
-                subscriptionStatus={subscriptionStatus}
-              />
-            )}
+                        return (
+                          <Link
+                            key={i}
+                            to={feature.url || "#"}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className=" group block bg-transparent overflow-hidden"
+                          >
+                            <div className="relative aspect-[4/5] bg-secondary overflow-hidden">
+                              <img
+                                src={feature.image || "/placeholder.png"}
+                                alt={feature.title || "Feature image"}
+                                onError={(e) =>
+                                  (e.currentTarget.src = "/placeholder.png")
+                                }
+                                className="absolute inset-0 w-full h-full object-cover"
+                              />
+                            </div>
 
-            {event.features && event.event_features.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Features</CardTitle>
-                </CardHeader>
-
-                <CardContent className="space-y-4">
-                  <div className="space-y-4 mt-2 bg-primary/10 rounded-lg p-3">
-                    <div className="flex flex-col gap-3">
-                      {event.event_features.map((feature, i) => (
-                        <div
-                          key={i}
-                          className="bg-secondary border rounded-xl p-4 flex justify-between items-center hover:shadow-md transition-all"
-                        >
-                          {/* Feature Image */}
-                          <div className="flex items-center space-x-4">
-                            <img
-                              src={feature.image || "/placeholder.png"}
-                              alt={feature.title || "Feature image"}
-                              className="w-20 h-20 object-cover rounded-full border"
-                              onError={(e) =>
-                                (e.currentTarget.src = "/placeholder.png")
-                              }
-                            />
-
-                            {/* Text Content */}
-                            <div className="flex flex-col">
+                            <div className="pt-4 space-y-2">
                               <h3 className="font-semibold text-lg">
                                 {feature.title || "Untitled Feature"}
                               </h3>
 
                               {feature.description && (
-                                <p className="text-sm text-muted-foreground line-clamp-2">
+                                <p className="text-sm line-clamp-2">
                                   {feature.description}
                                 </p>
                               )}
 
-                              {feature.url && (
-                                <Link
-                                  to={feature.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-xs text-blue-600 hover:underline break-all"
-                                >
-                                  {feature.url}
-                                </Link>
-                              )}
-
                               {feature.start_date && feature.start_time && (
-                                <div className="text-xs text-muted-foreground mt-1">
-                                  {(() => {
-                                    // Parse dates/times safely
-                                    const start = new Date(
-                                      `${feature.start_date}T${feature.start_time}`
-                                    );
-                                    const end =
-                                      feature.end_date && feature.end_time
-                                        ? new Date(
-                                            `${feature.end_date}T${feature.end_time}`
-                                          )
-                                        : null;
-
-                                    // Format like 28/10 04:23pm
-                                    const formatDateTime = (dt: Date) => {
-                                      const date = dt.toLocaleDateString(
-                                        "en-GB",
-                                        {
-                                          day: "2-digit",
-                                          month: "2-digit",
-                                        }
-                                      );
-                                      const time = dt
-                                        .toLocaleTimeString("en-US", {
-                                          hour: "2-digit",
-                                          minute: "2-digit",
-                                          hour12: true,
-                                        })
-                                        .toLowerCase();
-                                      return `${date} ${time}`;
-                                    };
-
-                                    return (
-                                      <span className="bg-background border px-2 py-1 rounded-md">
-                                        {formatDateTime(start)}
-                                        {end ? ` - ${formatDateTime(end)}` : ""}
-                                      </span>
-                                    );
-                                  })()}
+                                <div className="text-xs">
+                                  <span className="py-1 rounded-md">
+                                    {formatDateTime(start!)}
+                                    {end ? ` - ${formatDateTime(end)}` : ""}
+                                  </span>
                                 </div>
                               )}
                             </div>
-                          </div>
-                        </div>
-                      ))}
+                          </Link>
+                        );
+                      })}
                     </div>
                   </div>
                 </CardContent>
@@ -1633,106 +1625,57 @@ const EventDetails = () => {
             )}
 
             {event.imageGallery && event.imageGalleryLinks.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Image Gallery</CardTitle>
-                </CardHeader>
+              <Card className="space-y-2 bg-transparent shadow-none border-none">
+                <div className="border-t border-gray-300 mx-6" />
+                <CardHeader className="pt-1" />
                 <CardContent>
-                  <div className="my-2 pb-2 w-full overflow-x-auto">
-                    <div className="flex justify-center gap-3 min-w-max px-1">
-                      {event.imageGalleryLinks.map((img) => (
-                        <div className="relative w-28 aspect-[4/5] rounded-md flex-shrink-0 flex items-center justify-center text-muted-foreground bg-secondary hover:bg-secondary/70 transition-colors cursor-pointer">
-                          <img
-                            key={img}
-                            src={img}
-                            alt={`image ${img}`}
-                            className="h-40 w-full object-cover rounded-md"
-                          />
-                        </div>
+                  <div className="w-full">
+                    <Swiper
+                      modules={[Autoplay, Pagination, EffectFade]}
+                      effect="fade"
+                      fadeEffect={{ crossFade: true }}
+                      slidesPerView={1}
+                      loop={true}
+                      centeredSlides={true}
+                      autoplay={{
+                        delay: 3000,
+                        disableOnInteraction: false,
+                      }}
+                      pagination={{
+                        type: "fraction",
+                      }}
+                      className="w-full"
+                    >
+                      {event.imageGalleryLinks.map((img, i) => (
+                        <SwiperSlide key={i}>
+                          <div className="relative aspect-[4/5] mx-auto w-full max-w-sm rounded-md overflow-hidden bg-secondary">
+                            <img
+                              src={img}
+                              alt={`image ${i}`}
+                              className="absolute inset-0 w-full h-full object-cover rounded-md transition-opacity duration-700"
+                            />
+                          </div>
+                        </SwiperSlide>
                       ))}
-                    </div>
+                    </Swiper>
                   </div>
                 </CardContent>
               </Card>
             )}
 
             {event.tiktok && event.tiktok_Link && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>TikTok</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <TikTokPlayer url={event.tiktok_Link} />
-                </CardContent>
-              </Card>
+              // <Card className="space-y-2 bg-transparent shadow-none border-none">
+              //   <div className="border-t border-gray-300 mx-6" />
+              //   <CardHeader className="pt-1"></CardHeader>
+              //   <CardContent className="space-y-6">
+              <TikTokPlayer url={event.tiktok_Link} />
+              //   </CardContent>
+              // </Card>
             )}
 
-            {isCreator && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Payments History</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {payments?.length > 0 ? (
-                    <div className="mt-8">
-                      <div className="overflow-x-auto rounded-lg border border-muted">
-                        <table className="min-w-full text-sm text-left">
-                          <thead className="bg-muted text-muted-foreground uppercase tracking-wider">
-                            <tr>
-                              <th className="px-4 py-2">Name</th>
-                              <th className="px-4 py-2">Email</th>
-                              <th className="px-4 py-2">Status</th>
-                              <th className="px-4 py-2">Date</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {payments.map((payment, index) => (
-                              <tr key={index} className="border-t border-muted">
-                                <td className="px-4 py-2">
-                                  {payment.user_name}
-                                </td>
-                                <td className="px-4 py-2">
-                                  {payment.user_email}
-                                </td>
-                                <td className="px-4 py-2">
-                                  <span
-                                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium capitalize ${
-                                      payment.payment_status === "paid"
-                                        ? "bg-green-100 text-green-800"
-                                        : payment.payment_status === "pending"
-                                        ? "bg-yellow-100 text-yellow-800"
-                                        : payment.payment_status === "failed"
-                                        ? "bg-red-100 text-red-800"
-                                        : "bg-gray-100 text-gray-800"
-                                    }`}
-                                  >
-                                    {payment.payment_status}
-                                  </span>
-                                </td>
-                                <td className="px-4 py-2">
-                                  {format(
-                                    new Date(payment.created_at),
-                                    "MMM d, yyyy"
-                                  )}
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="mt-6 text-sm text-muted-foreground italic">
-                      No payments recorded yet.
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Reviews Section */}
             {eventReviews.length > 0 && (
-              <Card>
+              <Card className="space-y-2 bg-transparent shadow-none border-none">
+                <div className="border-t border-gray-300 mx-6" />
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <Star className="h-5 w-5" />
@@ -1741,7 +1684,6 @@ const EventDetails = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {/* Average Rating */}
                     {eventReviews.length > 0 && (
                       <div className="flex items-center space-x-4 p-4 bg-muted/50 rounded-lg">
                         <div className="text-center">
@@ -1781,7 +1723,6 @@ const EventDetails = () => {
                       </div>
                     )}
 
-                    {/* Individual Reviews */}
                     {eventReviews.slice(0, 3).map((review) => (
                       <div key={review.id} className="space-y-2">
                         <div className="flex items-start space-x-3">
@@ -1843,12 +1784,141 @@ const EventDetails = () => {
                 </CardContent>
               </Card>
             )}
-          </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* RSVP Card */}
-            <Card>
+            {isCreator && (
+              <EventAnalyticsDashboard
+                eventId={event.id}
+                eventColor={event.accent_color}
+                subscriptionStatus={subscriptionStatus}
+              />
+            )}
+
+            {isCreator && event.event_fee !== null && event.event_fee > 0 && (
+              <Card className="space-y-2 bg-transparent shadow-none border-none">
+                <div className="border-t border-gray-300 mx-6" />
+                <CardHeader>
+                  <CardTitle>Payments History</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {payments?.length > 0 ? (
+                    <div className="mt-8">
+                      <div className="overflow-x-auto rounded-lg border border-muted">
+                        <table className="min-w-full text-sm text-left">
+                          <thead className="bg-muted uppercase tracking-wider">
+                            <tr>
+                              <th className="px-4 py-2">Name</th>
+                              <th className="px-4 py-2">Email</th>
+                              <th className="px-4 py-2">Status</th>
+                              <th className="px-4 py-2">Date</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {payments.map((payment, index) => (
+                              <tr key={index} className="border-t border-muted">
+                                <td className="px-4 py-2">
+                                  {payment.user_name}
+                                </td>
+                                <td className="px-4 py-2">
+                                  {payment.user_email}
+                                </td>
+                                <td className="px-4 py-2">
+                                  <span
+                                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium capitalize ${
+                                      payment.payment_status === "paid"
+                                        ? "bg-green-100 text-green-800"
+                                        : payment.payment_status === "pending"
+                                        ? "bg-yellow-100 text-yellow-800"
+                                        : payment.payment_status === "failed"
+                                        ? "bg-red-100 text-red-800"
+                                        : "bg-gray-100 text-gray-800"
+                                    }`}
+                                  >
+                                    {payment.payment_status}
+                                  </span>
+                                </td>
+                                <td className="px-4 py-2">
+                                  {format(
+                                    new Date(payment.created_at),
+                                    "MMM d, yyyy"
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mt-6 text-sm italic">
+                      No payments recorded yet.
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {event.guest_list && confirmedRSVPs.length > 0 && !isCreator && (
+              <Card className="space-y-2 bg-transparent shadow-none border-none">
+                <div className="border-t border-gray-300 mx-6" />
+                <CardHeader>
+                  <CardTitle>Attendees ({confirmedRSVPs.length})</CardTitle>
+                </CardHeader>
+                <CardContent className="p-2">
+                  <div className="space-y-3">
+                    {confirmedRSVPs.map((rsvp) => (
+                      <div
+                        key={rsvp.id}
+                        className="flex items-center justify-between"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage
+                              src={rsvp.profiles?.profile_photo_url}
+                            />
+                            <AvatarFallback>
+                              {rsvp.profiles?.first_name?.[0] || "U"}
+                              {rsvp.profiles?.last_name?.[0] || "U"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-medium">
+                              <Link to={`/profile/${rsvp.profiles?.username}`}>
+                                {rsvp.profiles?.first_name || "Unknown"}{" "}
+                                {rsvp.profiles?.last_name || "User"}
+                              </Link>
+                              {rsvp.profiles.payments?.[0]?.status ===
+                              "completed" ? (
+                                <span className="px-2 py-1 text-xs font-semibold text-black bg-yellow-400 rounded-full ml-2">
+                                  🌟 Paid
+                                </span>
+                              ) : (
+                                <span className="px-2 py-1 text-xs font-semibold text-white bg-[rgb(0,30,83)] rounded-full ml-2">
+                                  {" "}
+                                  🆓 Free
+                                </span>
+                              )}
+                            </span>
+                            {isCreator && (
+                              <span className="text-xs text-muted-foreground">
+                                {rsvp.profiles?.email || "No email"}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        {isCreator && event.event_fee ? (
+                          <span className="text-sm   font-semibold">
+                            ${event.event_fee}
+                          </span>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            <Card className="space-y-2 bg-transparent shadow-none border-none pb-4 md:pb-8 sm:pb-12">
+              <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
                 <CardTitle>Join Event</CardTitle>
               </CardHeader>
@@ -1859,235 +1929,6 @@ const EventDetails = () => {
                     People attending
                   </p>
                 </div>
-
-                {isUpcoming &&
-                  spotsLeft > 0 &&
-                  !isCreator &&
-                  !event.is_password_protected && (
-                    <>
-                      {isBeforeDeadline ? (
-                        !event.event_fee || event.event_fee == 0 ? (
-                          <Button
-                            onClick={handleRSVP}
-                            className={`w-full ${hasRSVP ? "" : ""}`}
-                            style={{
-                              backgroundColor: event.accent_color,
-                            }}
-                          >
-                            {hasRSVP ? (
-                              <>
-                                <UserCheck className="h-4 w-4 mr-2" />
-                                Going - Cancel RSVP
-                              </>
-                            ) : (
-                              <>
-                                <Heart className="h-4 w-4 mr-2" />
-                                RSVP to Event
-                              </>
-                            )}
-                          </Button>
-                        ) : hasRSVP ? (
-                          <Button
-                            onClick={handleRSVP}
-                            className={`w-full ${hasRSVP ? "" : ""}`}
-                            style={{
-                              backgroundColor: event.accent_color,
-                            }}
-                          >
-                            <UserCheck className="h-4 w-4 mr-2" />
-                            Going - Cancel RSVP
-                          </Button>
-                        ) : (
-                          <Button
-                            onClick={() => {
-                              if (subscriptionStatus === "free") {
-                                toast({
-                                  title: "Premium Required",
-                                  description:
-                                    "You need a premium subscription to RSVP for paid events.",
-                                  variant: "destructive",
-                                });
-                                setTimeout(() => {
-                                  navigate("/subscription");
-                                }, 1200);
-                                return;
-                              }
-                              handlePaidRSVP();
-                            }}
-                            disabled={isPaying}
-                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center"
-                            style={{
-                              backgroundColor: event.accent_color,
-                            }}
-                          >
-                            {isPaying ? (
-                              <>
-                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                Processing...
-                              </>
-                            ) : (
-                              <>
-                                <CreditCard className="h-4 w-4 mr-2" />
-                                Pay ${event.event_fee} to RSVP
-                              </>
-                            )}
-                          </Button>
-                        )
-                      ) : (
-                        <Button
-                          disabled
-                          className="w-full bg-gray-400 text-white cursor-not-allowed"
-                          style={{
-                            backgroundColor: event.accent_color,
-                          }}
-                        >
-                          <Clock className="h-4 w-4 mr-2" />
-                          RSVP Closed
-                        </Button>
-                      )}
-                    </>
-                  )}
-
-                {isUpcoming &&
-                  spotsLeft > 0 &&
-                  !isCreator &&
-                  event.is_password_protected && (
-                    <>
-                      {isBeforeDeadline ? (
-                        // If event is FREE
-                        !event.event_fee || event.event_fee == 0 ? (
-                          hasRSVP ? (
-                            <Button
-                              onClick={handleRSVP}
-                              className="w-full"
-                              style={{ backgroundColor: event.accent_color }}
-                            >
-                              <UserCheck className="h-4 w-4 mr-2" />
-                              Going - Cancel RSVP
-                            </Button>
-                          ) : (
-                            <>
-                              {/* ✅ Show password input if event is protected */}
-                              {event.is_password_protected && (
-                                <Input
-                                  type="password"
-                                  value={password}
-                                  onChange={(e) => setPassword(e.target.value)}
-                                  placeholder="Enter password to RSVP"
-                                  className="w-full mb-2"
-                                  style={{ backgroundColor: event.accent_bg }}
-                                />
-                              )}
-                              <Button
-                                onClick={() => {
-                                  if (
-                                    event.is_password_protected &&
-                                    !password.trim()
-                                  ) {
-                                    toast({
-                                      title: "Password Required",
-                                      description:
-                                        "Please enter the event password.",
-                                      variant: "destructive",
-                                    });
-                                    return;
-                                  }
-                                  handleRSVP();
-                                }}
-                                className="w-full"
-                                style={{ backgroundColor: event.accent_color }}
-                              >
-                                <Heart className="h-4 w-4 mr-2" />
-                                RSVP to Event
-                              </Button>
-                            </>
-                          )
-                        ) : // If event is PAID
-                        hasRSVP ? (
-                          <Button
-                            onClick={handleRSVP}
-                            className="w-full"
-                            style={{ backgroundColor: event.accent_color }}
-                          >
-                            <UserCheck className="h-4 w-4 mr-2" />
-                            Going - Cancel RSVP
-                          </Button>
-                        ) : (
-                          <>
-                            {/* ✅ Add password field for paid + protected events */}
-                            {event.is_password_protected && (
-                              <Input
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="Enter password to RSVP"
-                                className="w-full mb-2"
-                                style={{ backgroundColor: event.accent_bg }}
-                              />
-                            )}
-
-                            <Button
-                              onClick={() => {
-                                if (subscriptionStatus === "free") {
-                                  toast({
-                                    title: "Premium Required",
-                                    description:
-                                      "You need a premium subscription to RSVP for paid events.",
-                                    variant: "destructive",
-                                  });
-                                  setTimeout(
-                                    () => navigate("/subscription"),
-                                    1200
-                                  );
-                                  return;
-                                }
-
-                                if (
-                                  event.is_password_protected &&
-                                  !password.trim()
-                                ) {
-                                  toast({
-                                    title: "Password Required",
-                                    description:
-                                      "Please enter the event password.",
-                                    variant: "destructive",
-                                  });
-                                  return;
-                                }
-
-                                handlePaidRSVP();
-                              }}
-                              disabled={isPaying}
-                              className="w-full text-white flex items-center justify-center"
-                              style={{ backgroundColor: event.accent_color }}
-                            >
-                              {isPaying ? (
-                                <>
-                                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                  Processing...
-                                </>
-                              ) : (
-                                <>
-                                  <CreditCard className="h-4 w-4 mr-2" />
-                                  Pay ${event.event_fee} to RSVP
-                                </>
-                              )}
-                            </Button>
-                          </>
-                        )
-                      ) : (
-                        <Button
-                          disabled
-                          className="w-full bg-gray-400 text-white cursor-not-allowed"
-                          style={{ backgroundColor: event.accent_color }}
-                        >
-                          <Clock className="h-4 w-4 mr-2" />
-                          RSVP Closed
-                        </Button>
-                      )}
-                    </>
-                  )}
-
                 {isCreator && !hasRSVP && (
                   <div className="text-center mt-2">
                     <Badge variant="outline" className="px-3 py-1">
@@ -2144,101 +1985,9 @@ const EventDetails = () => {
               </CardContent>
             </Card>
 
-            {/* Attendees */}
-            {/* {confirmedRSVPs.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Attendees ({confirmedRSVPs.length})</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {confirmedRSVPs.slice(0, 5).map((rsvp) => (
-                      <div
-                        key={rsvp.id}
-                        className="flex items-center space-x-3"
-                      >
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={rsvp.profiles?.profile_photo_url} />
-                          <AvatarFallback>
-                            {rsvp.profiles?.first_name?.[0] || "U"}
-                            {rsvp.profiles?.last_name?.[0] || "U"}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="text-sm">
-                          {rsvp.profiles?.first_name || "Unknown"}{" "}
-                          {rsvp.profiles?.last_name || "User"}
-                        </span>
-                      </div>
-                    ))}
-                    {confirmedRSVPs.length > 5 && (
-                      <p className="text-sm text-muted-foreground">
-                        And {confirmedRSVPs.length - 5} more...
-                      </p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )} */}
-            {event.guest_list && confirmedRSVPs.length > 0 && !isCreator && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Attendees ({confirmedRSVPs.length})</CardTitle>
-                </CardHeader>
-                <CardContent className="p-2">
-                  <div className="space-y-3">
-                    {confirmedRSVPs.map((rsvp) => (
-                      <div
-                        key={rsvp.id}
-                        className="flex items-center justify-between"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage
-                              src={rsvp.profiles?.profile_photo_url}
-                            />
-                            <AvatarFallback>
-                              {rsvp.profiles?.first_name?.[0] || "U"}
-                              {rsvp.profiles?.last_name?.[0] || "U"}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex flex-col">
-                            <span className="text-sm font-medium">
-                              <Link to={`/profile/${rsvp.profiles?.username}`}>
-                                {rsvp.profiles?.first_name || "Unknown"}{" "}
-                                {rsvp.profiles?.last_name || "User"}
-                              </Link>
-                              {rsvp.profiles.payments?.[0]?.status ===
-                              "completed" ? (
-                                <span className="px-2 py-1 text-xs font-semibold text-black bg-yellow-400 rounded-full ml-2">
-                                  🌟 Paid
-                                </span>
-                              ) : (
-                                <span className="px-2 py-1 text-xs font-semibold text-white bg-[rgb(0,30,83)] rounded-full ml-2">
-                                  {" "}
-                                  🆓 Free
-                                </span>
-                              )}
-                            </span>
-                            {isCreator && (
-                              <span className="text-xs text-muted-foreground">
-                                {rsvp.profiles?.email || "No email"}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        {isCreator && event.event_fee ? (
-                          <span className="text-sm   font-semibold">
-                            ${event.event_fee}
-                          </span>
-                        ) : null}
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
             {confirmedRSVPs.length > 0 && isCreator && (
-              <Card>
+              <Card className="space-y-2 bg-transparent shadow-none border-none">
+                <div className="border-t border-gray-300 mx-6" />
                 <CardHeader>
                   <CardTitle>Attendees ({confirmedRSVPs.length})</CardTitle>
                 </CardHeader>
@@ -2296,10 +2045,427 @@ const EventDetails = () => {
               </Card>
             )}
           </div>
+
+          <div className="lg:w-1/3 flex flex-col space-y-4 lg:sticky lg:top-6 lg:self-start order-last lg:order-none hidden lg:flex">
+            <div className="aspect-[4/5] w-full ">
+              <img
+                src={event.cover_photo_url}
+                alt="Event flyer"
+                className="w-full h-full object-cover rounded-md"
+              />
+            </div>
+          </div>
         </div>
+        {isUpcoming &&
+          spotsLeft > 0 &&
+          !isCreator &&
+          !event.is_password_protected && (
+            <div className="fixed bottom-4 left-0 right-0 px-4 sm:px-6 md:px-14 lg:px-36 z-50">
+              {isBeforeDeadline ? (
+                !event.event_fee || event.event_fee == 0 ? (
+                  <Button
+                    onClick={handleRSVP}
+                    className={`w-full ${hasRSVP ? "" : ""}`}
+                    style={{
+                      backgroundColor: event.accent_color,
+                    }}
+                  >
+                    {hasRSVP ? (
+                      <>
+                        <UserCheck className="h-4 w-4 mr-2" />
+                        Going - Cancel RSVP
+                      </>
+                    ) : (
+                      <>
+                        <Heart className="h-4 w-4 mr-2" />
+                        RSVP to Event
+                      </>
+                    )}
+                  </Button>
+                ) : hasRSVP ? (
+                  <Button
+                    onClick={handleRSVP}
+                    className={`w-full ${hasRSVP ? "" : ""}`}
+                    style={{
+                      backgroundColor: event.accent_color,
+                    }}
+                  >
+                    <UserCheck className="h-4 w-4 mr-2" />
+                    Going - Cancel RSVP
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      if (subscriptionStatus === "free") {
+                        toast({
+                          title: "Premium Required",
+                          description:
+                            "You need a premium subscription to RSVP for paid events.",
+                          variant: "destructive",
+                        });
+                        setTimeout(() => {
+                          navigate("/subscription");
+                        }, 1200);
+                        return;
+                      }
+                      handlePaidRSVP();
+                    }}
+                    disabled={isPaying}
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center"
+                    style={{
+                      backgroundColor: event.accent_color,
+                    }}
+                  >
+                    {isPaying ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="h-4 w-4 mr-2" />
+                        Pay ${event.event_fee} to RSVP
+                      </>
+                    )}
+                  </Button>
+                )
+              ) : (
+                <Button
+                  disabled
+                  className="w-full bg-gray-400 text-white cursor-not-allowed"
+                  style={{
+                    backgroundColor: event.accent_color,
+                  }}
+                >
+                  <Clock className="h-4 w-4 mr-2" />
+                  RSVP Closed
+                </Button>
+              )}
+            </div>
+          )}
+
+        {isUpcoming &&
+          spotsLeft > 0 &&
+          !isCreator &&
+          event.is_password_protected && (
+            <div className="fixed bottom-4 left-0 right-0 px-4 sm:px-6 md:px-14 lg:px-36 z-50">
+              {isBeforeDeadline ? (
+                // If event is FREE
+                !event.event_fee || event.event_fee == 0 ? (
+                  hasRSVP ? (
+                    <Button
+                      onClick={handleRSVP}
+                      className="w-full"
+                      style={{ backgroundColor: event.accent_color }}
+                    >
+                      <UserCheck className="h-4 w-4 mr-2" />
+                      Going - Cancel RSVP
+                    </Button>
+                  ) : (
+                    <div className="flex flex-col lg:flex-row gap-3">
+                      {event.is_password_protected && (
+                        <Input
+                          type="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="Enter password to RSVP"
+                          className="w-full mb-2 bg-transparent backdrop-blur-md bg-white/10"
+                        />
+                      )}
+                      <Button
+                        onClick={() => {
+                          if (event.is_password_protected && !password.trim()) {
+                            toast({
+                              title: "Password Required",
+                              description: "Please enter the event password.",
+                              variant: "destructive",
+                            });
+                            return;
+                          }
+                          handleRSVP();
+                        }}
+                        className="w-full lg:w-auto flex-1 text-sm sm:text-base whitespace-normal break-words justify-center"
+                        style={{
+                          backgroundColor: event.accent_color,
+                        }}
+                      >
+                        <Heart className="h-4 w-4 mr-2" />
+                        RSVP to Event
+                      </Button>
+                    </div>
+                  )
+                ) : // If event is PAID
+                hasRSVP ? (
+                  <Button
+                    onClick={handleRSVP}
+                    className="w-full"
+                    style={{ backgroundColor: event.accent_color }}
+                  >
+                    <UserCheck className="h-4 w-4 mr-2" />
+                    Going - Cancel RSVP
+                  </Button>
+                ) : (
+                  <div className="flex flex-col lg:flex-row gap-3">
+                    {event.is_password_protected && (
+                      <Input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Enter password"
+                        className="w-full mb-2 bg-transparent backdrop-blur-md bg-white/10"
+                      />
+                    )}
+
+                    <Button
+                      onClick={() => {
+                        if (subscriptionStatus === "free") {
+                          toast({
+                            title: "Premium Required",
+                            description:
+                              "You need a premium subscription to RSVP for paid events.",
+                            variant: "destructive",
+                          });
+                          setTimeout(() => navigate("/subscription"), 1200);
+                          return;
+                        }
+
+                        if (event.is_password_protected && !password.trim()) {
+                          toast({
+                            title: "Password Required",
+                            description: "Please enter the event password.",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+
+                        handlePaidRSVP();
+                      }}
+                      disabled={isPaying}
+                      className="w-full lg:w-auto flex-1"
+                      style={{ backgroundColor: event.accent_color }}
+                    >
+                      {isPaying ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard className="h-4 w-4 mr-2" />
+                          <span className="">Pay ${event.event_fee}</span>
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                )
+              ) : (
+                <Button
+                  disabled
+                  className="w-full bg-gray-400 text-white cursor-not-allowed"
+                  style={{ backgroundColor: event.accent_color }}
+                >
+                  <Clock className="h-4 w-4 mr-2" />
+                  RSVP Closed
+                </Button>
+              )}
+            </div>
+          )}
       </div>
     </div>
   );
 };
 
-export default EventDetails;
+export default OurEventDetails;
+
+{
+  /* {event.imageGallery && event.imageGalleryLinks.length > 0 && (
+              <Card className="space-y-2 bg-transparent shadow-none border-none">
+                <div className="border-t border-gray-300 mx-6" />
+                <CardHeader className="pt-1"></CardHeader>
+                <CardContent>
+                  <div className="my-2 pb-2 w-full">
+                    <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-3 px-1">
+                      {event.imageGalleryLinks.map((img) => (
+                        <div
+                          key={img}
+                          className="relative aspect-[4/5] rounded-md overflow-hiddenbg-secondary hover:bg-secondary/70 transition-colors"
+                        >
+                          <img
+                            src={img}
+                            alt={`image ${img}`}
+                            className="absolute rounded-md inset-0 w-full h-full object-cover"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )} */
+}
+
+{
+  /* RSVP Card */
+}
+
+{
+  /* Attendees */
+}
+{
+  /* {confirmedRSVPs.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Attendees ({confirmedRSVPs.length})</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {confirmedRSVPs.slice(0, 5).map((rsvp) => (
+                      <div
+                        key={rsvp.id}
+                        className="flex items-center space-x-3"
+                      >
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={rsvp.profiles?.profile_photo_url} />
+                          <AvatarFallback>
+                            {rsvp.profiles?.first_name?.[0] || "U"}
+                            {rsvp.profiles?.last_name?.[0] || "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm">
+                          {rsvp.profiles?.first_name || "Unknown"}{" "}
+                          {rsvp.profiles?.last_name || "User"}
+                        </span>
+                      </div>
+                    ))}
+                    {confirmedRSVPs.length > 5 && (
+                      <p className="text-sm text-muted-foreground">
+                        And {confirmedRSVPs.length - 5} more...
+                      </p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )} */
+}
+
+{
+  /* {event.recurrence && (
+              <Card className="space-y-2 bg-transparent shadow-none border-none">
+                <div className="border-t border-gray-300 mx-6" />
+                <CardHeader>
+                  <CardTitle>Recurrence</CardTitle>
+                </CardHeader>
+                <CardContent className="flex gap-4 justify-between">
+                  {event.recurrence_dates.map((date, i) => {
+                    const d = new Date(date);
+                    return (
+                      <div
+                        key={i}
+                        className="bg-transparent backdrop-blur-md bg-white/10 border rounded-xl py-4 px-5  hover:shadow-md transition-all"
+                      >
+                        <div className="">
+                          <span>
+                            {format(d, "EE, MMM d")}
+                            <br />
+                            {format(d, "h:mm a")}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </CardContent>
+              </Card>
+            )} */
+}
+
+{
+  /* {isCreator && event.event_fee ? (
+                        <span className="text-sm   font-semibold">
+                          ${event.event_fee}
+                        </span>
+                      ) : null} */
+}
+
+{
+  /* <div className="flex flex-col">
+                          <span className="text-sm font-medium">
+                            <Link to={`/profile/${rsvp.profiles?.username}`}>
+                              {rsvp.profiles?.first_name || "Unknown"}{" "}
+                              {rsvp.profiles?.last_name || "User"}
+                            </Link>
+                            {rsvp.profiles.payments?.[0]?.status ===
+                            "completed" ? (
+                              <span className="px-2 py-1 text-xs font-semibold text-black bg-yellow-400 rounded-full ml-2">
+                                🌟 Paid
+                              </span>
+                            ) : (
+                              <span className="px-2 py-1 text-xs font-semibold text-white bg-[rgb(0,30,83)] rounded-full ml-2">
+                                {" "}
+                                🆓 Free
+                              </span>
+                            )}
+                          </span>
+                          {isCreator && (
+                            <span className="text-xs text-muted-foreground">
+                              {rsvp.profiles?.email || "No email"}
+                            </span>
+                          )}
+                        </div> */
+}
+
+{
+  /* <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8"> */
+}
+
+{
+  /* Header */
+}
+{
+  /* <div className="mb-8 flex justify-between items-center">
+          {isCreator && (
+            <Link to={"/events"}>
+              <Button
+                variant="ghost"
+                className="mb-4"
+                style={{
+                  backgroundColor: event.accent_color,
+                }}
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Events
+              </Button>
+            </Link>
+          )}
+          {!isCreator && (
+            <Link to={"/explore"}>
+              <Button
+                variant="ghost"
+                className="mb-4"
+                style={{
+                  backgroundColor: event.accent_color,
+                }}
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Events
+              </Button>
+            </Link>
+          )} */
+}
+{
+  /* {!isCreator && isBeforeDeadline && (
+            <Button
+              onClick={handleInterest}
+              disabled={loading}
+              className={isInterested ? "mb-4" : "mb-4"}
+            >
+              {loading
+                ? "Updating..."
+                : isInterested
+                ? "Interested"
+                : "Show Interest"}
+            </Button>
+          )} */
+}
+{
+  /* </div> */
+}

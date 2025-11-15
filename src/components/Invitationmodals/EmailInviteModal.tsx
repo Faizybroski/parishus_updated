@@ -18,8 +18,6 @@ import { Cross, Plus, X } from "lucide-react";
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
 interface EmailInviteModalProps {
-  style: string;
-  style_button: string;
   open: boolean;
   onClose: () => void;
   onInviteResolved: (guestIds: string[]) => void;
@@ -28,8 +26,6 @@ interface EmailInviteModalProps {
 }
 
 export const EmailInviteModal = ({
-  style,
-  style_button,
   open,
   onClose,
   onInviteResolved,
@@ -129,10 +125,7 @@ export const EmailInviteModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent
-        className="max-h-[90vh] overflow-y-auto sm:max-w-[500px]"
-        style={style}
-      >
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Invite Guests</DialogTitle>
         </DialogHeader>
@@ -144,8 +137,8 @@ export const EmailInviteModal = ({
                 type="email"
                 value={email}
                 onChange={(e) => handleEmailChange(idx, e.target.value.trim())}
+                className="focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:outline-none"
                 placeholder="Enter guest email"
-                style={style}
               />
               {idx === emails.length - 1 &&
                 (!isFreeTier || emails.length < MAX_FREE_INVITES) && (
@@ -175,11 +168,7 @@ export const EmailInviteModal = ({
               <div className="text-sm text-muted-foreground flex justify-between items-center border border-border p-2 rounded">
                 <span>You’ve reached the free invite limit.</span>
                 <Link to={"/subscription"}>
-                  <Button
-                    variant="outline"
-                    className="text-xs"
-                    style={style_button}
-                  >
+                  <Button variant="outline" className="text-xs">
                     Upgrade Plan
                   </Button>
                 </Link>
@@ -193,11 +182,7 @@ export const EmailInviteModal = ({
           )}
 
           <DialogFooter>
-            <Button
-              disabled={sending}
-              onClick={handleSubmit}
-              style={style_button}
-            >
+            <Button disabled={sending} onClick={handleSubmit}>
               {sending ? "Sending..." : "Send Invitations"}
             </Button>
           </DialogFooter>

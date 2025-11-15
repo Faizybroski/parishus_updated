@@ -72,6 +72,7 @@ import PrivacyPolicy from "@/pages/PrivacyPolicy.tsx";
 import Layout from "./components/layout/Layout";
 import ConditionalWrapper from "./components/layout/DualLayout";
 import UserProfile from "./pages/UserProfile";
+import OurEventDetails from "./pages/OurEventDetail";
 
 const queryClient = new QueryClient();
 
@@ -86,7 +87,7 @@ const App = () => (
             <Routes>
               {/* <Route
                 path="/auth"
-                element={<div>Auth page rendered by ProtectedRoute</div>}
+                element={<div>Auth page rendered by ProtectedRoute}
               /> */}
               <Route path="/login" element={<AuthLogin />} />
               <Route path="/auth" element={<AuthPage />} />
@@ -246,12 +247,21 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              <Route
+              {/* <Route
                 path="/event/:eventId/details"
                 element={
                   <>
                     <Navigation />
                     <EventDetails />
+                  </>
+                }
+              /> */}
+              <Route
+                path="/event/:eventId/details"
+                element={
+                  <>
+                    <Navigation />
+                    <OurEventDetails />
                   </>
                 }
               />

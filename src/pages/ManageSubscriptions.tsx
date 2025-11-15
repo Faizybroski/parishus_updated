@@ -18,14 +18,14 @@ const ManageSubscriptions = () => {
 
     if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center bg-background pt-16">
         <LoaderText text="Parish" />
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10">
+    <div className="max-w-7xl mx-auto px-4 py-10 pt-16">
       <div className="mb-10">
         <h1 className="text-3xl font-bold mb-2 font-script">Manage User Subscriptions</h1>
         <p className="text-muted-foreground">Overview of all user plans and statuses</p>

@@ -645,7 +645,7 @@ const RSVPDetails = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen pt-16 flex items-center justify-center bg-background">
         <LoaderText text="Parish" />
       </div>
     );
@@ -653,7 +653,7 @@ const RSVPDetails = () => {
 
   if (!event) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center pt-16">
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-bold text-foreground font-script">
             Event Not Found
@@ -686,7 +686,7 @@ const RSVPDetails = () => {
   const isPastEvent = eventDate < now;
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 pt-16">
       <div className="w-full max-w-md bg-secondary p-6 rounded-3xl shadow-lg space-y-6 relative">
         <Link to="/">
           <Button
