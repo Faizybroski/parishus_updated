@@ -8,8 +8,10 @@ import { LoaderText } from "@/components/loader/Loader";
 import { Loader2 } from "lucide-react";
 import { AdminLogin } from "@/components/adminLogin/AdminLogin";
 import { ParishUsLanding } from "@/pages/LandingPage";
+import { Login } from "@/components/login/Login";
 import { SocialLinks } from "@/components/SocialMedia/SocialMedia";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -203,6 +205,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       return <AdminLogin />; // render AdminLogin component
     }
     return <ParishUsLanding />;
+    // toast({
+    //   title: "Login First",
+    //   description: "Please login before accessing Parish.",
+    //   variant: "destructive",
+    // });
+    // return <Login />
   }
 
   // if (profile  && profile.role === 'user' && !profile.instagram_username && !profile.linkedin_username) {

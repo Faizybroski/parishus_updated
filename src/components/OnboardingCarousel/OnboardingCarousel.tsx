@@ -388,9 +388,10 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
               style={{
                 width: "50%",
                 paddingTop: "120px",
-                paddingBottom: "120px",
+                paddingBottom: "50px",
               }}
             />
+            <p>Sign up to Unlock the full experience</p>
           </div>
         ) : currentCard.type === "intro-title" ? (
           <>
