@@ -266,7 +266,6 @@ const EventEdit = () => {
         explore: data.explore || true,
         imageGallery: data.imageGallery || false,
         imageGalleryLinks: data.imageGalleryLinks || [],
-        eventFeatures: data.eventFeatures || [],
         recurring: data.recurrence || false,
         recurrenceDates: data.recurrence_dates || [],
         // end_date: eventEndDateTime
