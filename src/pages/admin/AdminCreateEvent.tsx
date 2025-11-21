@@ -489,7 +489,7 @@ const AdminCreateEvent = () => {
       }
 
       const { data, error } = await supabase
-        .from("dummyevents")
+        .from("events")
         .insert({
           creator_id: profile.id,
           guest_user_ids: invitedGuestIds,

@@ -482,6 +482,7 @@ export type Database = {
           job_title: string | null
           last_name: string | null
           location_city: string | null
+          username: string | null
           location_lat: number | null
           location_lng: number | null
           onboarding_completed: boolean | null

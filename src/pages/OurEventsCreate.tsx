@@ -245,6 +245,46 @@ const OurEventsCreate = () => {
     return `rgb(${r}, ${g}, ${b})`;
   }
 
+  function getContrastColor(hex: string) {
+    if (!hex) return "black";
+
+    // Normalize hex
+    hex = hex.replace("#", "");
+
+    // Convert shorthand hex (#abc → #aabbcc)
+    if (hex.length === 3) {
+      hex = hex
+        .split("")
+        .map((x) => x + x)
+        .join("");
+    }
+
+    const r = parseInt(hex.substring(0, 2), 16) / 255;
+    const g = parseInt(hex.substring(2, 4), 16) / 255;
+    const b = parseInt(hex.substring(4, 6), 16) / 255;
+
+    // Gamma correction (WCAG formula)
+    const R = r <= 0.03928 ? r / 12.92 : Math.pow((r + 0.055) / 1.055, 2.4);
+    const G = g <= 0.03928 ? g / 12.92 : Math.pow((g + 0.055) / 1.055, 2.4);
+    const B = b <= 0.03928 ? b / 12.92 : Math.pow((b + 0.055) / 1.055, 2.4);
+
+    // Calculate luminance
+    const luminance = 0.2126 * R + 0.7152 * G + 0.0722 * B;
+
+    // Thresholds:
+    // - < 0.25 is dark    → use white
+    // - > 0.7 is light    → use black
+    // - between           → pick black or white based on which has better contrast
+    if (luminance < 0.25) return "white";
+    if (luminance > 0.7) return "black";
+
+    // Middle zone — choose best contrast
+    const contrastWithWhite = 1.05 / (luminance + 0.05);
+    const contrastWithBlack = (luminance + 0.05) / 0.05;
+
+    return contrastWithWhite > contrastWithBlack ? "white" : "black";
+  }
+
   const handleFontChange = (font: string) => {
     setSelectedFont(font);
     handleInputChange("title_font", font);
@@ -647,7 +687,7 @@ const OurEventsCreate = () => {
       }
 
       const { data, error } = await supabase
-        .from("dummyevents")
+        .from("events")
         .insert({
           creator_id: profile.id,
           guest_user_ids: invitedGuestIds,
@@ -2006,19 +2046,20 @@ const OurEventsCreate = () => {
                     type="button"
                     onClick={addTag}
                     variant="outline"
-                    style={
-                      selectedColor
-                        ? {
-                            backgroundColor: selectedColor,
-                            borderColor: selectedColor,
-                          }
-                        : {}
-                    }
+                    className="bg-transparent backdrop-blur-md bg-white/40 hover:bg-white/40 border-none"
+                    // style={
+                    //   selectedColor
+                    //     ? {
+                    //         backgroundColor: selectedColor,
+                    //         borderColor: selectedColor,
+                    //         color: getContrastColor(selectedColor)
+                    //       }
+                    //     : {}
+                    // }
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
-
                 {formData.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {formData.tags.map((tag) => (

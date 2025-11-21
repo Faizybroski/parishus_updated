@@ -164,7 +164,7 @@ const AdminEditEvent = () => {
 
     try {
       const { data, error } = await supabase
-        .from("dummyevents")
+        .from("events")
         .select("*")
         .eq("id", eventId)
         .single();
@@ -573,7 +573,7 @@ const AdminEditEvent = () => {
       }
 
       const { data, error } = await supabase
-        .from("dummyevents")
+        .from("events")
         .update({
           guest_user_ids: invitedGuestIds,
           date_time: eventDateTime.toISOString(),

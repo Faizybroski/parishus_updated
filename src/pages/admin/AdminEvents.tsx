@@ -65,7 +65,7 @@ const AdminEvents = () => {
   const fetchEvents = async () => {
     try {
       const { data, error } = await supabase
-        .from("dummyevents")
+        .from("events")
         .select(
           `
           *,
@@ -76,6 +76,10 @@ const AdminEvents = () => {
           restaurants (
             name,
             city
+          ),
+          rsvps (
+            id,
+            status
           )
         `
         )
@@ -93,12 +97,6 @@ const AdminEvents = () => {
       setLoading(false);
     }
   };
-
-  // ,
-  //         rsvps (
-  //           id,
-  //           status
-  //         )
 
   const handleDeleteEvent = async (eventId: string) => {
     if (!eventId) return;
@@ -335,7 +333,10 @@ const AdminEvents = () => {
 
                     <div className="flex-grow" />
                     <div className="flex space-x-2">
-                      <Link to={`/admin/event/${event.id}/details`} className="flex-1">
+                      <Link
+                        to={`/admin/event/${event.id}/details`}
+                        className="flex-1"
+                      >
                         <Button className="w-full bg-primary hover:bg-primary/90 text-black rounded-sm">
                           See details
                         </Button>

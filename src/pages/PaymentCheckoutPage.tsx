@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import {LoaderText} from "@/components/loader/Loader"
+import { LoaderText } from "@/components/loader/Loader";
 import {
   Elements,
   useStripe,
@@ -39,13 +39,14 @@ interface Event {
 export default function PaymentCheckoutPage() {
   const location = useLocation();
   const [event, setEvent] = useState<Event | null>(null);
-  const { clientSecret, publishableKey, eventId, userName, userEmail } =
+  const { clientSecret, publishableKey, eventId, userName, userEmail, date } =
     location.state || {};
   const [stripePromise, setStripePromise] = useState(null);
 
   useEffect(() => {
     if (eventId) {
       fetchEventDetails(eventId);
+      console.log("date====>", date)
     }
   }, [eventId]);
 
@@ -65,10 +66,11 @@ export default function PaymentCheckoutPage() {
   }, [publishableKey]);
 
   if (!clientSecret || !stripePromise)
-    return(
+    return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <LoaderText text="Parish" />
-      </div>)
+      </div>
+    );
 
   return (
     // <div className="min-h-screen px-4 py-10">
@@ -114,65 +116,63 @@ export default function PaymentCheckoutPage() {
     //   </div>
     // </div>
 
- <div className="min-h-screen px-4 py-10 flex flex-col items-center pt-16">
-  <div className="w-full max-w-2xl space-y-6">
+    <div className="min-h-screen px-4 py-10 flex flex-col items-center pt-16">
+      <div className="w-full max-w-2xl space-y-6">
+        {/* User Info Card */}
+        <Card className="border-none shadow-lg">
+          <CardHeader>
+            <CardTitle>👤 User Info</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            <div className="text-lg font-semibold">
+              <strong>Name:</strong> {userName}
+            </div>
+            <div className="text-muted-foreground">
+              <strong>Email:</strong> {userEmail}
+            </div>
+          </CardContent>
+        </Card>
 
-    {/* User Info Card */}
-    <Card className="text-white border-none shadow-lg">
-      <CardHeader>
-        <CardTitle>👤 User Info</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2 text-sm">
-        <div className="text-lg font-semibold">
-          <strong>Name:</strong> {userName}
+        {/* Event Info Card */}
+        {event && (
+          <Card className="border-none shadow-lg">
+            <CardHeader>
+              <CardTitle>🎉 Event Info</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm">
+              <div className="text-lg font-semibold">{event.name}</div>
+              <div className="text-muted-foreground">
+                {new Date(date).toLocaleString()} – {event.location_name}
+              </div>
+              <p className="text-muted-foreground">{event.description}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Payment Form */}
+        <div className="p-6 rounded-2xl shadow-lg border border-neutral-800">
+          <Elements stripe={stripePromise} options={{ clientSecret }}>
+            <CheckoutForm
+              userName={userName}
+              userEmail={userEmail}
+              clientSecret={clientSecret}
+              eventId={eventId}
+              date={date}
+            />
+          </Elements>
         </div>
-        <div className="text-muted-foreground">
-          <strong>Email:</strong> {userEmail}
-        </div>
-      </CardContent>
-    </Card>
-
-    {/* Event Info Card */}
-    {event && (
-      <Card className=" text-white border-none shadow-lg">
-        <CardHeader>
-          <CardTitle>🎉 Event Info</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 text-sm">
-          <div className="text-lg font-semibold">{event.name}</div>
-          <div className="text-muted-foreground">
-            {event.date_time} – {event.location_name}
-          </div>
-          <p className="text-muted-foreground">{event.description}</p>
-        </CardContent>
-      </Card>
-    )}
-
-    {/* Payment Form */}
-    <div className="p-6 rounded-2xl shadow-lg border border-neutral-800">
-      <Elements stripe={stripePromise} options={{ clientSecret }}>
-        <CheckoutForm
-          userName={userName}
-          userEmail={userEmail}
-          clientSecret={clientSecret}
-          eventId={eventId}
-        />
-      </Elements>
+      </div>
     </div>
-
-  </div>
-</div>
-
   );
 }
 
-function CheckoutForm({ userName, userEmail, clientSecret, eventId }) {
+function CheckoutForm({ userName, userEmail, clientSecret, eventId, date }) {
   const stripe = useStripe();
   const elements = useElements();
   const { profile } = useProfile();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-    const [postalCode, setPostalCode] = useState("");
+  const [postalCode, setPostalCode] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -193,7 +193,7 @@ function CheckoutForm({ userName, userEmail, clientSecret, eventId }) {
     //     card: cardNumberElement,
     //     billing_details: {
     //       name: userName,
-    //       email: userEmail,   
+    //       email: userEmail,
     //                 address: {
     //         postal_code: postalCode,
     //       },
@@ -202,34 +202,34 @@ function CheckoutForm({ userName, userEmail, clientSecret, eventId }) {
     // });
 
     const cardNumberElement = elements.getElement(CardNumberElement);
-const cardExpiryElement = elements.getElement(CardExpiryElement);
-const cardCvcElement = elements.getElement(CardCvcElement);
+    const cardExpiryElement = elements.getElement(CardExpiryElement);
+    const cardCvcElement = elements.getElement(CardCvcElement);
 
-if (!cardNumberElement || !cardExpiryElement || !cardCvcElement) {
-  toast({ title: "Please fill in all card details" });
-  setLoading(false);
-  return;
-}
+    if (!cardNumberElement || !cardExpiryElement || !cardCvcElement) {
+      toast({ title: "Please fill in all card details" });
+      setLoading(false);
+      return;
+    }
 
-const { paymentMethod, error } = await stripe.createPaymentMethod({
-  type: 'card',
-  card: cardNumberElement,  
-  billing_details: {
-    name: userName,
-    email: userEmail,
-    address: { postal_code: postalCode },
-  },
-});
+    const { paymentMethod, error } = await stripe.createPaymentMethod({
+      type: "card",
+      card: cardNumberElement,
+      billing_details: {
+        name: userName,
+        email: userEmail,
+        address: { postal_code: postalCode },
+      },
+    });
 
-if (error) {
-  toast({ title: error.message });
-  setLoading(false);
-  return;
-}
+    if (error) {
+      toast({ title: error.message });
+      setLoading(false);
+      return;
+    }
 
-const result = await stripe.confirmCardPayment(clientSecret, {
-  payment_method: paymentMethod.id,
-});
+    const result = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: paymentMethod.id,
+    });
 
     if (result?.paymentIntent?.status === "succeeded") {
       const userId = profile.user_id;
@@ -244,6 +244,7 @@ const result = await stripe.confirmCardPayment(clientSecret, {
             userEmail,
             paymentIntentId: result.paymentIntent.id,
             paymentStatus: result.paymentIntent.status,
+            date
           },
         }
       );
@@ -253,6 +254,7 @@ const result = await stripe.confirmCardPayment(clientSecret, {
           event_id: eventId,
           user_id: profile.id,
           status: "confirmed",
+          date
         });
 
         await supabase.from("reservations").insert({
@@ -260,6 +262,7 @@ const result = await stripe.confirmCardPayment(clientSecret, {
           user_id: profile.id,
           reservation_type: "standard",
           reservation_status: "confirmed",
+          date
         });
 
         const { data: eventData } = await supabase
@@ -361,7 +364,10 @@ const result = await stripe.confirmCardPayment(clientSecret, {
 
         navigate("/rsvp-success");
       } else {
-        console.error("Payment was successful but backend failed:", error || response);
+        console.error(
+          "Payment was successful but backend failed:",
+          error || response
+        );
         alert("Payment done, but something went wrong on our end.");
       }
     }
@@ -371,46 +377,42 @@ const result = await stripe.confirmCardPayment(clientSecret, {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-  <div>
-    <label className="block text-sm mb-2">Card Number</label>
-    <div className="p-3 bg-white rounded-md text-black">
-      <CardNumberElement />
-    </div>
-  </div>
-
-  <div className="grid grid-cols-2 gap-4">
-    <div>
-      <label className="block text-sm mb-2">Expiry Date</label>
-      <div className="p-3 bg-white rounded-md text-black">
-        <CardExpiryElement />
+      <div>
+        <label className="block text-sm mb-2">Card Number</label>
+        <div className="p-3 bg-white rounded-md text-black">
+          <CardNumberElement />
+        </div>
       </div>
-    </div>
-    <div>
-      <label className="block text-sm mb-2">CVC</label>
-      <div className="p-3 bg-white rounded-md text-black">
-        <CardCvcElement />
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm mb-2">Expiry Date</label>
+          <div className="p-3 bg-white rounded-md text-black">
+            <CardExpiryElement />
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm mb-2">CVC</label>
+          <div className="p-3 bg-white rounded-md text-black">
+            <CardCvcElement />
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <div>
-    <label className="block text-sm mb-2">Postal Code</label>
-    <input
-      type="text"
-      value={postalCode}
-      onChange={(e) => setPostalCode(e.target.value.trim())}
-      className="w-full p-3 rounded-md bg-white text-black"
-      required
-    />
-  </div>
+      <div>
+        <label className="block text-sm mb-2">Postal Code</label>
+        <input
+          type="text"
+          value={postalCode}
+          onChange={(e) => setPostalCode(e.target.value.trim())}
+          className="w-full p-3 rounded-md bg-white text-black"
+          required
+        />
+      </div>
 
-  <Button
-    type="submit"
-    disabled={!stripe || loading}
-    className="w-full"
-  >
-    {loading ? "Processing..." : "Pay Now"}
-  </Button>
-</form>
+      <Button type="submit" disabled={!stripe || loading} className="w-full">
+        {loading ? "Processing..." : "Pay Now"}
+      </Button>
+    </form>
   );
 }

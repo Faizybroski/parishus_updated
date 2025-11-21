@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
+import { LoaderText } from "@/components/loader/Loader";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,70 +32,75 @@ import { useNavigate, useParams } from "react-router-dom";
 import "@/index.css";
 
 const UserProfile = () => {
+  const { profile: currentUserProfile } = useProfile();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [paymentStatus, setPaymentStatus] = useState<string>("free");
   const [user_profile, setProfile] = useState<any>(null);
   const { username } = useParams();
+  const [checking, setChecking] = useState(true);
 
-  React.useEffect(() => {
-    fetchProfile();
-  }, [username]);
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!username || !currentUserProfile) return;
 
-  const fetchProfile = async () => {
-    if (!username) return;
+      setLoading(true);
 
-    setLoading(true);
+      try {
+        const { data: profiledata, error: profileErr } = await supabase
+          .from("profiles")
+          .select(
+            "id, first_name, last_name, job_title, location_city, dining_style, dietary_preferences, gender_identity, profile_photo_url, role"
+          )
+          .eq("username", username)
+          .single();
 
-    try {
-      const { data: profiledata, error: profileErr } = await supabase
-        .from("profiles")
-        .select(
-          "id, first_name, last_name, job_title, location_city, dining_style, dietary_preferences, gender_identity, profile_photo_url, role"
-        )
-        .eq("username", username)
-        .single();
+        if (profileErr) throw profileErr;
 
-      if (profileErr) throw profileErr;
-
-      let paymentStatusResult = "free";
-
-      if (profiledata?.id) {
-        const { data: subData, error: subErr } = await supabase
-          .from("payments")
-          .select("status")
-          .eq("user_id", profiledata.id)
-          .order("created_at", { ascending: false })
-          .limit(1);
-
-        if (subErr) {
-          console.error("Error fetching payment status:", subErr);
-        } else {
-          paymentStatusResult = subData?.[0]?.status || "free";
+        if (profiledata?.id === currentUserProfile?.id) {
+          navigate("/profile", { replace: true });
+          return;
         }
+
+        let paymentStatusResult = "free";
+
+        if (profiledata?.id) {
+          const { data: subData, error: subErr } = await supabase
+            .from("payments")
+            .select("status")
+            .eq("user_id", profiledata.id)
+            .order("created_at", { ascending: false })
+            .limit(1);
+
+          if (subErr) {
+            console.error("Error fetching payment status:", subErr);
+          } else {
+            paymentStatusResult = subData?.[0]?.status || "free";
+          }
+        }
+
+        setProfile(profiledata);
+      } catch (error: any) {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to get profile",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+        setChecking(false);
       }
+    };
 
-      setProfile(profiledata);
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to get profile",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
+    if (username && currentUserProfile) {
+      fetchProfile();
     }
-  };
+  }, [username, currentUserProfile, navigate]);
 
-  if (!user_profile) {
+  if (!user_profile || checking) {
     return (
-      <div className="min-h-screen bg-background pt-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-card rounded w-48 mb-8"></div>
-            <div className="h-64 bg-card rounded"></div>
-          </div>
-        </div>
+      <div className="min-h-screen pt-16 flex items-center justify-center bg-background">
+        <LoaderText text="Parish" />
       </div>
     );
   }
@@ -104,7 +110,9 @@ const UserProfile = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-foreground font-script">Profile</h1>
+            <h1 className="text-3xl font-bold text-foreground font-script">
+              Profile
+            </h1>
           </div>
 
           <Card className="shadow-card border-border">

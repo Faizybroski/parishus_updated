@@ -158,9 +158,9 @@ const Feedback = () => {
         const { error } = await supabase
           .from("feedback")
           .update({
-            rating: feedback.rating.trim(),
+            rating: feedback.rating,
             comment: feedback.comment.trim(),
-            flagged_users: feedback.flagged_users.trim(),
+            flagged_users: feedback.flagged_users,
           })
           .eq("id", existingFeedback.id);
 
@@ -196,6 +196,7 @@ const Feedback = () => {
         description: "Failed to submit feedback",
         variant: "destructive",
       });
+      console.error("error feedback =====> ", error.message)
     } finally {
       setSubmitting(false);
     }

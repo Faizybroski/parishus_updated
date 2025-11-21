@@ -141,12 +141,19 @@ const OurEventDetails = () => {
   const [loading, setLoading] = useState(true);
   const [userProfileId, setUserProfileId] = useState<string | null>(null);
   const [eventReviews, setEventReviews] = useState<any[]>([]);
+  const [showAllReviews, setShowAllReviews] = useState(false);
+  const visibleReviews = showAllReviews
+    ? eventReviews
+    : eventReviews.slice(0, 3);
   const [showRSVPConfirm, setShowRSVPConfirm] = useState(false);
   const { profile } = useProfile();
   const subscriptionStatus = useSubscriptionStatus(profile?.id);
   const [isInterested, setIsInterested] = useState(false);
   const [password, setPassword] = useState("");
+  const [showRecurrenceDialog, setShowRecurrenceDialog] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState(false);
 
   const prevRef = useRef<HTMLDivElement>(null);
   const nextRef = useRef<HTMLDivElement>(null);
@@ -276,7 +283,7 @@ const OurEventDetails = () => {
 
     try {
       const { data, error } = await supabase
-        .from("dummyevents")
+        .from("events")
         .select(
           `
         *,
@@ -293,6 +300,26 @@ const OurEventDetails = () => {
           city,
           country,
           full_address
+        ),
+        rsvps (
+          id,
+          user_id,
+          status,
+          created_at,
+          profiles:user_id (
+            id,
+            first_name,
+            user_id,
+            last_name,
+            username,
+            profile_photo_url,
+            email,
+            payments:payments_user_id_fkey (
+              id,
+              status,
+              updated_at
+            )
+          )
         )
       `
         )
@@ -311,27 +338,6 @@ const OurEventDetails = () => {
       setLoading(false);
     }
   };
-
-  // rsvps (
-  //         id,
-  //         user_id,
-  //         status,
-  //         created_at,
-  //         profiles:user_id (
-  //           id,
-  //           first_name,
-  //           user_id,
-  //           last_name,
-  //           username,
-  //           profile_photo_url,
-  //           email,
-  //           payments:payments_user_id_fkey (
-  //             id,
-  //             status,
-  //             updated_at
-  //       )
-  //       )
-  //       )
 
   const fetchEventReviews = async () => {
     if (!eventId) return;
@@ -398,6 +404,7 @@ const OurEventDetails = () => {
               "The Password you entered for RSVP this event is incorrect",
             variant: "destructive",
           });
+          setIsPaying(false);
           return;
         }
 
@@ -425,6 +432,7 @@ const OurEventDetails = () => {
                 }`.trim() ||
                 "Guest User",
               userEmail: user?.email || "unknown@example.com",
+              date: event.recurrence ? selectedDate : event.date_time,
             },
           });
         }
@@ -453,6 +461,7 @@ const OurEventDetails = () => {
                 }`.trim() ||
                 "Guest User",
               userEmail: user?.email || "unknown@example.com",
+              date: event.recurrence ? selectedDate : event.date_time,
             },
           });
         }
@@ -671,6 +680,7 @@ const OurEventDetails = () => {
   const confirmRSVP = async () => {
     setShowRSVPConfirm(false); // Hide Modal
     try {
+      setLoadingStatus(true);
       // --- Send Email via Supabase Edge Function ---
       if (invitedUser?.email) {
         const inviterName = `${profile?.first_name} ${profile?.last_name}`;
@@ -839,6 +849,7 @@ const OurEventDetails = () => {
             event_id: eventId,
             user_id: userProfileId,
             status: "confirmed",
+            date: event.recurrence ? selectedDate : event.date_time,
           });
           if (rsvpError) throw rsvpError;
 
@@ -849,6 +860,7 @@ const OurEventDetails = () => {
               user_id: userProfileId,
               reservation_type: "standard",
               reservation_status: "confirmed",
+              date: event.recurrence ? selectedDate : event.date_time,
             });
           if (reservationError) throw reservationError;
 
@@ -964,6 +976,7 @@ const OurEventDetails = () => {
             event_id: eventId,
             user_id: userProfileId,
             status: "confirmed",
+            date: event.recurrence ? selectedDate : event.date_time,
           });
           if (rsvpError) throw rsvpError;
 
@@ -974,6 +987,7 @@ const OurEventDetails = () => {
               user_id: userProfileId,
               reservation_type: "standard",
               reservation_status: "confirmed",
+              date: event.recurrence ? selectedDate : event.date_time,
             });
           if (reservationError) throw reservationError;
 
@@ -1085,6 +1099,7 @@ const OurEventDetails = () => {
           fetchEvent();
         }
       }
+      setLoadingStatus(false);
     } catch (error) {
       console.error("Error handling RSVP:", error);
       toast({
@@ -1391,7 +1406,7 @@ const OurEventDetails = () => {
                       <Badge
                         key={tag}
                         variant="secondary"
-                        className="bg-transparent backdrop-blur-md bg-white/10"
+                        className="bg-transparent backdrop-blur-md bg-white/10 hover:bg-white/10"
                       >
                         {tag}
                       </Badge>
@@ -1409,39 +1424,6 @@ const OurEventDetails = () => {
                 </CardTitle>
               </CardHeader>
             </Card>
-
-            {event.guest_list && confirmedRSVPs.length > 0 && !isCreator && (
-              <Card className="space-y-2 bg-transparent shadow-none border-none">
-                <div className="border-t border-gray-300 mx-6" />
-                <CardHeader className="space-y-6">
-                  <CardTitle>
-                    <p className="text-muted-foreground bg-transparent">
-                      {`${confirmedRSVPs.profiles?.first_name} and ${
-                        confirmedRSVPs.length - 1
-                      } others going`}
-                    </p>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {confirmedRSVPs.slice(0, 10).map((rsvp) => (
-                    <div
-                      key={rsvp.id}
-                      className="flex items-center justify-between"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={rsvp.profiles?.profile_photo_url} />
-                          <AvatarFallback>
-                            {rsvp.profiles?.first_name?.[0] || "U"}
-                            {rsvp.profiles?.last_name?.[0] || "U"}
-                          </AvatarFallback>
-                        </Avatar>
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            )}
 
             <Card className="space-y-2 bg-transparent shadow-none border-none">
               <div className="border-t border-gray-300 mx-6" />
@@ -1514,7 +1496,7 @@ const OurEventDetails = () => {
                       <h4 className="font-medium mb-2">Dining Style</h4>
                       <Badge
                         variant="secondary"
-                        className="bg-transparent backdrop-blur-md bg-white/10"
+                        className="bg-transparent backdrop-blur-md bg-white/10 hover:bg-white/10 cursor-default"
                       >
                         {event.dining_style.replace("_", " ")}
                       </Badge>
@@ -1526,7 +1508,7 @@ const OurEventDetails = () => {
                       <h4 className="font-medium mb-2">Dietary Theme</h4>
                       <Badge
                         variant="secondary"
-                        className="bg-transparent backdrop-blur-md bg-white/10"
+                        className="bg-transparent backdrop-blur-md bg-white/10 hover:bg-white/10 cursor-default"
                       >
                         {event.dietary_theme.replace("_", " ")}
                       </Badge>
@@ -1535,6 +1517,79 @@ const OurEventDetails = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {event.guest_list && confirmedRSVPs.length > 0 && !isCreator && (
+              <Card className="space-y-2 bg-transparent shadow-none border-none">
+                <div className="border-t border-gray-300 mx-6" />
+                <CardHeader className="space-y-6">
+                  <CardTitle>
+                    <p className=" bg-transparent">
+                      {confirmedRSVPs.length === 1
+                        ? `${confirmedRSVPs[0].profiles?.first_name} is going`
+                        : `${confirmedRSVPs[0].profiles?.first_name} and ${
+                            confirmedRSVPs.length - 1
+                          } others are going`}
+                    </p>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {confirmedRSVPs.slice(0, 10).map((rsvp) => (
+                    <div
+                      key={rsvp.id}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={rsvp.profiles?.profile_photo_url} />
+                          <AvatarFallback>
+                            {rsvp.profiles?.first_name?.[0] || "U"}
+                            {rsvp.profiles?.last_name?.[0] || "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <Link to={`/profile/${rsvp.profiles?.username}`}>
+                          {rsvp.profiles?.first_name || "Unknown"}{" "}
+                          {rsvp.profiles?.last_name || "User"}
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+
+            {isCreator && event.recurrence && (
+              <Card className="space-y-2 bg-transparent shadow-none border-none">
+                <div className="border-t border-gray-300 mx-6" />
+                <CardHeader>
+                  <CardTitle>Recurrence</CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {event.recurrence_dates.map((date, i) => {
+                    const d = new Date(date);
+
+                    return (
+                      <div
+                        key={i}
+                        className="flex flex-col items-center justify-center
+                   bg-transparent backdrop-blur-md bg-white/10
+                   border border-white/20 rounded-xl
+                   py-4 px-5 min-h-[90px]
+                   text-center
+                   hover:bg-white/20 hover:shadow-lg
+                   transition-all duration-200"
+                      >
+                        <span className="text-sm font-semibold">
+                          {format(d, "EEE, MMM d")}
+                        </span>
+                        <span className="text-xs opacity-80 mt-1">
+                          {format(d, "h:mm a")}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </CardContent>
+              </Card>
+            )}
 
             <Card className="space-y-2 bg-transparent shadow-none border-none">
               <div className="border-t border-gray-300 mx-6" />
@@ -1714,46 +1769,57 @@ const OurEventDetails = () => {
                 <CardContent>
                   <div className="space-y-4">
                     {eventReviews.length > 0 && (
-                      <div className="flex items-center space-x-4 p-4 bg-muted/50 rounded-lg">
-                        <div className="text-center">
-                          <div className="text-2xl font-bold">
-                            {(
-                              eventReviews.reduce(
-                                (sum, review) => sum + review.rating,
-                                0
-                              ) / eventReviews.length
-                            ).toFixed(1)}
+                      <div className="py-4 px-7 bg-muted/50 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        {/* Rating Box */}
+                        <div className="flex items-center gap-4">
+                          <div className="text-center">
+                            <div className="text-3xl font-bold">
+                              {(
+                                eventReviews.reduce(
+                                  (sum, review) => sum + review.rating,
+                                  0
+                                ) / eventReviews.length
+                              ).toFixed(1)}
+                            </div>
+
+                            {/* Stars */}
+                            <div className="flex items-center justify-center mt-1">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star
+                                  key={star}
+                                  className={`h-4 w-4 ${
+                                    star <=
+                                    Math.round(
+                                      eventReviews.reduce(
+                                        (s, r) => s + r.rating,
+                                        0
+                                      ) / eventReviews.length
+                                    )
+                                      ? "fill-[yellow] text-[yellow]"
+                                      : "text-muted-foreground"
+                                  }`}
+                                />
+                              ))}
+                            </div>
                           </div>
-                          <div className="flex items-center justify-center mt-1">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <Star
-                                key={star}
-                                className={`h-4 w-4 ${
-                                  star <=
-                                  Math.round(
-                                    eventReviews.reduce(
-                                      (sum, review) => sum + review.rating,
-                                      0
-                                    ) / eventReviews.length
-                                  )
-                                    ? "  fill-current"
-                                    : "text-muted-foreground"
-                                }`}
-                              />
-                            ))}
-                          </div>
+
+                          {/* Vertical Divider (desktop only) */}
+                          {/* <div className="hidden sm:block w-px h-10 bg-gray-300 opacity-40" /> */}
                         </div>
-                        <div className="flex-1">
-                          <p className="text-sm text-muted-foreground">
-                            Based on {eventReviews.length} review
-                            {eventReviews.length !== 1 ? "s" : ""}
-                          </p>
-                        </div>
+
+                        {/* Text */}
+                        <p className="text-sm text-muted-foreground text-center sm:text-left">
+                          Based on {eventReviews.length} review
+                          {eventReviews.length !== 1 ? "s" : ""}
+                        </p>
                       </div>
                     )}
 
-                    {eventReviews.slice(0, 3).map((review) => (
-                      <div key={review.id} className="space-y-2">
+                    {visibleReviews.map((review) => (
+                      <div
+                        key={review.id}
+                        className="space-y-2 border p-3 rounded-lg"
+                      >
                         <div className="flex items-start space-x-3">
                           <Avatar className="h-8 w-8">
                             <AvatarImage
@@ -1764,39 +1830,39 @@ const OurEventDetails = () => {
                               {review.profiles?.last_name?.[0] || "U"}
                             </AvatarFallback>
                           </Avatar>
+
                           <div className="flex-1 space-y-1">
                             <div className="flex items-center justify-between">
                               <span className="text-sm font-medium">
                                 <Link
                                   to={`/profile/${review.profiles.username}`}
+                                  className="font-bold"
                                 >
                                   {review.profiles.first_name}{" "}
                                   {review.profiles.last_name}
                                 </Link>
                               </span>
+
                               <div className="flex items-center space-x-1">
                                 {[1, 2, 3, 4, 5].map((star) => (
                                   <Star
                                     key={star}
                                     className={`h-3 w-3 ${
                                       star <= review.rating
-                                        ? "  fill-current"
+                                        ? "fill-[yellow] text-[yellow]"
                                         : "text-muted-foreground"
                                     }`}
                                   />
                                 ))}
                               </div>
                             </div>
+
                             {review.comment && (
-                              <p className="text-sm text-muted-foreground">
-                                {review.comment}
-                              </p>
+                              <p className="text-sm">{review.comment}</p>
                             )}
-                            <p className="text-xs text-muted-foreground">
-                              {format(
-                                new Date(review.created_at),
-                                "MMM d, yyyy"
-                              )}
+
+                            <p className="text-xs">
+                              {format(new Date(review.created_at), "d MMM yyy")}
                             </p>
                           </div>
                         </div>
@@ -1804,10 +1870,14 @@ const OurEventDetails = () => {
                     ))}
 
                     {eventReviews.length > 3 && (
-                      <p className="text-sm text-muted-foreground text-center">
-                        And {eventReviews.length - 3} more review
-                        {eventReviews.length - 3 !== 1 ? "s" : ""}...
-                      </p>
+                      <button
+                        onClick={() => setShowAllReviews(!showAllReviews)}
+                        className="text-sm text-muted-foreground underline w-full text-center mt-2"
+                      >
+                        {showAllReviews
+                          ? "Show Less Reviews"
+                          : `View All ${eventReviews.length} Reviews`}
+                      </button>
                     )}
                   </div>
                 </CardContent>
@@ -1886,13 +1956,73 @@ const OurEventDetails = () => {
               </Card>
             )}
 
-            {event.guest_list && confirmedRSVPs.length > 0 && !isCreator && (
+            {/* {event.guest_list && confirmedRSVPs.length > 0 && !isCreator && (
               <Card className="space-y-2 bg-transparent shadow-none border-none">
                 <div className="border-t border-gray-300 mx-6" />
                 <CardHeader>
                   <CardTitle>Attendees ({confirmedRSVPs.length})</CardTitle>
                 </CardHeader>
-                <CardContent className="p-2">
+                <CardContent>
+                  <div className="space-y-3">
+                    {confirmedRSVPs.map((rsvp) => (
+                      <div
+                        key={rsvp.id}
+                        className="flex items-center justify-between"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage
+                              src={rsvp.profiles?.profile_photo_url}
+                            />
+                            <AvatarFallback>
+                              {rsvp.profiles?.first_name?.[0] || "U"}
+                              {rsvp.profiles?.last_name?.[0] || "U"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-medium">
+                              <Link to={`/profile/${rsvp.profiles?.username}`}>
+                                {rsvp.profiles?.first_name || "Unknown"}{" "}
+                                {rsvp.profiles?.last_name || "User"}
+                              </Link>
+                              {rsvp.profiles.payments?.[0]?.status ===
+                              "completed" ? (
+                                <span className="px-2 py-1 text-xs font-semibold text-black bg-yellow-400 rounded-full ml-2">
+                                  🌟 Paid
+                                </span>
+                              ) : (
+                                <span className="px-2 py-1 text-xs font-semibold text-white bg-[rgb(0,30,83)] rounded-full ml-2">
+                                  {" "}
+                                  🆓 Free
+                                </span>
+                              )}
+                            </span>
+                            {isCreator && (
+                              <span className="text-xs text-muted-foreground">
+                                {rsvp.profiles?.email || "No email"}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        {isCreator && event.event_fee ? (
+                          <span className="text-sm   font-semibold">
+                            ${event.event_fee}
+                          </span>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )} */}
+
+            {confirmedRSVPs.length > 0 && isCreator && (
+              <Card className="space-y-2 bg-transparent shadow-none border-none">
+                <div className="border-t border-gray-300 mx-6" />
+                <CardHeader>
+                  <CardTitle>Attendees ({confirmedRSVPs.length})</CardTitle>
+                </CardHeader>
+                <CardContent>
                   <div className="space-y-3">
                     {confirmedRSVPs.map((rsvp) => (
                       <div
@@ -1988,15 +2118,18 @@ const OurEventDetails = () => {
                   )}
 
                 {!isUpcoming && hasRSVP && (
-                  <div className="space-y-2">
-                    <Badge
+                  <div className="space-y-2 flex gap-3 flex-col">
+                    <Button
                       variant="secondary"
-                      className="px-3 py-1 w-full justify-center"
+                      className="bg-transparent backdrop-blur-md bg-white/10 hover:bg-white/10 flex justify-center cursor-default"
                     >
                       Event Ended
-                    </Badge>
+                    </Button>
                     <Link to={"/feedback"}>
-                      <Button className="w-full">
+                      <Button
+                        className="w-full"
+                        style={{ backgroundColor: event.accent_color }}
+                      >
                         <Star className="h-4 w-4 mr-2" />
                         Leave Review
                       </Button>
@@ -2013,66 +2146,6 @@ const OurEventDetails = () => {
                 )}
               </CardContent>
             </Card>
-
-            {confirmedRSVPs.length > 0 && isCreator && (
-              <Card className="space-y-2 bg-transparent shadow-none border-none">
-                <div className="border-t border-gray-300 mx-6" />
-                <CardHeader>
-                  <CardTitle>Attendees ({confirmedRSVPs.length})</CardTitle>
-                </CardHeader>
-                <CardContent className="p-2">
-                  <div className="space-y-3">
-                    {confirmedRSVPs.map((rsvp) => (
-                      <div
-                        key={rsvp.id}
-                        className="flex items-center justify-between"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage
-                              src={rsvp.profiles?.profile_photo_url}
-                            />
-                            <AvatarFallback>
-                              {rsvp.profiles?.first_name?.[0] || "U"}
-                              {rsvp.profiles?.last_name?.[0] || "U"}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex flex-col">
-                            <span className="text-sm font-medium">
-                              <Link to={`/profile/${rsvp.profiles?.username}`}>
-                                {rsvp.profiles?.first_name || "Unknown"}{" "}
-                                {rsvp.profiles?.last_name || "User"}
-                              </Link>
-                              {rsvp.profiles.payments?.[0]?.status ===
-                              "completed" ? (
-                                <span className="px-2 py-1 text-xs font-semibold text-black bg-yellow-400 rounded-full ml-2">
-                                  🌟 Paid
-                                </span>
-                              ) : (
-                                <span className="px-2 py-1 text-xs font-semibold text-white bg-[rgb(0,30,83)] rounded-full ml-2">
-                                  {" "}
-                                  🆓 Free
-                                </span>
-                              )}
-                            </span>
-                            {isCreator && (
-                              <span className="text-xs text-muted-foreground">
-                                {rsvp.profiles?.email || "No email"}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        {isCreator && event.event_fee ? (
-                          <span className="text-sm   font-semibold">
-                            ${event.event_fee}
-                          </span>
-                        ) : null}
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
           </div>
 
           <div className="lg:w-1/3 flex flex-col space-y-4 lg:sticky lg:top-6 lg:self-start order-last lg:order-none hidden lg:flex">
@@ -2085,6 +2158,7 @@ const OurEventDetails = () => {
             </div>
           </div>
         </div>
+
         {isUpcoming &&
           spotsLeft > 0 &&
           !isCreator &&
@@ -2093,11 +2167,23 @@ const OurEventDetails = () => {
               {isBeforeDeadline ? (
                 !event.event_fee || event.event_fee == 0 ? (
                   <Button
-                    onClick={handleRSVP}
+                    onClick={() => {
+                      if (hasRSVP) {
+                        handleRSVP();
+                      }
+                      if (event.recurrence && !hasRSVP) {
+                        setShowRecurrenceDialog(true);
+                        return;
+                      }
+                      if (!event.recurrence) {
+                        handleRSVP();
+                      }
+                    }}
                     className={`w-full ${hasRSVP ? "" : ""}`}
                     style={{
                       backgroundColor: event.accent_color,
                     }}
+                    disabled={loadingStatus}
                   >
                     {hasRSVP ? (
                       <>
@@ -2125,19 +2211,26 @@ const OurEventDetails = () => {
                 ) : (
                   <Button
                     onClick={() => {
-                      if (subscriptionStatus === "free") {
-                        toast({
-                          title: "Premium Required",
-                          description:
-                            "You need a premium subscription to RSVP for paid events.",
-                          variant: "destructive",
-                        });
-                        setTimeout(() => {
-                          navigate("/subscription");
-                        }, 1200);
+                      // if (subscriptionStatus === "free") {
+                      //   toast({
+                      //     title: "Premium Required",
+                      //     description:
+                      //       "You need a premium subscription to RSVP for paid events.",
+                      //     variant: "destructive",
+                      //   });
+                      //   setTimeout(() => {
+                      //     navigate("/subscription");
+                      //   }, 1200);
+                      //   return;
+                      // }
+
+                      if (event.recurrence && !hasRSVP) {
+                        setShowRecurrenceDialog(true);
                         return;
                       }
-                      handlePaidRSVP();
+                      if (!event.recurrence) {
+                        handlePaidRSVP();
+                      }
                     }}
                     disabled={isPaying}
                     className="w-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center"
@@ -2198,7 +2291,7 @@ const OurEventDetails = () => {
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="Enter password to RSVP"
-                          className="w-full mb-2 bg-transparent backdrop-blur-md bg-white/10"
+                          className="w-[90%] mb-2 bg-transparent backdrop-blur-md bg-white/10"
                         />
                       )}
                       <Button
@@ -2211,12 +2304,18 @@ const OurEventDetails = () => {
                             });
                             return;
                           }
+                          if (event.recurrence) {
+                            setShowRecurrenceDialog(true); // show dialog instead
+                            return;
+                          }
+
                           handleRSVP();
                         }}
-                        className="w-full lg:w-auto flex-1 text-sm sm:text-base whitespace-normal break-words justify-center"
+                        className="flex-1 lg:w-auto text-sm sm:text-base items-center justify-center flex-nowrap"
                         style={{
                           backgroundColor: event.accent_color,
                         }}
+                        disabled={loadingStatus}
                       >
                         <Heart className="h-4 w-4 mr-2" />
                         RSVP to Event
@@ -2247,16 +2346,16 @@ const OurEventDetails = () => {
 
                     <Button
                       onClick={() => {
-                        if (subscriptionStatus === "free") {
-                          toast({
-                            title: "Premium Required",
-                            description:
-                              "You need a premium subscription to RSVP for paid events.",
-                            variant: "destructive",
-                          });
-                          setTimeout(() => navigate("/subscription"), 1200);
-                          return;
-                        }
+                        // if (subscriptionStatus === "free") {
+                        //   toast({
+                        //     title: "Premium Required",
+                        //     description:
+                        //       "You need a premium subscription to RSVP for paid events.",
+                        //     variant: "destructive",
+                        //   });
+                        //   setTimeout(() => navigate("/subscription"), 1200);
+                        //   return;
+                        // }
 
                         if (event.is_password_protected && !password.trim()) {
                           toast({
@@ -2267,7 +2366,13 @@ const OurEventDetails = () => {
                           return;
                         }
 
-                        handlePaidRSVP();
+                        if (event.recurrence && !hasRSVP) {
+                          setShowRecurrenceDialog(true);
+                          return;
+                        }
+                        if (!event.recurrence) {
+                          handlePaidRSVP();
+                        }
                       }}
                       disabled={isPaying}
                       className="w-full lg:w-auto flex-1"
@@ -2300,6 +2405,74 @@ const OurEventDetails = () => {
             </div>
           )}
       </div>
+      <Dialog
+        open={showRecurrenceDialog}
+        onOpenChange={setShowRecurrenceDialog}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Select a Date</DialogTitle>
+            <DialogDescription>
+              Choose one of the available recurrence dates. You may also
+              unselect.
+            </DialogDescription>
+          </DialogHeader>
+
+          {/* Selected date preview */}
+          {selectedDate && (
+            <div className="p-3 rounded-md bg-blue-50 text-blue-700 text-sm font-medium mb-3">
+              Selected: {new Date(selectedDate).toLocaleString()}
+            </div>
+          )}
+
+          <div className="flex flex-col gap-3 mt-2">
+            {event.recurrence_dates?.map((date) => {
+              const formatted = new Date(date).toLocaleString();
+              const isSelected = selectedDate === date;
+
+              return (
+                <Button
+                  key={date}
+                  onClick={() => {
+                    // toggle logic
+                    if (isSelected) {
+                      setSelectedDate(null); // deselect
+                      return;
+                    }
+
+                    setSelectedDate(date); // select
+                  }}
+                  className={`w-full ${
+                    isSelected
+                      ? "ring-2 ring-blue-500 bg-blue-100 text-blue-800"
+                      : ""
+                  }`}
+                  variant={isSelected ? "secondary" : "default"}
+                >
+                  {formatted}
+                </Button>
+              );
+            })}
+          </div>
+
+          {/* Continue/Confirm button */}
+          <Button
+            disabled={!selectedDate}
+            onClick={() => {
+              if (!event.event_fee) {
+                handleRSVP();
+              } else {
+                handlePaidRSVP();
+              }
+              setShowRecurrenceDialog(false);
+            }}
+            className="mt-4 w-full"
+            style={{ backgroundColor: event.accent_color }}
+          >
+            Confirm RSVP
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

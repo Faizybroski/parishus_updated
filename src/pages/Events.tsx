@@ -182,7 +182,7 @@ const Events = () => {
 
     try {
       const { data, error } = await supabase
-        .from("dummyevents")
+        .from("events")
         .select(
           `
           *,
@@ -195,6 +195,11 @@ const Events = () => {
             name,
             city,
             state_province
+          ),
+          rsvps (
+            id,
+            status,
+            user_id
           )
         `
         )
@@ -202,11 +207,7 @@ const Events = () => {
         .neq("creator_id", currentProfileId)
         .order("date_time", { ascending: false });
 
-      //rsvps (
-      //   id,
-      //   status,
-      //   user_id
-      // ),
+
 
       if (error) throw error;
       const eventsWithCounts =
@@ -244,7 +245,7 @@ const Events = () => {
 
       // Fetch events created by the user
       const { data: userEvents, error: userError } = await supabase
-        .from("dummyevents")
+        .from("events")
         .select(
           `
           *,
@@ -257,6 +258,11 @@ const Events = () => {
             name,
             city,
             state_province
+          ),
+          rsvps (
+            id,
+            status,
+            user_id
           )
         `
         )
@@ -264,11 +270,7 @@ const Events = () => {
         .eq("status", "active")
         .order("date_time", { ascending: false });
 
-      //         rsvps (
-      //   id,
-      //   status,
-      //   user_id
-      // ),
+
 
       if (userError) {
         console.error("User events error:", userError);

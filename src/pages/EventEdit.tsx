@@ -212,7 +212,7 @@ const EventEdit = () => {
 
     try {
       const { data, error } = await supabase
-        .from("dummyevents")
+        .from("events")
         .select("*")
         .eq("id", eventId)
         .single();
@@ -742,7 +742,7 @@ const EventEdit = () => {
       }
 
       const { data, error } = await supabase
-        .from("dummyevents")
+        .from("events")
         .update({
           creator_id: profile.id,
           guest_user_ids: invitedGuestIds,
@@ -1141,7 +1141,7 @@ const EventEdit = () => {
                                   : "bg-transparent text-muted-foreground"
                               }`}
                     >
-                      Sell Tickets
+                      Paid Event
                     </Button>
 
                     <Button
@@ -1155,7 +1155,7 @@ const EventEdit = () => {
                                   : "bg-transparent text-muted-foreground"
                               }`}
                     >
-                      RSVP
+                      Free Event
                     </Button>
                   </div>
                 </div>

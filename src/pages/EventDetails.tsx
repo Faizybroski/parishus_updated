@@ -245,7 +245,7 @@ const EventDetails = () => {
 
     try {
       const { data, error } = await supabase
-        .from("dummyevents")
+        .from("events")
         .select(
           `
         *,
@@ -262,6 +262,26 @@ const EventDetails = () => {
           city,
           country,
           full_address
+        ), 
+        rsvps (
+          id,
+          user_id,
+          status,
+          created_at,
+          profiles:user_id (
+            id,
+            first_name,
+            user_id,
+            last_name,
+            username,
+            profile_photo_url,
+            email,
+            payments:payments_user_id_fkey (
+              id,
+              status,
+              updated_at
+            )
+          )
         )
       `
         )
@@ -281,26 +301,7 @@ const EventDetails = () => {
     }
   };
 
-  // rsvps (
-  //         id,
-  //         user_id,
-  //         status,
-  //         created_at,
-  //         profiles:user_id (
-  //           id,
-  //           first_name,
-  //           user_id,
-  //           last_name,
-  //           username,
-  //           profile_photo_url,
-  //           email,
-  //           payments:payments_user_id_fkey (
-  //             id,
-  //             status,
-  //             updated_at
-  //       )
-  //       )
-  //       )
+
 
   const fetchEventReviews = async () => {
     if (!eventId) return;

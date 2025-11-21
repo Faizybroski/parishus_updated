@@ -237,7 +237,7 @@ const AdminEventDetails = () => {
 
     try {
       const { data, error } = await supabase
-        .from("dummyevents")
+        .from("events")
         .select(
           `
           *,
@@ -252,25 +252,25 @@ const AdminEventDetails = () => {
             city,
             country,
             full_address
+          ),
+          rsvps (
+            id,
+            user_id,
+            status,
+            created_at,
+            profiles:user_id (
+              first_name,
+              last_name,
+              profile_photo_url,
+              email
+            )
           )
         `
         )
         .eq("id", eventId)
         .single();
 
-        // ,
-        //   rsvps (
-        //     id,
-        //     user_id,
-        //     status,
-        //     created_at,
-        //     profiles:user_id (
-        //       first_name,
-        //       last_name,
-        //       profile_photo_url,
-        //       email
-        //     )
-        //   )
+
 
       if (error) throw error;
       setEvent(data);

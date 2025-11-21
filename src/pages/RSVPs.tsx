@@ -47,6 +47,7 @@ interface RSVP {
   user_id: string;
   event_id: string;
   response_status: string;
+  date: string;
   status: string;
   created_at: string;
   events: {
@@ -546,8 +547,7 @@ const RSVPs = () => {
                                     align="end"
                                     className="w-40"
                                   >
-                                    {/* DEVELOPER COMMENTS THIS. WILL BE UNCOMMENT IN LIVE */}
-                                    {/* {isCreator && ( */}
+                                    {/* {isCreator && (
                                     <DropdownMenuItem asChild>
                                       <Link
                                         to={`/event/${rsvp.events.id}/edit`}
@@ -558,7 +558,7 @@ const RSVPs = () => {
                                         <span>Edit Event</span>
                                       </Link>
                                     </DropdownMenuItem>
-                                    {/* )} */}
+                                     )}  */}
 
                                     <DropdownMenuItem
                                       onClick={(e) => {
@@ -571,8 +571,7 @@ const RSVPs = () => {
                                       <span>Cancel RSVP</span>
                                     </DropdownMenuItem>
 
-                                    {/* DEVELOPER COMMENTS THIS. WILL BE UNCOMMENT IN LIVE */}
-                                    {/* {isCreator && (
+                                     {/* {isCreator && (
                                     <DropdownMenuItem
                                       // onClick={(e) => {
                                       //   e.stopPropagation();
@@ -583,7 +582,7 @@ const RSVPs = () => {
                                       <Trash2 className="mr-2 h-4 w-4" />
                                       <span>Delete</span>
                                     </DropdownMenuItem>
-                                    )}  */}
+                                    )}   */}
                                   </DropdownMenuContent>
                                 </DropdownMenu>
                               </div>
@@ -641,7 +640,7 @@ const RSVPs = () => {
                                     {/* Date & Time Box */}
                                     <div className="border border-white/25 bg-black/40 backdrop-blur-sm rounded px-3 py-1.5 shadow-md">
                                       <span className="tracking-wide">
-                                        {new Date(eventDate).toLocaleDateString(
+                                        {new Date(rsvp.date).toLocaleDateString(
                                           "en-US",
                                           {
                                             month: "short",
@@ -649,7 +648,7 @@ const RSVPs = () => {
                                           }
                                         )}
                                         {" • "}
-                                        {new Date(eventDate).toLocaleTimeString(
+                                        {new Date(rsvp.date).toLocaleTimeString(
                                           "en-US",
                                           {
                                             hour: "numeric",
@@ -729,9 +728,10 @@ const RSVPs = () => {
                         const isUpcoming = eventDate > new Date();
 
                         return (
-                          <Card
+                          <Link
                             key={rsvp.id}
-                            className="hover:shadow-lg transition-shadow hover:bg-secondary transition-all duration-300"
+                            to={`/event/${rsvp.events.id}/details`}
+                            className="block rounded-lg border hover:shadow-lg transition-shadow hover:bg-secondary transition-all duration-300"
                           >
                             <CardContent className="p-6">
                               <div className="flex flex-wrap items-center gap-4">
@@ -760,13 +760,13 @@ const RSVPs = () => {
                                           <div className="flex items-center gap-1">
                                             <Calendar className="h-4 w-4" />
                                             <span>
-                                              {format(eventDate, "PPP")}
+                                              {format(rsvp.date, "PPP")}
                                             </span>
                                           </div>
                                           <div className="flex items-center gap-1">
                                             <Clock className="h-4 w-4" />
                                             <span>
-                                              {format(eventDate, "p")}
+                                              {format(rsvp.date, "p")}
                                             </span>
                                           </div>
                                           <div className="flex items-center gap-1">
@@ -787,7 +787,7 @@ const RSVPs = () => {
                                       variant={
                                         isUpcoming ? "default" : "secondary"
                                       }
-                                      className="text-sm bg-secondary/70"
+                                      className="text-sm bg-primary text-primary-foreground hover:bg-secondary"
                                     >
                                       {isUpcoming ? "Upcoming" : "Ended"}
                                     </Badge>
@@ -799,7 +799,7 @@ const RSVPs = () => {
                                       {rsvp.status}
                                     </Badge>
                                   </div>
-                                  <Link to={`/event/${rsvp.events.id}/details`}>
+                                  {/* <Link to={`/event/${rsvp.events.id}/details`}>
                                     <Button
                                       variant="default"
                                       size="sm"
@@ -808,7 +808,7 @@ const RSVPs = () => {
                                       <Eye className="h-4 w-4 " />
                                       View
                                     </Button>
-                                  </Link>
+                                  </Link> */}
                                   <Button
                                     variant="outline"
                                     size="sm"
@@ -822,7 +822,7 @@ const RSVPs = () => {
                                 </div>
                               </div>
                             </CardContent>
-                          </Card>
+                          </Link>
                         );
                       })}
                     </div>

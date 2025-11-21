@@ -603,7 +603,7 @@ const OurExploreEvents = () => {
       //     )
 
       let query = supabase
-        .from("dummyevents")
+        .from("events")
         .select(
           `
         *,
@@ -612,19 +612,18 @@ const OurExploreEvents = () => {
           last_name,
           profile_photo_url,
           role
-        )
-      `
+        ),
+          rsvps (
+            id,
+            status,
+            user_id
+          )
+        `
         )
         .eq("status", "active")
         .neq("is_mystery_dinner", true)
         .neq("is_private", true)
         .neq("explore", false);
-      //    ,
-      //     rsvps (
-      //       id,
-      //       status,
-      //       user_id
-      //     )
 
       // 🔥 Trending
       if (filters?.trending === "Newest") {
