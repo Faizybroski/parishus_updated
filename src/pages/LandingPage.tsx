@@ -312,7 +312,7 @@ export const ParishUsLanding: React.FC = () => {
       </section>
 
       {/* Events Showcase */}
-      <section id="events" className="py-20 bg-card/30">
+      <section id="events" className="py-20 bg-card/30 border-t border-border">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-end justify-between mb-12">
             <div>

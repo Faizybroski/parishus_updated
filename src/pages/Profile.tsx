@@ -473,7 +473,7 @@ const Profile = () => {
                         🌟 Premium
                       </span>
                     ) : (
-                      <span className="px-3 py-1 text-xs font-semibold text-white bg-[rgb(0,30,83)] rounded-full">
+                      <span className="px-2 py-1 text-xs font-semibold text-white bg-[rgb(0,30,83)] rounded-full">
                         🆓 Freemium
                       </span>
                     ))}

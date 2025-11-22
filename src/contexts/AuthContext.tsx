@@ -1,13 +1,21 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { User, Session } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, metadata?: any) => Promise<{ error: any }>;
-  signIn: (email: string, password: string, expectedRole: 'admin' | 'user') => Promise<{ error: any }>;
+  signUp: (
+    email: string,
+    password: string,
+    metadata?: any
+  ) => Promise<{ error: any }>;
+  signIn: (
+    email: string,
+    password: string,
+    expectedRole: "admin" | "user"
+  ) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ error: any }>;
   signInWithApple: () => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -20,20 +28,23 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       try {
         setSession(session);
         setUser(session?.user ?? null);
@@ -63,49 +74,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch (err) {
         console.error("Auth state error:", err);
       }
-    }
-    );
+    });
 
     // Check for existing session
-      supabase.auth.getSession().then(async ({ data: { session }, error }) => {
-    try {
-      if (error) console.error("getSession error:", error);
+    supabase.auth.getSession().then(async ({ data: { session }, error }) => {
+      try {
+        if (error) console.error("getSession error:", error);
 
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
 
-      // if (session?.user) {
-      //   const instagram = localStorage.getItem("signup_instagram");
-      //   const linkedin = localStorage.getItem("signup_linkedin");
+        // if (session?.user) {
+        //   const instagram = localStorage.getItem("signup_instagram");
+        //   const linkedin = localStorage.getItem("signup_linkedin");
 
-      //   if (instagram !== null || linkedin !== null) {
-      //     console.log("Upserting profile on refresh:", session.user.email);
+        //   if (instagram !== null || linkedin !== null) {
+        //     console.log("Upserting profile on refresh:", session.user.email);
 
-      //     const { error } = await supabase.from("profiles").update({
-      //       instagram_username: instagram ,
-      //       linkedin_username: linkedin ,
-      //     }).eq('user_id', session.user.id);
+        //     const { error } = await supabase.from("profiles").update({
+        //       instagram_username: instagram ,
+        //       linkedin_username: linkedin ,
+        //     }).eq('user_id', session.user.id);
 
-      //     if (error) console.error("Upsert error:", error);
+        //     if (error) console.error("Upsert error:", error);
 
-      //     localStorage.removeItem("signup_instagram");
-      //     localStorage.removeItem("signup_linkedin");
-      //   }
-      // }
-    } catch (err) {
-      console.error("getSession error:", err);
-    }
-  });
+        //     localStorage.removeItem("signup_instagram");
+        //     localStorage.removeItem("signup_linkedin");
+        //   }
+        // }
+      } catch (err) {
+        console.error("getSession error:", err);
+      }
+    });
 
     return () => subscription.unsubscribe();
   }, []);
 
   const signUp = async (email: string, password: string, metadata?: any) => {
     const redirectUrl = `${window.location.origin}/`;
-    
-    console.log('🚀 SignUp called with:', { email, role: metadata?.role });
-    
+
+    console.log("🚀 SignUp called with:", { email, role: metadata?.role });
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -116,70 +126,84 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           last_name: metadata?.last_name,
           instagram_username: metadata?.instagram_username,
           linkedin_username: metadata?.linkedin_username,
-          role: 'user', // Always assign 'user' role during signup
-          approval_status: 'pending',
-        }
-      }
+          role: "user", // Always assign 'user' role during signup
+          approval_status: "pending",
+        },
+      },
     });
-    
-    console.log('📝 SignUp result:', { error });
+
+    console.log("📝 SignUp result:", { error });
     return { error };
   };
 
-  const signIn = async (email: string, password: string, expectedRole: 'admin' | 'user') => {
+  const signIn = async (
+    email: string,
+    password: string,
+    expectedRole: "admin" | "user"
+  ) => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('user_id', data.user.id)
+      .from("profiles")
+      .select("role")
+      .eq("user_id", data.user.id)
       .single();
-    
-    const articleMap: Record< 'admin' | 'user', string> = {
-      admin: 'an admin',
-      user: 'a user',
+
+    const articleMap: Record<"admin" | "user", string> = {
+      admin: "an admin",
+      user: "a user",
     };
-  
+
     if (profile?.role !== expectedRole) {
       await supabase.auth.signOut();
-      if (expectedRole === 'admin') {
-        window.location.href = '/admin/login';
-      } 
-      return { error: { message: `${email} is not ${articleMap[expectedRole]}` } };
+      if (expectedRole === "admin") {
+        window.location.href = "/admin/login";
+      }
+      return {
+        error: { message: `${email} is not ${articleMap[expectedRole]}` },
+      };
     }
 
     if (error) {
       return { error };
     }
 
+    if (!profile) {
+      return {
+        error: {
+          message: "Your account profile is not configured. Contact support.",
+        },
+      };
+    }
+
     if (!data.user) {
-      return { error: { message: 'Invalid login attempt' } };
+      return { error: { message: "Invalid login attempt" } };
     }
 
     if (profileError) return { error: profileError };
-      
+
     setTimeout(() => {
       switch (profile.role) {
-        case 'admin':
-          window.location.href = '/admin/dashboard';
+        case "admin":
+          window.location.href = "/admin/dashboard";
           break;
-        case 'user':
+        case "user":
         default:
-          window.location.href = '/user/dashboard';
+          window.location.href = "/user/dashboard";
           break;
       }
     }, 100); // Small delay to ensure auth state is updated
     return { error };
-  }
-    
+  };
+
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: window.location.origin, 
+        redirectTo: window.location.origin,
       },
     });
 
@@ -212,7 +236,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`
+      redirectTo: `${window.location.origin}/reset-password`,
     });
     return { error };
   };
@@ -234,12 +258,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signInWithGoogle,
     signInWithApple,
     resetPassword,
-    updatePassword
+    updatePassword,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

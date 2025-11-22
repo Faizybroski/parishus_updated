@@ -67,6 +67,38 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
     if (currentStep > 0) setCurrentStep(currentStep - 1);
   };
 
+  const formatError = (err: any) => {
+    if (!err) return null;
+
+    const message = err.message?.toLowerCase() || "";
+
+    if (message.includes("invalid login credentials")) {
+      return "Incorrect email or password.";
+    }
+
+    if (
+      message.includes("already registered") ||
+      message.includes("duplicate key")
+    ) {
+      return "This email is already registered.";
+    }
+
+    if (message.includes("email rate limit")) {
+      return "Too many attempts. Please try again in a moment.";
+    }
+
+    if (message.includes("password")) {
+      return "Your password must be at least 6 characters long.";
+    }
+
+    if (message.includes("null") || message.includes("cannot read")) {
+      return "Something went wrong. Please try again.";
+    }
+
+    // fallback safety net
+    return "An unexpected error occurred. Please try again.";
+  };
+
   const handleEmailLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -183,7 +215,7 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
     } catch (err) {
       toast({
         title: "Error",
-        description: err.message,
+        description: formatError(err),
         variant: "destructive",
       });
     } finally {

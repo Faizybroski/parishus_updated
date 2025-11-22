@@ -27,12 +27,146 @@ const UserDashboard = () => {
   const { user } = useAuth();
   const { profile } = useProfile();
   const navigate = useNavigate();
-  const [walletPayments, setWalletPayments] = useState<WalletPayment[]>([]);
+  const [walletPayments, setWalletPayments] = useState([]);
+  const [crossedPaths, setCrossedPaths] = useState([]);
+  const [events, setEvents] = useState([]);
   useEffect(() => {
     if (profile) {
       fetchWalletPayments();
+      fetchAllEvents();
+      fetchCrossedPaths();
     }
   }, [profile]);
+
+  const fetchCrossedPaths = async () => {
+      if (!profile) return;
+  
+      try {
+        // First get basic crossed paths using proper foreign key joins
+        const { data: crossedPathsData, error } = await supabase
+          .from("crossed_paths")
+          .select(
+            `
+            *,
+            user1:profiles!crossed_paths_user1_id_fkey(
+              id, user_id, email,  username, first_name, last_name, profile_photo_url, job_title, 
+              location_city, dining_style, dietary_preferences, gender_identity,
+              payments:payments!payments_user_id_fkey (
+                id, user_id, status, updated_at
+              )
+            ),
+            user2:profiles!crossed_paths_user2_id_fkey(
+              id, user_id,  email, username, first_name, last_name, profile_photo_url, job_title, 
+              location_city, dining_style, dietary_preferences, gender_identity,
+              payments:payments!payments_user_id_fkey (
+                id, user_id, status, updated_at
+              )
+            )
+          `
+          )
+          .or(`user1_id.eq.${profile.user_id},user2_id.eq.${profile.user_id}`)
+          .eq("is_active", true)
+          .order("matched_at", { ascending: false })
+          // 👇 apply ordering+limit on the joined payments table
+          .order("updated_at", {
+            foreignTable: "user1.payments",
+            ascending: false,
+          })
+          .limit(1, { foreignTable: "user1.payments" })
+          .order("updated_at", {
+            foreignTable: "user2.payments",
+            ascending: false,
+          })
+          .limit(1, { foreignTable: "user2.payments" });
+  
+        if (error) {
+          console.error("Error fetching crossed paths:", error);
+          setCrossedPaths([]);
+          return;
+        }
+  
+        // Now get aggregated data from crossed_paths_log for each pair
+        const enrichedPaths = await Promise.all(
+          (crossedPathsData || []).map(async (path: any) => {
+            const otherUserId =
+              path.user1_id === profile.user_id
+                ? path.user2.user_id
+                : path.user1.user_id;
+            const userAId =
+              profile.user_id < otherUserId ? profile.user_id : otherUserId;
+            const userBId =
+              profile.user_id < otherUserId ? otherUserId : profile.user_id;
+  
+            // Get all crossed path logs for this user pair
+            const { data: logData } = await supabase
+              .from("crossed_paths_log")
+              .select("restaurant_name, cross_count")
+              .eq("user_a_id", userAId)
+              .eq("user_b_id", userBId);
+  
+            const locations =
+              logData?.map((log) => log.restaurant_name).filter(Boolean) || [];
+            const totalCrosses =
+              logData?.reduce((sum, log) => sum + (log.cross_count || 1), 0) || 1;
+  
+            // Create location_details array with proper structure
+            const locationDetails =
+              logData?.reduce((acc, log) => {
+                if (!log.restaurant_name) return acc;
+  
+                const existing = acc.find(
+                  (item) => item.name === log.restaurant_name
+                );
+                if (existing) {
+                  existing.cross_count += log.cross_count || 1;
+                } else {
+                  acc.push({
+                    name: log.restaurant_name,
+                    cross_count: log.cross_count || 1,
+                  });
+                }
+                return acc;
+              }, [] as Array<{ name: string; cross_count: number }>) || [];
+  
+            return {
+              ...path,
+              matched_user:
+                path.user1_id === profile.user_id ? path.user2 : path.user1,
+              payment_status:
+                path.user1_id === profile.user_id
+                  ? path.user2.payments?.[0]?.status || "free"
+                  : path.user1.payments?.[0]?.status || "free",
+              total_crosses: totalCrosses,
+              locations: [...new Set(locations)], // Remove duplicates
+              location_details: locationDetails,
+            };
+          })
+        );
+  
+        setCrossedPaths(enrichedPaths);
+      } catch (error: any) {
+        console.error("Error in fetchCrossedPaths:", error);
+        setCrossedPaths([]);
+      }
+    };
+
+  const fetchAllEvents = async () => {
+    if (!profile?.id) return;
+
+    try {
+      const {data, error} = await supabase
+      .from('events')
+      .select('id')
+      .eq('creator_id', profile?.id);
+
+      if (error) throw error;
+      setEvents(data);
+
+    } catch (error) {
+      console.error("error for events on dashboard", error)
+    }
+  }
+
   const fetchWalletPayments = async () => {
     if (!profile?.id) return;
 
@@ -64,11 +198,6 @@ const UserDashboard = () => {
       setWalletPayments(data || []);
     } catch (err) {
       console.error("Error fetching wallet payments:", err);
-      toast({
-        title: "Error",
-        description: "Failed to load wallet payments",
-        variant: "destructive",
-      });
     }
   };
   return (
@@ -90,7 +219,7 @@ const UserDashboard = () => {
               <Calendar className="h-4 w-4 text-muted-foreground icon-animate" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
+              <div className="text-2xl font-bold">{events.length}</div>
               <p className="text-xs text-muted-foreground">
                 Events you've created
               </p>
@@ -120,7 +249,7 @@ const UserDashboard = () => {
               <Star className="h-4 w-4 text-muted-foreground icon-animate" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
+              <div className="text-2xl font-bold">{crossedPaths.length}</div>
               <p className="text-xs text-muted-foreground">
                 Recent connections
               </p>
