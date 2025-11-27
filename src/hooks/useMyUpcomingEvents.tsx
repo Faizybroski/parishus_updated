@@ -74,13 +74,14 @@ export const useMyUpcomingEvents = () => {
           rsvps!inner (
             id,
             status,
+            date,
             user_id
           )
         `)
         .eq('rsvps.user_id', profile.id)
         .eq('rsvps.status', 'confirmed')
-        .gt('date_time', new Date().toISOString())
-        .order('date_time', { ascending: true })
+        .gt('rsvps.date', new Date().toISOString())
+        .order('rsvps.date', { ascending: true })
         .limit(2);
 
       if (eventError) {
