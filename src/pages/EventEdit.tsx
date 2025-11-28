@@ -845,6 +845,12 @@ const EventEdit = () => {
     handleInputChange("eventFeatures", updated);
   };
 
+    const handleAutoGrow = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const el = e.target;
+      el.style.height = "auto"; // reset height
+      el.style.height = `${el.scrollHeight}px`; // grow to fit
+    };
+
   // const isFormValid =
   //   formData.name &&
   //   formData.description &&
@@ -1172,7 +1178,7 @@ const EventEdit = () => {
                       handleInputChange("name", e.target.value);
                     }}
                     required
-                    className={`!leading-[1.2] p-0 resize-none overflow-hidden px-2 text-black placeholder:text-black/90 bg-transparent font-${selectedFont} border-none ring-0 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none xsm:text-[2.8rem] sm:text-[3rem] md:text-[3rem] lg:text-[3.5rem] xl:text-[4rem] min-h-[2.5rem]`}
+                    className={`!leading-[1.2] p-0 resize-none overflow-hidden px-2 text-black placeholder:text-black/60 bg-transparent font-${selectedFont} border-none ring-0 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none xsm:text-[2.8rem] sm:text-[3rem] md:text-[3rem] lg:text-[3.5rem] xl:text-[4rem] min-h-[2.5rem]`}
                     style={{ fontFamily: selectedFont }}
                   />
                 </div>

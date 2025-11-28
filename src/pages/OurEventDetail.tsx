@@ -31,6 +31,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Loader2,
+  ChevronLeft,
   MapPin,
   Share2,
   Hourglass,
@@ -1254,6 +1255,32 @@ const OurEventDetails = () => {
           )}
 
           <div className="flex-1 space-y-6 min-w-0 order-first lg:order-none">
+            <div className="relative lg:hidden">
+            <div className="absolute  lg:hidden left-1 -top-5 z-50">
+              {isCreator && (
+                <Link to={"/events"}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="bg-transparent backdrop-blur-md bg-white/10"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                  </Button>
+                </Link>
+              )}
+              {!isCreator && (
+                <Link to={"/explore"}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="bg-transparent backdrop-blur-md bg-white/10"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                  </Button>
+                </Link>
+              )}
+            </div>
+            </div>
             <div className="block lg:hidden mb-4 flex justify-center">
               <div className="bg-primary rounded-md flex items-center justify-center relative overflow-hidden cursor-pointer group aspect-[4/5] w-full max-w-sm mx-auto">
                 <img
@@ -1264,6 +1291,30 @@ const OurEventDetails = () => {
               </div>
             </div>
             <Card className="space-y-2 bg-transparent border-none shadow-none">
+              <div className="lg:flex hidden">
+                {isCreator && (
+                  <Link to={"/events"}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="bg-transparent "
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                )}
+                {!isCreator && (
+                  <Link to={"/explore"}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="bg-transparent"
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                )}
+              </div>
               <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
                 <div className="flex flex-wrap items-center justify-between gap-y-1.5 lg:gap-y-2">
@@ -2295,7 +2346,7 @@ const OurEventDetails = () => {
                         />
                       )}
                       <Button
-                        onClick={() => {
+                        onClick={async () => {
                           if (event.is_password_protected && !password.trim()) {
                             toast({
                               title: "Password Required",
@@ -2303,6 +2354,27 @@ const OurEventDetails = () => {
                               variant: "destructive",
                             });
                             return;
+                          }
+                          const correctPassword = await bcrypt.compare(
+                            password.trim(),
+                            event.password_hash
+                          );
+                          if (!correctPassword) {
+                            toast({
+                              title: "Incorrect Password",
+                              description:
+                                "The Password you entered for RSVP this event is incorrect",
+                              variant: "destructive",
+                            });
+                            return;
+                          }
+
+                          if (event.recurrence && !hasRSVP) {
+                            setShowRecurrenceDialog(true);
+                            return;
+                          }
+                          if (!event.recurrence) {
+                            handleRSVP();
                           }
                           if (event.recurrence) {
                             setShowRecurrenceDialog(true); // show dialog instead
@@ -2345,7 +2417,7 @@ const OurEventDetails = () => {
                     )}
 
                     <Button
-                      onClick={() => {
+                      onClick={async () => {
                         // if (subscriptionStatus === "free") {
                         //   toast({
                         //     title: "Premium Required",
@@ -2365,6 +2437,19 @@ const OurEventDetails = () => {
                           });
                           return;
                         }
+                        const correctPassword = await bcrypt.compare(
+                          password.trim(),
+                          event.password_hash
+                        );
+                        if (!correctPassword) {
+                          toast({
+                            title: "Incorrect Password",
+                            description:
+                              "The Password you entered for RSVP this event is incorrect",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
 
                         if (event.recurrence && !hasRSVP) {
                           setShowRecurrenceDialog(true);
@@ -2372,6 +2457,11 @@ const OurEventDetails = () => {
                         }
                         if (!event.recurrence) {
                           handlePaidRSVP();
+                        }
+
+                        if (event.recurrence && !hasRSVP) {
+                          setShowRecurrenceDialog(true);
+                          return;
                         }
                       }}
                       disabled={isPaying}

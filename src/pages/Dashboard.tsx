@@ -92,29 +92,70 @@ const Dashboard = () => {
     if (!profile?.id) return;
 
     try {
-      const { data, error } = await supabase
+      const { data: events, error: eventsError } = await supabase
+        .from("events")
+        .select("id, name, event_fee, date_time")
+        .eq("creator_id", profile.id)
+        .eq("is_paid", true)
+        .order("date_time", { ascending: false });
+
+      if (eventsError) throw eventsError;
+
+      const eventIds = events.map((e) => e.id);
+      if (eventIds.length === 0) return [];
+
+      const { data, error: paymentsError } = await supabase
         .from("events_payments")
         .select(
           `
-        id,
-        creator_id,
-        event_id,
-        created_at,
-        withdraw_status,
-        events:event_id (
-          id,
-          name,
-          event_fee,
-          date_time,
-          location_name
+    id,
+    creator_id,
+    event_id,
+    created_at,
+    withdraw_status,
+    events:events_payments_event_id_fkey (
+      id,
+      name,
+      event_fee,
+      date_time,
+      location_name,
+      creator_id
+    )
+  `
         )
-      `
-        )
-        .eq("creator_id", profile.user_id)
-        .eq("withdraw_status", false)
+        .in("event_id", eventIds)
+        .eq("withdraw_status", false) // optional filter
+        .eq("payment_status", "succeeded")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (paymentsError) throw paymentsError;
+
+      // if (eventsError) throw eventsError;
+
+      // const { data, error } = await supabase
+      //   .from("events_payments")
+      //   .select(
+      //     `
+      //   id,
+      //   creator_id,
+      //   event_id,
+      //   created_at,
+      //   withdraw_status,
+      //   events:events_payments_event_id_fkey (
+      //     id,
+      //     name,
+      //     event_fee,
+      //     date_time,
+      //     location_name,
+      //     creator_id
+      //   )
+      // `
+      //   )
+      //   .eq("events.creator_id", profile.user_id)
+      //   .eq("withdraw_status", false)
+      //   .order("created_at", { ascending: false });
+
+      // if (error) throw error;
 
       setWalletPayments(data || []);
     } catch (err) {

@@ -32,52 +32,53 @@ const WalletWithdraw = () => {
   const [totalPayments, setTotalPayments] = useState(0);
   const [paymentNote, setPaymentNote] = useState("");
   const [loading, setLoading] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<"Venmo" | "CashApp" | "PayPal" | "">("");  
+  const [paymentMethod, setPaymentMethod] = useState<
+    "Venmo" | "CashApp" | "PayPal" | ""
+  >("");
   const [accountDetails, setAccountDetails] = useState("");
 
   useEffect(() => {
-    if (!user?.id) return; 
-  const channel = supabase
-    .channel("wallet-withdraw-status")
-    .on(
-      "postgres_changes",
-      {
-        event: "UPDATE",
-        schema: "public",
-        table: "wallet_withdraw_requests",
-        filter: `creator_id=eq.${user.id}`, 
-      },
-      async (payload) => {
-        const newStatus = payload.new.status;
+    if (!user?.id) return;
+    const channel = supabase
+      .channel("wallet-withdraw-status")
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "wallet_withdraw_requests",
+          filter: `creator_id=eq.${user.id}`,
+        },
+        async (payload) => {
+          const newStatus = payload.new.status;
 
-        // ✅ Toast works
-        toast({
-          title: "Withdrawal Update",
-          description: `Your withdrawal request is now "${newStatus}".`,
-        });
-
-        // ✅ Insert into notifications
-        const { error } = await supabase.from("notifications").insert([
-          {
-            user_id: profile.id,  // <- make sure this matches your Notification schema
+          // ✅ Toast works
+          toast({
             title: "Withdrawal Update",
-            message: `Your withdrawal request is now "${newStatus}".`,
-            type: "wallet_update",
-            is_read: false,
-            data: { withdraw_id: payload.new.id },
-          },
-        ]);
+            description: `Your withdrawal request is now "${newStatus}".`,
+          });
 
-        if (error) console.error("Failed to insert notification:", error);
-      }
-    )
-    .subscribe();
+          // ✅ Insert into notifications
+          const { error } = await supabase.from("notifications").insert([
+            {
+              user_id: profile.id, // <- make sure this matches your Notification schema
+              title: "Withdrawal Update",
+              message: `Your withdrawal request is now "${newStatus}".`,
+              type: "wallet_update",
+              is_read: false,
+              data: { withdraw_id: payload.new.id },
+            },
+          ]);
 
-  return () => {
-    supabase.removeChannel(channel);
-  };
-}, [profile?.id, user?.id, toast]);
+          if (error) console.error("Failed to insert notification:", error);
+        }
+      )
+      .subscribe();
 
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [profile?.id, user?.id, toast]);
 
   useEffect(() => {
     if (profile) {
@@ -88,6 +89,18 @@ const WalletWithdraw = () => {
   const fetchWalletPayments = async () => {
     if (!profile?.id) return;
     try {
+      const { data: events, error: eventsError } = await supabase
+        .from("events")
+        .select("id, name, event_fee, date_time")
+        .eq("creator_id", profile.id)
+        .eq("is_paid", true)
+        .order("date_time", { ascending: false });
+
+      if (eventsError) throw eventsError;
+
+      const eventIds = events.map((e) => e.id);
+      if (eventIds.length === 0) return [];
+
       const { data, error } = await supabase
         .from("events_payments")
         .select(
@@ -106,8 +119,9 @@ const WalletWithdraw = () => {
           )
         `
         )
-        .eq("creator_id", profile.user_id)
+        .eq("event_id", eventIds)
         .eq("withdraw_status", false)
+        .eq("payment_status", "succeeded")
         .order("created_at", { ascending: false });
       if (error) throw error;
       setWalletPayments(data || []);
@@ -271,7 +285,9 @@ const WalletWithdraw = () => {
           <CardContent>
             {/* Payment Method Selection */}
             <div className="mb-3">
-              <label className="block mb-1 font-medium">Select Payment Method:</label>
+              <label className="block mb-1 font-medium">
+                Select Payment Method:
+              </label>
               <div className="flex gap-4">
                 {["Venmo", "CashApp", "PayPal"].map((method) => (
                   <label key={method} className="flex items-center gap-2">
