@@ -48,7 +48,7 @@ export const AdminLogin = () => {
           <div className="flex items-center justify-between mb-6">
             <div className="w-6" />
             <div className="flex items-center">
-              <img className='max-w-8 mr-2' src='/Parishus logo.png' alt="Parish Logo" />
+              <img className='max-w-8 mr-2' src='https://jigznrpgzoyrbqbrpsqx.supabase.co/storage/v1/object/public/Parish/Parishus%20logo.png' alt="Parish Logo" />
               <h1 className="text-2xl font-extrabold font-script text-black">
                 Parish
               </h1>

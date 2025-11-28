@@ -415,7 +415,7 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
             style={{ textAlign: "center !important" }}
           >
             <img
-              src="Parishus logo.png"
+              src="https://jigznrpgzoyrbqbrpsqx.supabase.co/storage/v1/object/public/Parish/Parishus%20logo.png"
               alt="Parish Logo"
               style={{
                 width: "50%",
@@ -428,7 +428,7 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
         ) : currentCard.type === "intro-title" ? (
           <>
             <img
-              src="Parishus logo.png"
+              src="https://jigznrpgzoyrbqbrpsqx.supabase.co/storage/v1/object/public/Parish/Parishus%20logo.png"
               alt="Parish Logo"
               style={{
                 width: "20%",

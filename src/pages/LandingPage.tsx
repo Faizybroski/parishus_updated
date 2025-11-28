@@ -130,7 +130,7 @@ export const ParishUsLanding: React.FC = () => {
             <div className="cursor-pointer flex items-center space-x-1 shrink-0">
               <img
                 className="w-10 h-8 mr-2 object-contain"
-                src="/Parishus logo.png"
+                src="https://jigznrpgzoyrbqbrpsqx.supabase.co/storage/v1/object/public/Parish/Parishus%20logo.png"
                 alt="Logo"
               />
               <h1
