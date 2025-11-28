@@ -39,14 +39,14 @@ const UserDashboard = () => {
   }, [profile]);
 
   const fetchCrossedPaths = async () => {
-      if (!profile) return;
-  
-      try {
-        // First get basic crossed paths using proper foreign key joins
-        const { data: crossedPathsData, error } = await supabase
-          .from("crossed_paths")
-          .select(
-            `
+    if (!profile) return;
+
+    try {
+      // First get basic crossed paths using proper foreign key joins
+      const { data: crossedPathsData, error } = await supabase
+        .from("crossed_paths")
+        .select(
+          `
             *,
             user1:profiles!crossed_paths_user1_id_fkey(
               id, user_id, email,  username, first_name, last_name, profile_photo_url, job_title, 
@@ -63,141 +63,186 @@ const UserDashboard = () => {
               )
             )
           `
-          )
-          .or(`user1_id.eq.${profile.user_id},user2_id.eq.${profile.user_id}`)
-          .eq("is_active", true)
-          .order("matched_at", { ascending: false })
-          // 👇 apply ordering+limit on the joined payments table
-          .order("updated_at", {
-            foreignTable: "user1.payments",
-            ascending: false,
-          })
-          .limit(1, { foreignTable: "user1.payments" })
-          .order("updated_at", {
-            foreignTable: "user2.payments",
-            ascending: false,
-          })
-          .limit(1, { foreignTable: "user2.payments" });
-  
-        if (error) {
-          console.error("Error fetching crossed paths:", error);
-          setCrossedPaths([]);
-          return;
-        }
-  
-        // Now get aggregated data from crossed_paths_log for each pair
-        const enrichedPaths = await Promise.all(
-          (crossedPathsData || []).map(async (path: any) => {
-            const otherUserId =
-              path.user1_id === profile.user_id
-                ? path.user2.user_id
-                : path.user1.user_id;
-            const userAId =
-              profile.user_id < otherUserId ? profile.user_id : otherUserId;
-            const userBId =
-              profile.user_id < otherUserId ? otherUserId : profile.user_id;
-  
-            // Get all crossed path logs for this user pair
-            const { data: logData } = await supabase
-              .from("crossed_paths_log")
-              .select("restaurant_name, cross_count")
-              .eq("user_a_id", userAId)
-              .eq("user_b_id", userBId);
-  
-            const locations =
-              logData?.map((log) => log.restaurant_name).filter(Boolean) || [];
-            const totalCrosses =
-              logData?.reduce((sum, log) => sum + (log.cross_count || 1), 0) || 1;
-  
-            // Create location_details array with proper structure
-            const locationDetails =
-              logData?.reduce((acc, log) => {
-                if (!log.restaurant_name) return acc;
-  
-                const existing = acc.find(
-                  (item) => item.name === log.restaurant_name
-                );
-                if (existing) {
-                  existing.cross_count += log.cross_count || 1;
-                } else {
-                  acc.push({
-                    name: log.restaurant_name,
-                    cross_count: log.cross_count || 1,
-                  });
-                }
-                return acc;
-              }, [] as Array<{ name: string; cross_count: number }>) || [];
-  
-            return {
-              ...path,
-              matched_user:
-                path.user1_id === profile.user_id ? path.user2 : path.user1,
-              payment_status:
-                path.user1_id === profile.user_id
-                  ? path.user2.payments?.[0]?.status || "free"
-                  : path.user1.payments?.[0]?.status || "free",
-              total_crosses: totalCrosses,
-              locations: [...new Set(locations)], // Remove duplicates
-              location_details: locationDetails,
-            };
-          })
-        );
-  
-        setCrossedPaths(enrichedPaths);
-      } catch (error: any) {
-        console.error("Error in fetchCrossedPaths:", error);
+        )
+        .or(`user1_id.eq.${profile.user_id},user2_id.eq.${profile.user_id}`)
+        .eq("is_active", true)
+        .order("matched_at", { ascending: false })
+        // 👇 apply ordering+limit on the joined payments table
+        .order("updated_at", {
+          foreignTable: "user1.payments",
+          ascending: false,
+        })
+        .limit(1, { foreignTable: "user1.payments" })
+        .order("updated_at", {
+          foreignTable: "user2.payments",
+          ascending: false,
+        })
+        .limit(1, { foreignTable: "user2.payments" });
+
+      if (error) {
+        console.error("Error fetching crossed paths:", error);
         setCrossedPaths([]);
+        return;
       }
-    };
+
+      // Now get aggregated data from crossed_paths_log for each pair
+      const enrichedPaths = await Promise.all(
+        (crossedPathsData || []).map(async (path: any) => {
+          const otherUserId =
+            path.user1_id === profile.user_id
+              ? path.user2.user_id
+              : path.user1.user_id;
+          const userAId =
+            profile.user_id < otherUserId ? profile.user_id : otherUserId;
+          const userBId =
+            profile.user_id < otherUserId ? otherUserId : profile.user_id;
+
+          // Get all crossed path logs for this user pair
+          const { data: logData } = await supabase
+            .from("crossed_paths_log")
+            .select("restaurant_name, cross_count")
+            .eq("user_a_id", userAId)
+            .eq("user_b_id", userBId);
+
+          const locations =
+            logData?.map((log) => log.restaurant_name).filter(Boolean) || [];
+          const totalCrosses =
+            logData?.reduce((sum, log) => sum + (log.cross_count || 1), 0) || 1;
+
+          // Create location_details array with proper structure
+          const locationDetails =
+            logData?.reduce((acc, log) => {
+              if (!log.restaurant_name) return acc;
+
+              const existing = acc.find(
+                (item) => item.name === log.restaurant_name
+              );
+              if (existing) {
+                existing.cross_count += log.cross_count || 1;
+              } else {
+                acc.push({
+                  name: log.restaurant_name,
+                  cross_count: log.cross_count || 1,
+                });
+              }
+              return acc;
+            }, [] as Array<{ name: string; cross_count: number }>) || [];
+
+          return {
+            ...path,
+            matched_user:
+              path.user1_id === profile.user_id ? path.user2 : path.user1,
+            payment_status:
+              path.user1_id === profile.user_id
+                ? path.user2.payments?.[0]?.status || "free"
+                : path.user1.payments?.[0]?.status || "free",
+            total_crosses: totalCrosses,
+            locations: [...new Set(locations)], // Remove duplicates
+            location_details: locationDetails,
+          };
+        })
+      );
+
+      setCrossedPaths(enrichedPaths);
+    } catch (error: any) {
+      console.error("Error in fetchCrossedPaths:", error);
+      setCrossedPaths([]);
+    }
+  };
 
   const fetchAllEvents = async () => {
     if (!profile?.id) return;
 
     try {
-      const {data, error} = await supabase
-      .from('events')
-      .select('id')
-      .eq('creator_id', profile?.id);
+      const { data, error } = await supabase
+        .from("events")
+        .select("id")
+        .eq("creator_id", profile?.id);
 
       if (error) throw error;
       setEvents(data);
-
     } catch (error) {
-      console.error("error for events on dashboard", error)
+      console.error("error for events on dashboard", error);
     }
-  }
+  };
 
   const fetchWalletPayments = async () => {
     if (!profile?.id) return;
 
     try {
-      const { data, error } = await supabase
+      const { data: events, error: eventsError } = await supabase
+        .from("events")
+        .select("id, name, event_fee, date_time")
+        .eq("creator_id", profile.id)
+        .eq("is_paid", true)
+        .order("date_time", { ascending: false });
+
+      if (eventsError) throw eventsError;
+
+      const eventIds = events.map((e) => e.id);
+      if (eventIds.length === 0) return [];
+
+      const { data, error: paymentsError } = await supabase
         .from("events_payments")
         .select(
           `
-        id,
-        creator_id,
-        event_id,
-        created_at,
-        withdraw_status,
-        events:event_id (
-          id,
-          name,
-          event_fee,
-          date_time,
-          location_name
+    id,
+    creator_id,
+    event_id,
+    created_at,
+    withdraw_status,
+    events:events_payments_event_id_fkey (
+      id,
+      name,
+      event_fee,
+      date_time,
+      location_name,
+      creator_id
+    )
+  `
         )
-      `
-        )
-        .eq("creator_id", profile.user_id)
-        .eq("withdraw_status", false)
+        .in("event_id", eventIds)
+        .eq("withdraw_status", false) // optional filter
+        .eq("payment_status", "succeeded")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (paymentsError) throw paymentsError;
+
+      // if (eventsError) throw eventsError;
+
+      // const { data, error } = await supabase
+      //   .from("events_payments")
+      //   .select(
+      //     `
+      //   id,
+      //   creator_id,
+      //   event_id,
+      //   created_at,
+      //   withdraw_status,
+      //   events:events_payments_event_id_fkey (
+      //     id,
+      //     name,
+      //     event_fee,
+      //     date_time,
+      //     location_name,
+      //     creator_id
+      //   )
+      // `
+      //   )
+      //   .eq("events.creator_id", profile.user_id)
+      //   .eq("withdraw_status", false)
+      //   .order("created_at", { ascending: false });
+
+      // if (error) throw error;
 
       setWalletPayments(data || []);
     } catch (err) {
       console.error("Error fetching wallet payments:", err);
+      toast({
+        title: "Error",
+        description: "Failed to load wallet payments",
+        variant: "destructive",
+      });
     }
   };
   return (
