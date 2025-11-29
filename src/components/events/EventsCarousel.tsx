@@ -397,10 +397,10 @@ const EventsCarousel = () => {
     return (
       <div className="h-96 flex items-center justify-center text-center text-muted-foreground bg-background rounded-xl">
         <div>
-          <h3 className="text-2xl font-semibold mb-2">No Events Found</h3>
-          <Link to={"/create-event"}>
+          <h3 className="text-2xl font-semibold mb-2">No Featured Events yet</h3>
+          {/* <Link to={"/create-event"}>
             <Button>Create Event</Button>
-          </Link>
+          </Link> */}
         </div>
       </div>
     );
