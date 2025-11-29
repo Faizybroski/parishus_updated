@@ -317,6 +317,7 @@ const Dashboard = () => {
 
           {/* Featured Admin Events Carousel */}
           <EventsCarousel />
+
           <Card className="shadow-card border-border mt-6">
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
