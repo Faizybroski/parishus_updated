@@ -68,9 +68,9 @@ const EventsCarousel = () => {
     },
     {
       id: 3,
-      name: "Atlanta Food Festival",
+      name: "Atlanta Food Festival Atlanta Food Festival Atlanta Food Festival Atlanta Food Festival",
       description:
-        "Taste the best of Atlanta! Food trucks, live music, and fun for the whole family.",
+        "Taste the best of Atlanta! Food trucks, live music, and fun for the whole family. An elegant evening of dinner, dancing, and charity in Washington DC. Taste the best of Atlanta! Food trucks, live music, and fun for the whole family. An elegant evening of dinner, dancing, and charity in Washington DC.",
       cover_photo_url:
         "https://images.unsplash.com/photo-1519068737630-e5db30e12e42?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       location_name: "Piedmont Park",
@@ -599,7 +599,7 @@ const EventsCarousel = () => {
                       </h2>
                       {/* <div className="w-full min-h-[60px] sm:min-h-[80px] md:min-h-[100px] max-h-[110px] overflow-hidden"> */}
                         {event.description && (
-                          <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-200 line-clamp-2 sm:line-clamp-3 md:line-clamp-none">
+                          <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-200 line-clamp-2 sm:line-clamp-3">
                             {event.description}
                           </p>
                         )}
@@ -650,7 +650,7 @@ const EventsCarousel = () => {
                           </Button>
                         </Link>
                         <Link to={`/rsvp/${event.id}/details`}>
-                          <Button className="w-full group sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-lg font-semibold bg-white text-black hover:bg-gray-200 rounded-full flex items-center justify-center gap-2 transition-all">
+                          <Button className="w-full group sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-lg font-semibold bg-primary text-black hover:bg-gray-200 rounded-full flex items-center justify-center gap-2 transition-all">
                             {rsvpStatus === "yes" ? "Cancel RSVP" : "RSVP"}
                             <ChevronRight className="w-5 h-5 icon-animate" />
                           </Button>
