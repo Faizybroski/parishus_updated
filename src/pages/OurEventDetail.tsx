@@ -28,6 +28,7 @@ import {
   Upload,
   Edit,
   Heart,
+  Trash,
   ArrowLeft,
   ArrowRight,
   Loader2,
@@ -1111,6 +1112,55 @@ const OurEventDetails = () => {
     }
   };
 
+  const deleteEvent = (eventId: string) => {
+    toast({
+      title: "Are you sure?",
+      description: "This will permanently delete your event.",
+      action: (
+        <div className="flex gap-2">
+          <Button
+            variant="destructive"
+            onClick={async () => {
+              const { error } = await supabase
+                .from("events")
+                .delete()
+                .eq("id", eventId)
+                .eq("creator_id", userProfileId);
+
+              if (error) {
+                toast({
+                  title: "Error",
+                  description: error.message || "Failed to delete event",
+                  variant: "destructive",
+                });
+              } else {
+                toast({
+                  title: "Event deleted",
+                  description: "Your event has been deleted successfully",
+                });
+                navigate("/events");
+              }
+            }}
+          >
+            Yes
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              // just dismiss toast
+              toast({
+                title: "Cancelled",
+                description: "Event deletion cancelled.",
+              });
+            }}
+          >
+            No
+          </Button>
+        </div>
+      ),
+    });
+  };
+
   const shareEvent = async () => {
     try {
       await navigator.share({
@@ -1256,30 +1306,30 @@ const OurEventDetails = () => {
 
           <div className="flex-1 space-y-6 min-w-0 order-first lg:order-none">
             <div className="relative lg:hidden">
-            <div className="absolute  lg:hidden left-1 -top-5 z-50">
-              {isCreator && (
-                <Link to={"/events"}>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="bg-transparent hover:bg-transparent"
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                  </Button>
-                </Link>
-              )}
-              {!isCreator && (
-                <Link to={"/explore"}>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="bg-transparent hover:bg-transparent"
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                  </Button>
-                </Link>
-              )}
-            </div>
+              <div className="absolute  lg:hidden left-1 -top-5 z-50">
+                {isCreator && (
+                  <Link to={"/events"}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="bg-transparent hover:bg-transparent"
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                )}
+                {!isCreator && (
+                  <Link to={"/explore"}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="bg-transparent hover:bg-transparent"
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                )}
+              </div>
             </div>
             <div className="block lg:hidden mb-4 flex justify-center">
               <div className="bg-primary rounded-md flex items-center justify-center relative overflow-hidden cursor-pointer group aspect-[4/5] w-full max-w-sm mx-auto">
@@ -1397,6 +1447,19 @@ const OurEventDetails = () => {
                           <Edit className="h-5 w-5" />
                         </Button>
                       </Link>
+                    )}
+
+                    {isCreator && (
+                      <Button
+                        variant="outline"
+                        onClick={(e) => {
+                          deleteEvent(event.id);
+                        }}
+                        size="icon"
+                        className="bg-transparent text-black hover:bg-transparent border-none"
+                      >
+                        <Trash className="h-5 w-5" />
+                      </Button>
                     )}
 
                     <Button
