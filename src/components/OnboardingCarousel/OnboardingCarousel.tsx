@@ -212,6 +212,7 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
       setPassword("");
       setFirstName("");
       setLastName("");
+      navigate("/");
     } catch (err) {
       toast({
         title: "Error",
