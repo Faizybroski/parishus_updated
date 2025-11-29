@@ -205,7 +205,7 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
       if (error) throw error;
       toast({
         title: "Account Created!",
-        description: "Check your email for verification.",
+        description: "Your profile has been registered successfully. Access activation is pending administrative approval."
       });
       if (!error) setEmail("");
       //  navigate('social-media')

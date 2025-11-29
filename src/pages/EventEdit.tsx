@@ -789,6 +789,7 @@ const EventEdit = () => {
           eventEndDateTime: eventEndDateTime
             ? eventEndDateTime.toISOString()
             : null,
+            location: `${formData.location_name}, ${formData.location_address}`
         } as any)
         .eq("id", eventId);
 

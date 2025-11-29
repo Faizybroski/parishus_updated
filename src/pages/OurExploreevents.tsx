@@ -106,11 +106,11 @@ const OurExploreEvents = () => {
     "Atlanta",
   ];
   const cityFilterMap: Record<string, string> = {
-    "New York City": "NY",
-    Miami: "FL",
-    "Washington DC": "DC",
-    Boston: "MA",
-    "New Mirpur City": "Mirpur",
+    "New York City": "New York",
+    Miami: "Miami",
+    "Washington DC": "Washington",
+    Boston: "Boston",
+    Atlanta: "Atlanta",
   };
   // const [filters, setFilters] = useState({
   //   trending: "Newest",
@@ -331,6 +331,15 @@ const OurExploreEvents = () => {
     });
     setSearchParams(newParams);
   };
+
+  useEffect(() => {
+    const newFilters = {
+      trending: searchParams.get("trending") || "Newest",
+      timeframe: searchParams.get("timeframe") || "All",
+      city: searchParams.get("city") || "All",
+    };
+    setFilters(newFilters);
+  }, [searchParams]);
 
   // ✅ Fetch only when filters or userProfileId change
   useEffect(() => {
@@ -687,7 +696,7 @@ const OurExploreEvents = () => {
         filters.city !== "Near Me"
       ) {
         const cityKey = cityFilterMap[filters.city] || filters.city;
-        query = query.ilike("location_address", `%${cityKey}%`);
+        query = query.ilike("location", `%${cityKey}%`);
       }
 
       const { data, error } = await query;
@@ -1336,7 +1345,7 @@ const OurExploreEvents = () => {
                 {/* Title container with black bg + gradient top */}
                 <div className="absolute inset-x-0 bottom-0">
                   <div className="relative bg-black">
-                    <div className="absolute -top-[17.5rem] left-0 right-0 h-[17.5rem] bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10"></div>
+                    <div className="absolute -top-[17.5rem] left-0 right-0 h-[17.5rem] bg-gradient-to-t from-black/60 via-black/20 to-transparent z-9"></div>
                     <span className="absolute -top-12 left-5 border border-white/20 text-white text-sm px-3 py-2 rounded shadow-md z-20">
                       {new Date(event.date_time).toLocaleDateString("en-US", {
                         month: "short",

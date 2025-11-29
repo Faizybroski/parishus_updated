@@ -535,6 +535,7 @@ const AdminCreateEvent = () => {
             ? formData.recurrenceDates
             : null,
           eventEndDateTime: eventEndDateTime.toISOString(),
+          location: `${formData.location_name}, ${formData.location_address}`
         } as any)
         .select()
         .single();
