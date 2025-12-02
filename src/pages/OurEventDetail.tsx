@@ -84,6 +84,7 @@ interface Event {
   tiktok: boolean;
   tiktok_Link: string;
   imageGallery: boolean;
+  explore: boolean;
   imageGalleryLinks: Array<string>;
   features: boolean;
   eventEndDateTime: string;
@@ -2325,18 +2326,20 @@ const OurEventDetails = () => {
                 ) : (
                   <Button
                     onClick={() => {
-                      // if (subscriptionStatus === "free") {
-                      //   toast({
-                      //     title: "Premium Required",
-                      //     description:
-                      //       "You need a premium subscription to RSVP for paid events.",
-                      //     variant: "destructive",
-                      //   });
-                      //   setTimeout(() => {
-                      //     navigate("/subscription");
-                      //   }, 1200);
-                      //   return;
-                      // }
+                      if (!event.explore) {
+                        if (subscriptionStatus === "free") {
+                          toast({
+                            title: "Premium Required",
+                            description:
+                              "You need a premium subscription to RSVP private paid events.",
+                            variant: "destructive",
+                          });
+                          setTimeout(() => {
+                            navigate("/subscription");
+                          }, 1200);
+                          return;
+                        }
+                      }
 
                       if (event.recurrence && !hasRSVP) {
                         setShowRecurrenceDialog(true);
@@ -2481,16 +2484,20 @@ const OurEventDetails = () => {
 
                     <Button
                       onClick={async () => {
-                        // if (subscriptionStatus === "free") {
-                        //   toast({
-                        //     title: "Premium Required",
-                        //     description:
-                        //       "You need a premium subscription to RSVP for paid events.",
-                        //     variant: "destructive",
-                        //   });
-                        //   setTimeout(() => navigate("/subscription"), 1200);
-                        //   return;
-                        // }
+                        if (event.explore) {
+                        if (subscriptionStatus === "free") {
+                          toast({
+                            title: "Premium Required",
+                            description:
+                              "You need a premium subscription to RSVP private paid events.",
+                            variant: "destructive",
+                          });
+                          setTimeout(() => {
+                            navigate("/subscription");
+                          }, 1200);
+                          return;
+                        }
+                      }
 
                         if (event.is_password_protected && !password.trim()) {
                           toast({

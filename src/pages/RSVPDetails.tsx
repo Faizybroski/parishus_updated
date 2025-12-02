@@ -153,20 +153,20 @@ const RSVPDetails = () => {
     setIsPaying(true);
     try {
       if (event.is_password_protected) {
-        const correctPassword = await bcrypt.compare(
-          password.trim(),
-          event.password_hash
-        );
+        // const correctPassword = await bcrypt.compare(
+        //   password.trim(),
+        //   event.password_hash
+        // );
 
-        if (!correctPassword) {
-          toast({
-            title: "Incorrect Password",
-            description:
-              "The Password you entered for RSVP this event is incorrect",
-            variant: "destructive",
-          });
-          return;
-        }
+        // if (!correctPassword) {
+        //   toast({
+        //     title: "Incorrect Password",
+        //     description:
+        //       "The Password you entered for RSVP this event is incorrect",
+        //     variant: "destructive",
+        //   });
+        //   return;
+        // }
         const { data: response, error } = await supabase.functions.invoke(
           "create-event-payment-intent",
           {
@@ -191,6 +191,7 @@ const RSVPDetails = () => {
                 }`.trim() ||
                 "Guest User",
               userEmail: user?.email || "unknown@example.com",
+              date: event.date_time,
             },
           });
         }
@@ -219,6 +220,7 @@ const RSVPDetails = () => {
                 }`.trim() ||
                 "Guest User",
               userEmail: user?.email || "unknown@example.com",
+              date: event.date_time,
             },
           });
         }
@@ -325,26 +327,27 @@ const RSVPDetails = () => {
                   }
 
                   if (event.is_password_protected) {
-                    const correctPassword = await bcrypt.compare(
-                      password.trim(),
-                      event.password_hash
-                    );
+                    // const correctPassword = await bcrypt.compare(
+                    //   password.trim(),
+                    //   event.password_hash
+                    // );
 
-                    if (!correctPassword) {
-                      toast({
-                        title: "Incorrect Password",
-                        description:
-                          "The Password you entered for RSVP this event is incorrect",
-                        variant: "destructive",
-                      });
-                      return;
-                    }
+                    // if (!correctPassword) {
+                    //   toast({
+                    //     title: "Incorrect Password",
+                    //     description:
+                    //       "The Password you entered for RSVP this event is incorrect",
+                    //     variant: "destructive",
+                    //   });
+                    //   return;
+                    // }
                     const { error: rsvpError } = await supabase
                       .from("rsvps")
                       .insert({
                         event_id: eventId,
                         user_id: userProfileId,
                         status: "confirmed",
+                        date: event.date_time,
                       });
                     if (rsvpError) throw rsvpError;
 
@@ -355,6 +358,7 @@ const RSVPDetails = () => {
                         user_id: userProfileId,
                         reservation_type: "standard",
                         reservation_status: "confirmed",
+                        date: event.date_time,
                       });
                     if (reservationError) throw reservationError;
 
@@ -472,6 +476,7 @@ const RSVPDetails = () => {
                         event_id: eventId,
                         user_id: userProfileId,
                         status: "confirmed",
+                        date: event.date_time,
                       });
                     if (rsvpError) throw rsvpError;
 
@@ -482,6 +487,7 @@ const RSVPDetails = () => {
                         user_id: userProfileId,
                         reservation_type: "standard",
                         reservation_status: "confirmed",
+                        date: event.date_time,
                       });
                     if (reservationError) throw reservationError;
 
@@ -843,17 +849,19 @@ const RSVPDetails = () => {
                 ) : (
                   <Button
                     onClick={() => {
-                      if (subscriptionStatus === "free") {
-                        toast({
-                          title: "Premium Required",
-                          description:
-                            "You need a premium subscription to RSVP for paid events.",
-                          variant: "destructive",
-                        });
-                        setTimeout(() => {
-                          navigate("/subscription");
-                        }, 1200);
-                        return;
+                      if (!event.explore) {
+                        if (subscriptionStatus === "free") {
+                          toast({
+                            title: "Premium Required",
+                            description:
+                              "You need a premium subscription to RSVP private paid events.",
+                            variant: "destructive",
+                          });
+                          setTimeout(() => {
+                            navigate("/subscription");
+                          }, 1200);
+                          return;
+                        }
                       }
                       handlePaidRSVP();
                     }}
@@ -911,11 +919,24 @@ const RSVPDetails = () => {
                         />
                       )}
                       <Button
-                        onClick={() => {
+                        onClick={async () => {
                           if (event.is_password_protected && !password.trim()) {
                             toast({
                               title: "Password Required",
                               description: "Please enter the event password.",
+                              variant: "destructive",
+                            });
+                            return;
+                          }
+                          const correctPassword = await bcrypt.compare(
+                            password.trim(),
+                            event.password_hash
+                          );
+                          if (!correctPassword) {
+                            toast({
+                              title: "Incorrect Password",
+                              description:
+                                "The Password you entered for RSVP this event is incorrect",
                               variant: "destructive",
                             });
                             return;
@@ -949,22 +970,40 @@ const RSVPDetails = () => {
                     )}
 
                     <Button
-                      onClick={() => {
-                        if (subscriptionStatus === "free") {
-                          toast({
-                            title: "Premium Required",
-                            description:
-                              "You need a premium subscription to RSVP for paid events.",
-                            variant: "destructive",
-                          });
-                          setTimeout(() => navigate("/subscription"), 1200);
-                          return;
+                      onClick={async () => {
+                        if (event.explore) {
+                          if (subscriptionStatus === "free") {
+                            toast({
+                              title: "Premium Required",
+                              description:
+                                "You need a premium subscription to RSVP private paid events.",
+                              variant: "destructive",
+                            });
+                            setTimeout(() => {
+                              navigate("/subscription");
+                            }, 1200);
+                            return;
+                          }
                         }
 
                         if (event.is_password_protected && !password.trim()) {
                           toast({
                             title: "Password Required",
                             description: "Please enter the event password.",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+
+                        const correctPassword = await bcrypt.compare(
+                          password.trim(),
+                          event.password_hash
+                        );
+                        if (!correctPassword) {
+                          toast({
+                            title: "Incorrect Password",
+                            description:
+                              "The Password you entered for RSVP this event is incorrect",
                             variant: "destructive",
                           });
                           return;

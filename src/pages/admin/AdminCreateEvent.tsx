@@ -106,9 +106,9 @@ const AdminCreateEvent = () => {
   const [showFeatures, setShowFeatures] = useState(false);
   const [editFeatureIndex, setEditFeatureIndex] = useState(null);
   const [colors, setColors] = useState([]);
-  const [selectedFont, setSelectedFont] = useState("");
-  const [selectedColor, setSelectedColor] = useState("primary");
-  const [selectedBgColor, setSelectedBgColor] = useState("background");
+  const [selectedFont, setSelectedFont] = useState("Dancing Script");
+  const [selectedColor, setSelectedColor] = useState("#E4D7CD");
+  const [selectedBgColor, setSelectedBgColor] = useState("#F8F6F1");
   const [showRecurringDialog, setShowRecurringDialog] = useState(false);
 
   useEffect(() => {
