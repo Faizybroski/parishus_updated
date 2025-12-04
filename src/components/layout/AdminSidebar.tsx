@@ -36,9 +36,9 @@ const AdminSidebar = () => {
 
   const isActive = (path: string) => currentPath === path;
   const getNavCls = (isActive: boolean) =>
-  isActive
-    ? "bg-gradient-to-r from-primary/80 to-primary text-primary-foreground shadow-md font-medium"
-    : "hover:bg-muted/50 hover:text-foreground transition-all duration-200";
+    isActive
+      ? "bg-gradient-to-r from-primary/80 to-primary text-primary-foreground shadow-md font-medium"
+      : "hover:bg-muted/50 hover:text-foreground transition-all duration-200";
 
   // Define navigation items based on role
   const getNavigationItems = () => {
@@ -95,20 +95,48 @@ const AdminSidebar = () => {
             <SidebarMenu className="space-y-2 px-3">
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      end={false} // 👈 allow parent routes to stay active
-                      className={({ isActive }) => `
-                        ${getNavCls(isActive)}
-                        flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium
-                        ${isActive ? "shadow-lg" : ""}
-                      `}
-                    >
-                      <item.icon className="h-4 w-4 flex-shrink-0" />
-                      <span className="truncate">{item.title}</span>
-                    </NavLink>
-                  </SidebarMenuButton>
+                  <NavLink to={item.url} end>
+                    {({ isActive }) => (
+                      <SidebarMenuButton
+                        asChild
+                        isActive={isActive}
+                        className={`
+                          flex items-center space-x-3 px-4 py-5 rounded-lg text-sm font-medium transition-all duration-200 border-none
+                          ${
+                            isActive
+                              ? "bg-secondary text-primary font-bold text-md"
+                              : "hover:bg-secondary hover:text-foreground"
+                          }
+                        `}
+                      >
+                        <div
+                          className={`flex items-center space-x-3 
+                          ${
+                            isActive
+                              ? "bg-secondary text-primary font-bold text-md hover:bg-secondary hover:text-foreground"
+                              : "hover:bg-secondary hover:text-foreground"
+                          }`}
+                        >
+                          <item.icon
+                            className={`h-6 w-6 flex-shrink-0 text-muted-foreground ${
+                              isActive
+                                ? "h-8 w-8 text-primary font-bold"
+                                : "text-muted-foreground"
+                            }`}
+                          />
+                          <span
+                            className={`truncate text-md ${
+                              isActive
+                                ? "text-primary font-bold"
+                                : "text-muted-foreground"
+                            }`}
+                          >
+                            {item.title}
+                          </span>
+                        </div>
+                      </SidebarMenuButton>
+                    )}
+                  </NavLink>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
