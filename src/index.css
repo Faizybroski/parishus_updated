@@ -75,16 +75,19 @@
 
   ::-webkit-scrollbar-track {
     background: hsl(var(--background));
+    background-color: hsl(var(--background));
+    padding: 0;
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: hsl(var(--primary) / 0.5);
+    background-color: hsl(var(--primary));
     border-radius: 9999px;
     transition: background-color 0.2s ease-in-out;
   }
 
   ::-webkit-scrollbar-thumb:hover {
     background-color: hsl(var(--primary));
+    background: hsl(var(--primary));
   }
 
   .scroll-hidden {
@@ -101,7 +104,7 @@
   /* Firefox */
   * {
     scrollbar-width: thin;
-    scrollbar-color: hsl(var(--primary) / 0.6) hsl(var(--background));
+    scrollbar-color: hsl(var(--primary)) hsl(var(--background));
   }
 
   .dark {
@@ -360,11 +363,11 @@
   body {
     overflow: auto;
     -ms-overflow-style: none; /* IE/Edge */
-    scrollbar-width: none; /* Firefox */
+    /* scrollbar-width: none;  */
   }
-  body::-webkit-scrollbar {
-    display: none; /* Chrome, Safari */
-  }
+  /* body::-webkit-scrollbar {
+    display: none; 
+  } */
 }
 
 /* Line clamp utilities */
@@ -413,10 +416,10 @@ h1:empty::before {
 }
 
 /* Hide scrollbar for IE, Edge, and Firefox */
-* {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;     /* Firefox */
-}
+/* * {
+  -ms-overflow-style: none;  
+  scrollbar-width: none;     
+} */
 
 .swiper-pagination-bullet {
   background: hsl(var(--muted-foreground)) !important;

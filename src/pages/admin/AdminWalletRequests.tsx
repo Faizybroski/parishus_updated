@@ -17,6 +17,13 @@ import {
 import { LoaderText } from "@/components/loader/Loader";
 import { useToast } from "@/components/ui/use-toast";
 import { sendEventInvite } from "@/lib/sendInvite";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type WithdrawRequest = {
   id: string;
@@ -169,8 +176,7 @@ const AdminWalletRequests = () => {
             </body>
           </html>
           `,
-        }
-      );
+      });
 
       toast({
         title: "Success",
@@ -282,9 +288,8 @@ const AdminWalletRequests = () => {
                 </table>
               </body>
             </html>
-          `
-        }
-      );
+          `,
+      });
 
       toast({
         title: "Success",
@@ -389,9 +394,8 @@ const AdminWalletRequests = () => {
                 </table>
               </body>
             </html>
-          `
-        } 
-      );
+          `,
+      });
 
       toast({
         title: "Success",
@@ -486,39 +490,42 @@ const AdminWalletRequests = () => {
           {withdrawRequests.length === 0 ? (
             <p className="text-muted-foreground">No withdraw requests found.</p>
           ) : (
-            <table className="min-w-full text-sm text-left border border-border rounded-lg overflow-hidden">
-              <thead className="bg-muted text-muted-foreground">
-                <tr>
-                  <th className="p-3 whitespace-nowrap">User</th>
-                  <th className="p-3 whitespace-nowrap">Email</th>
-                  <th className="p-3 whitespace-nowrap">Note</th>
-                  <th className="p-3 whitespace-nowrap">Payment Method</th>
-                  <th className="p-3 whitespace-nowrap">Account Username</th>
-                  <th className="p-3 whitespace-nowrap">Amount</th>
-                  <th className="p-3 whitespace-nowrap">Status</th>
-                  <th className="p-3 whitespace-nowrap">Date</th>
-                  <th className="p-3 whitespace-nowrap">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {withdrawRequests.map((req) => (
-                  <tr
-                    key={req.id}
-                    className="border-t border-border hover:bg-muted/50 transition"
-                  >
-                    <td className="p-3">
-                      {req.profiles?.first_name} {req.profiles?.last_name}
-                    </td>
-                    <td className="p-3">{req.profiles?.email}</td>
-                    <td className="p-3">{req.note}</td>
-                    <td className="p-3">{req.payment_method}</td>
-                    <td className="p-3">{req.account_details}</td>
-                    <td className="p-3 text-green-600">${req.total_amount}</td>
-                    <td className="p-3 capitalize">{req.status}</td>
-                    <td className="p-3">
-                      {format(new Date(req.created_at), "MMM dd, yyyy")}
-                    </td>
-                    {/* <td className="p-3">
+            <div className="border border-border rounded-lg overflow-hidden">
+              <table className="min-w-full text-sm text-left overflow-visible">
+                <thead className="bg-muted text-muted-foreground">
+                  <tr>
+                    <th className="p-3 whitespace-nowrap">User</th>
+                    <th className="p-3 whitespace-nowrap">Email</th>
+                    <th className="p-3 whitespace-nowrap">Note</th>
+                    <th className="p-3 whitespace-nowrap">Payment Method</th>
+                    <th className="p-3 whitespace-nowrap">Account Username</th>
+                    <th className="p-3 whitespace-nowrap">Amount</th>
+                    <th className="p-3 whitespace-nowrap">Status</th>
+                    <th className="p-3 whitespace-nowrap">Date</th>
+                    <th className="p-3 whitespace-nowrap">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {withdrawRequests.map((req) => (
+                    <tr
+                      key={req.id}
+                      className="border-t border-border hover:bg-muted/50 transition"
+                    >
+                      <td className="p-3">
+                        {req.profiles?.first_name} {req.profiles?.last_name}
+                      </td>
+                      <td className="p-3">{req.profiles?.email}</td>
+                      <td className="p-3">{req.note}</td>
+                      <td className="p-3">{req.payment_method}</td>
+                      <td className="p-3">{req.account_details}</td>
+                      <td className="p-3 text-green-600">
+                        ${req.total_amount}
+                      </td>
+                      <td className="p-3 capitalize">{req.status}</td>
+                      <td className="p-3">
+                        {format(new Date(req.created_at), "MMM dd, yyyy")}
+                      </td>
+                      {/* <td className="p-3">
                       {req.status === "pending" && (
                         <Button
                           variant="success"
@@ -540,25 +547,114 @@ const AdminWalletRequests = () => {
                         </Button>
                       )}
                     </td> */}
-                    <td className="p-3 text-right">
-                      <Menu
-                        as="div"
-                        className="relative inline-block text-left"
-                      >
-                        <Menu.Button className="p-2 rounded-full hover:bg-muted/50 focus:outline-none">
-                          <MoreVertical size={20} />
-                        </Menu.Button>
+                      {/* <td className="p-3 text-right relative overflow-visible z-50">
+                        <Menu
+                          as="div"
+                          className="relative inline-block text-left"
+                        >
+                          <Menu.Button className="p-2 rounded-full hover:bg-muted/50 focus:outline-none">
+                            <MoreVertical size={20} />
+                          </Menu.Button>
 
-                        <Menu.Items className="absolute right-0 mt-2 w-40 origin-top-right bg-background border border-border shadow-lg rounded-md focus:outline-none z-50">
-                          {/* Approve */}
-                          <Menu.Item as="button">
-                            {({ active }) => (
-                              <button
-                                onClick={() => handleApprove(req.id, req.profiles?.email)}
+                          <Menu.Items className="absolute right-0 mt-2 w-40 origin-top-right bg-background border border-border shadow-lg rounded-md focus:outline-none z-50">
+                            
+                            <Menu.Item as="button">
+                              {({ active }) => (
+                                <button
+                                  onClick={() =>
+                                    handleApprove(req.id, req.profiles?.email)
+                                  }
+                                  disabled={loading === req.id}
+                                  className={`flex items-center gap-2 px-3 py-2 w-full text-left text-sm ${
+                                    active ? "bg-muted/50" : ""
+                                  }`}
+                                >
+                                  {loading === req.id ? (
+                                    <>
+                                      <Loader2
+                                        size={16}
+                                        className="animate-spin"
+                                      />{" "}
+                                      Approving...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <CheckCircle size={16} /> Approve
+                                    </>
+                                  )}
+                                </button>
+                              )}
+                            </Menu.Item>
+
+                            <Menu.Item as="button">
+                              {({ active }) => (
+                                <button
+                                  onClick={() =>
+                                    handleReject(req.id, req.profiles?.email)
+                                  }
+                                  disabled={loading === req.id}
+                                  className={`flex items-center gap-2 px-3 py-2 w-full text-left text-sm ${
+                                    active ? "bg-muted/50" : ""
+                                  } text-red-600`}
+                                >
+                                  <XCircle size={16} /> Reject
+                                </button>
+                              )}
+                            </Menu.Item>
+
+                            <Menu.Item as="button">
+                              {({ active }) => (
+                                <button
+                                  onClick={() =>
+                                    handleOnHold(req.id, req.profiles?.email)
+                                  }
+                                  disabled={loading === req.id}
+                                  className={`flex items-center gap-2 px-3 py-2 w-full text-left text-sm ${
+                                    active ? "bg-muted/50" : ""
+                                  } text-yellow-600`}
+                                >
+                                  <PauseCircle size={16} /> On Hold
+                                </button>
+                              )}
+                            </Menu.Item>
+
+                            <Menu.Item as="button">
+                              {({ active }) => (
+                                <button
+                                  onClick={() => handleDelete(req.id)}
+                                  disabled={loading === req.id}
+                                  className={`flex items-center gap-2 px-3 py-2 w-full text-left text-sm ${
+                                    active ? "bg-muted/50" : ""
+                                  } text-red-700`}
+                                >
+                                  <Trash2 size={16} /> Delete
+                                </button>
+                              )}
+                            </Menu.Item>
+                          </Menu.Items>
+                        </Menu>
+                      </td> */}
+                      <td className="p-3 text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-black transition-colors hover:bg-primary"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <MoreVertical size={20} />
+                            </Button>
+                          </DropdownMenuTrigger>
+
+                          <DropdownMenuContent align="end" className="w-40">
+                            <DropdownMenuItem asChild>
+                              <Button
+                                onClick={() =>
+                                  handleApprove(req.id, req.profiles?.email)
+                                }
                                 disabled={loading === req.id}
-                                className={`flex items-center gap-2 px-3 py-2 w-full text-left text-sm ${
-                                  active ? "bg-muted/50" : ""
-                                }`}
+                                className="w-full bg-transparent justify-start"
                               >
                                 {loading === req.id ? (
                                   <>
@@ -573,61 +669,53 @@ const AdminWalletRequests = () => {
                                     <CheckCircle size={16} /> Approve
                                   </>
                                 )}
-                              </button>
-                            )}
-                          </Menu.Item>
+                              </Button>
+                            </DropdownMenuItem>
 
-                          {/* Reject */}
-                          <Menu.Item as="button">
-                            {({ active }) => (
-                              <button
-                                onClick={() => handleReject(req.id, req.profiles?.email)}
+                            <DropdownMenuItem asChild>
+                              <Button
+                                onClick={() =>
+                                  handleReject(req.id, req.profiles?.email)
+                                }
                                 disabled={loading === req.id}
-                                className={`flex items-center gap-2 px-3 py-2 w-full text-left text-sm ${
-                                  active ? "bg-muted/50" : ""
-                                } text-red-600`}
+                                className="text-red-600 w-full bg-transparent justify-start"
                               >
-                                <XCircle size={16} /> Reject
-                              </button>
-                            )}
-                          </Menu.Item>
+                                <XCircle size={16} />
+                                Reject
+                              </Button>
+                            </DropdownMenuItem>
 
-                          {/* On Hold */}
-                          <Menu.Item as="button">
-                            {({ active }) => (
-                              <button
-                                onClick={() => handleOnHold(req.id, req.profiles?.email)}
+                            <DropdownMenuItem asChild>
+                              <Button
+                                onClick={() =>
+                                  handleOnHold(req.id, req.profiles?.email)
+                                }
                                 disabled={loading === req.id}
-                                className={`flex items-center gap-2 px-3 py-2 w-full text-left text-sm ${
-                                  active ? "bg-muted/50" : ""
-                                } text-yellow-600`}
+                                className="text-yellow-600 w-full bg-transparent justify-start"
                               >
-                                <PauseCircle size={16} /> On Hold
-                              </button>
-                            )}
-                          </Menu.Item>
+                                <PauseCircle size={16} />
+                                On Hold
+                              </Button>
+                            </DropdownMenuItem>
 
-                          {/* Delete */}
-                          <Menu.Item as="button">
-                            {({ active }) => (
-                              <button
+                            <DropdownMenuItem asChild>
+                              <Button
                                 onClick={() => handleDelete(req.id)}
                                 disabled={loading === req.id}
-                                className={`flex items-center gap-2 px-3 py-2 w-full text-left text-sm ${
-                                  active ? "bg-muted/50" : ""
-                                } text-red-700`}
+                                className="text-red-700 w-full bg-transparent justify-start"
                               >
-                                <Trash2 size={16} /> Delete
-                              </button>
-                            )}
-                          </Menu.Item>
-                        </Menu.Items>
-                      </Menu>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                                <Trash2 size={16} />
+                                Delete
+                              </Button>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </CardContent>
       </Card>
