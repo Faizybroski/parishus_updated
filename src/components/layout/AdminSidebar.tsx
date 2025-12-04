@@ -92,7 +92,7 @@ const AdminSidebar = () => {
           </SidebarGroupLabel>
 
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-2 px-3">
+            <SidebarMenu className="px-3">
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <NavLink to={item.url} end>
@@ -110,12 +110,7 @@ const AdminSidebar = () => {
                         `}
                       >
                         <div
-                          className={`flex items-center space-x-3 
-                          ${
-                            isActive
-                              ? "bg-secondary text-primary font-bold text-md hover:bg-secondary hover:text-foreground"
-                              : "hover:bg-secondary hover:text-foreground"
-                          }`}
+                          className={`flex items-center space-x-3`}
                         >
                           <item.icon
                             className={`h-6 w-6 flex-shrink-0 text-muted-foreground ${
