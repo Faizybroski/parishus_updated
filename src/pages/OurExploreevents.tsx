@@ -65,6 +65,7 @@ interface Event {
 const OurExploreEvents = () => {
   const { profile, loading: profileLoading } = useProfile();
   const [loading, setLoading] = useState(false);
+  const [featuredLoading, setFeaturedLoading] = useState(false);
   const [adminEvents, setAdminEvents] = useState([]);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [trending, setTrending] = useState("All");
@@ -362,6 +363,7 @@ const OurExploreEvents = () => {
 
   const fetchAdminEvents = async () => {
     try {
+      setFeaturedLoading(true);
       const { data: adminProfiles, error: profileError } = await supabase
         .from("profiles")
         .select("id")
@@ -401,7 +403,7 @@ const OurExploreEvents = () => {
     } catch (err) {
       console.error("Fetch Events Error:", err);
     } finally {
-      setLoading(false);
+      setFeaturedLoading(false);
     }
   };
   const fetchUserRSVPs = async () => {
@@ -1091,7 +1093,12 @@ const OurExploreEvents = () => {
               className="rounded-b-xl overflow-hidden"
             >
               <>
-                {adminEvents.length === 0 && (
+                {featuredLoading && (
+                  <div className="w-full flex items-center justify-center py-20">
+                    <LoaderText text="Loading Featured Events..." />
+                  </div>
+                )}
+                {!featuredLoading && adminEvents.length === 0 && (
                   <div
                     className="relative rounded-xl flex flex-col font-sans lg:flex-row items-center justify-center px-4 sm:px-8 lg:px-12 py-6 sm:py-10 gap-6 lg:gap-10 min-h-[60vh] sm:min-h-[70vh] lg:min-h-[80vh]"
                     style={{ touchAction: "pan-y" }}
@@ -1108,67 +1115,69 @@ const OurExploreEvents = () => {
                     </div>
                   </div>
                 )}
-                {adminEvents.map((event, index) => (
-                  <div
-                    key={index}
-                    className="relative rounded-xl flex flex-col font-sans lg:flex-row items-center justify-center px-4 sm:px-8 lg:px-12 py-6 sm:py-10 gap-6 lg:gap-10 min-h-[60vh] sm:min-h-[70vh] lg:min-h-[80vh]"
-                    style={{ touchAction: "pan-y" }}
-                  >
-                    {/* Carousel background image */}
+                {!featuredLoading &&
+                  adminEvents.length > 0 &&
+                  adminEvents.map((event, index) => (
                     <div
-                      className="absolute inset-0 z-0"
-                      style={{
-                        backgroundImage: `url(${event.cover_photo_url})`,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                        filter: "brightness(0.35) blur(0px)",
-                      }}
-                    />
-                    <div className="absolute inset-0 rounded-xl z-0 bg-gradient-to-b from-neutral-100/20 via-neutral-200/5 to-transparent backdrop-blur-lg"></div>
+                      key={index}
+                      className="relative rounded-xl flex flex-col font-sans lg:flex-row items-center justify-center px-4 sm:px-8 lg:px-12 py-6 sm:py-10 gap-6 lg:gap-10 min-h-[60vh] sm:min-h-[70vh] lg:min-h-[80vh]"
+                      style={{ touchAction: "pan-y" }}
+                    >
+                      {/* Carousel background image */}
+                      <div
+                        className="absolute inset-0 z-0"
+                        style={{
+                          backgroundImage: `url(${event.cover_photo_url})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                          filter: "brightness(0.35) blur(0px)",
+                        }}
+                      />
+                      <div className="absolute inset-0 rounded-xl z-0 bg-gradient-to-b from-neutral-100/20 via-neutral-200/5 to-transparent backdrop-blur-lg"></div>
 
-                    {/* Carousel content */}
-                    <div className="relative z-10 flex flex-col lg:flex-row items-center justify-center w-full p-7 gap-8">
-                      <div className="w-full sm:w-[70%] md:w-[60%] lg:w-[30%] max-w-[500px]">
-                        <img
-                          src={event.cover_photo_url}
-                          alt={`Event ${index + 1}`}
-                          className="w-full h-auto rounded-xl shadow-2xl object-cover"
-                        />
-                      </div>
+                      {/* Carousel content */}
+                      <div className="relative z-10 flex flex-col lg:flex-row items-center justify-center w-full p-7 gap-8">
+                        <div className="w-full sm:w-[70%] md:w-[60%] lg:w-[30%] max-w-[500px]">
+                          <img
+                            src={event.cover_photo_url}
+                            alt={`Event ${index + 1}`}
+                            className="w-full h-auto rounded-xl shadow-2xl object-cover"
+                          />
+                        </div>
 
-                      <div className="text-white flex flex-col justify-center items-center lg:items-start text-center lg:text-left max-w-2xl px-2 sm:px-0">
-                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 leading-tight">
-                          {event.name}
-                        </h2>
-                        <p className="text-base sm:text-lg md:text-xl mb-2 text-gray-200">
-                          {event.location_name}
-                        </p>
-                        <p className="text-sm sm:text-base md:text-lg text-gray-300 mb-6">
-                          {new Date(event.date_time).toLocaleDateString(
-                            "en-US",
-                            {
-                              month: "short",
-                              day: "numeric",
-                            }
-                          )}{" "}
-                          -{" "}
-                          {new Date(event.date_time).toLocaleTimeString(
-                            "en-US",
-                            {
-                              hour: "numeric",
-                              minute: "2-digit",
-                            }
-                          )}
-                        </p>
-                        <Link to={`/rsvp/${event.id}/details`}>
-                          <button className="bg-white text-black px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold hover:bg-gray-200 transition-all duration-200">
-                            RSVP
-                          </button>
-                        </Link>
+                        <div className="text-white flex flex-col justify-center items-center lg:items-start text-center lg:text-left max-w-2xl px-2 sm:px-0">
+                          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 leading-tight">
+                            {event.name}
+                          </h2>
+                          <p className="text-base sm:text-lg md:text-xl mb-2 text-gray-200">
+                            {event.location_name}
+                          </p>
+                          <p className="text-sm sm:text-base md:text-lg text-gray-300 mb-6">
+                            {new Date(event.date_time).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                              }
+                            )}{" "}
+                            -{" "}
+                            {new Date(event.date_time).toLocaleTimeString(
+                              "en-US",
+                              {
+                                hour: "numeric",
+                                minute: "2-digit",
+                              }
+                            )}
+                          </p>
+                          <Link to={`/rsvp/${event.id}/details`}>
+                            <button className="bg-white text-black px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold hover:bg-gray-200 transition-all duration-200">
+                              RSVP
+                            </button>
+                          </Link>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </>
             </Carousel>
           </div>

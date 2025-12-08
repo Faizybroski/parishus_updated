@@ -109,6 +109,7 @@ const AdminEditEvent = () => {
   const [selectedFont, setSelectedFont] = useState("");
   const [selectedColor, setSelectedColor] = useState("#E4D7CD");
   const [selectedBgColor, setSelectedBgColor] = useState("#F8F6F1");
+  const [applyAccentBg, setApplyAccentBg] = useState(true);
   const [showRecurringDialog, setShowRecurringDialog] = useState(false);
   const [mode, setMode] = useState<"sell" | "rsvp">("sell");
 
@@ -183,6 +184,7 @@ const AdminEditEvent = () => {
       setSelectedFont(data.title_font || "");
       setSelectedColor(data.accent_color || "#E4D7CD");
       setSelectedBgColor(data.accent_bg || "#F8F6F1");
+      setApplyAccentBg(data.bg_color ? true : false);
       setMode(data.is_paid ? "sell" : "rsvp");
 
       setFormData({
@@ -284,16 +286,49 @@ const AdminEditEvent = () => {
     handleInputChange("title_font", font);
   };
 
+  // const handleColorChange = (color: string) => {
+  //   setSelectedColor(color);
+  //   const bgColor = lightenColor(color, 30);
+  //   setSelectedBgColor(bgColor);
+
+  //   handleInputChange("accent_color", color);
+  //   handleInputChange("accent_bg", bgColor);
+
+  //   document.documentElement.style.setProperty("--accent-color", color);
+  //   document.documentElement.style.setProperty("--accent-bg", bgColor);
+  // };
+
   const handleColorChange = (color: string) => {
     setSelectedColor(color);
     const bgColor = lightenColor(color, 30);
-    setSelectedBgColor(bgColor);
+    if (applyAccentBg) {
+      // If checkbox ON → bg = selected color
+      setSelectedBgColor(bgColor);
+    } else {
+      // checkbox OFF → bg = transparent
+      setSelectedBgColor("#F8F6F1");
+    }
 
-    handleInputChange("accent_color", color);
-    handleInputChange("accent_bg", bgColor);
-
+    // OPTIONAL: update CSS vars
     document.documentElement.style.setProperty("--accent-color", color);
-    document.documentElement.style.setProperty("--accent-bg", bgColor);
+    document.documentElement.style.setProperty(
+      "--accent-bg",
+      applyAccentBg ? bgColor : "#F8F6F1"
+    );
+  };
+
+  const handleToggleBg = (checked: boolean) => {
+    setApplyAccentBg(checked);
+
+    if (checked) {
+      // If turning ON → bg = selectedColor
+      setSelectedBgColor(selectedColor);
+      document.documentElement.style.setProperty("--accent-bg", selectedColor);
+    } else {
+      // If turning OFF → bg transparent
+      setSelectedBgColor("#F8F6F1");
+      document.documentElement.style.setProperty("--accent-bg", "#F8F6F1");
+    }
   };
 
   const handleFlyerChange = (url: string) => {
@@ -615,7 +650,7 @@ const AdminEditEvent = () => {
           eventEndDateTime: eventEndDateTime
             ? eventEndDateTime.toISOString()
             : null,
-            location: `${formData.location_name}, ${formData.location_address}`
+          location: `${formData.location_name}, ${formData.location_address}`,
         } as any)
         .eq("id", eventId);
 
@@ -2237,13 +2272,37 @@ const AdminEditEvent = () => {
 
                       {/* Color Preview */}
                       {selectedColor && (
-                        <div className="mt-2 text-xs text-muted-foreground pl-1 flex items-center gap-2">
-                          <div
-                            className="w-4 h-4 rounded border"
-                            style={{ backgroundColor: selectedColor }}
-                          ></div>
-                          <span>{selectedColor}</span>
-                        </div>
+                        <>
+                          <div className="mt-2 text-xs text-muted-foreground pl-1 flex items-center gap-2">
+                            <div
+                              className="w-4 h-4 rounded border"
+                              style={{ backgroundColor: selectedColor }}
+                            ></div>
+                            <span>{selectedColor}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <Label
+                              className="flex gap-3 items-center"
+                              htmlFor="bg_color"
+                            >
+                              Apply Accent Color to Background
+                            </Label>
+                            <Checkbox
+                              id="bg_color"
+                              checked={formData.bg_color}
+                              onCheckedChange={(checked) => {
+                                handleInputChange("bg_color", checked);
+                                handleColorChange(selectedColor);
+                                handleToggleBg(checked as boolean);
+                              }}
+                              className={`w-4 h-4 border  ${
+                                formData.bg_color
+                                  ? "backdrop-blur-md bg-white/40 border-black"
+                                  : "bg-transparent border-red"
+                              }`}
+                            />
+                          </div>
+                        </>
                       )}
                     </>
                   ) : (

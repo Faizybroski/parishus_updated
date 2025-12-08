@@ -44,61 +44,61 @@ const EventsCarousel = () => {
   const [events, setEvents] = useState([]);
 
   const dummyEvents = [
-    {
-      id: 1,
-      name: "Boston Jazz Night",
-      description:
-        "Join us for an unforgettable night of smooth jazz and great company in the heart of Boston.",
-      cover_photo_url:
-        "https://images.unsplash.com/photo-1628258334105-2a0b3d6efee1?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      location_name: "The Jazz Lounge",
-      location_address: "225 Northern Ave, Boston, MA 02210, USA",
-      date_time: "2025-12-10T19:00:00",
-    },
-    {
-      id: 2,
-      name: "Miami Beach Yoga Retreat",
-      description:
-        "A full day of relaxation, yoga, and meditation on the sunny Miami Beach.",
-      cover_photo_url:
-        "https://images.unsplash.com/photo-1554331808-4e46e8ee8041?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      location_name: "Miami Beach",
-      location_address: "123 Ocean Drive, Miami, FL 33139, USA",
-      date_time: "2025-12-15T08:30:00",
-    },
-    {
-      id: 3,
-      name: "Atlanta Food Festival Atlanta Food Festival Atlanta Food Festival Atlanta Food Festival",
-      description:
-        "Taste the best of Atlanta! Food trucks, live music, and fun for the whole family. An elegant evening of dinner, dancing, and charity in Washington DC. Taste the best of Atlanta! Food trucks, live music, and fun for the whole family. An elegant evening of dinner, dancing, and charity in Washington DC.",
-      cover_photo_url:
-        "https://images.unsplash.com/photo-1519068737630-e5db30e12e42?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      location_name: "Piedmont Park",
-      location_address: "1320 Monroe Dr NE, Atlanta, GA 30306, USA",
-      date_time: "2025-12-20T12:00:00",
-    },
-    {
-      id: 4,
-      name: "New York City Tech Meetup",
-      description:
-        "Networking event for tech enthusiasts and startup founders in NYC.",
-      cover_photo_url:
-        "https://images.unsplash.com/photo-1564910443496-5fd2d76b47fa?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      location_name: "NYC Tech Hub",
-      location_address: "50 Broad St, New York, NY 10004, USA",
-      date_time: "2025-12-18T18:00:00",
-    },
-    {
-      id: 5,
-      name: "Washington DC Winter Gala",
-      description:
-        "An elegant evening of dinner, dancing, and charity in Washington DC.",
-      cover_photo_url:
-        "https://images.unsplash.com/photo-1526374870839-e155464bb9b2?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      location_name: "DC Grand Hall",
-      location_address: "600 Pennsylvania Ave NW, Washington, DC 20001, USA",
-      date_time: "2025-12-22T20:00:00",
-    },
+    // {
+    //   id: 1,
+    //   name: "Boston Jazz Night",
+    //   description:
+    //     "Join us for an unforgettable night of smooth jazz and great company in the heart of Boston.",
+    //   cover_photo_url:
+    //     "https://images.unsplash.com/photo-1628258334105-2a0b3d6efee1?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    //   location_name: "The Jazz Lounge",
+    //   location_address: "225 Northern Ave, Boston, MA 02210, USA",
+    //   date_time: "2025-12-10T19:00:00",
+    // },
+    // {
+    //   id: 2,
+    //   name: "Miami Beach Yoga Retreat",
+    //   description:
+    //     "A full day of relaxation, yoga, and meditation on the sunny Miami Beach.",
+    //   cover_photo_url:
+    //     "https://images.unsplash.com/photo-1554331808-4e46e8ee8041?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    //   location_name: "Miami Beach",
+    //   location_address: "123 Ocean Drive, Miami, FL 33139, USA",
+    //   date_time: "2025-12-15T08:30:00",
+    // },
+    // {
+    //   id: 3,
+    //   name: "Atlanta Food Festival Atlanta Food Festival Atlanta Food Festival Atlanta Food Festival",
+    //   description:
+    //     "Taste the best of Atlanta! Food trucks, live music, and fun for the whole family. An elegant evening of dinner, dancing, and charity in Washington DC. Taste the best of Atlanta! Food trucks, live music, and fun for the whole family. An elegant evening of dinner, dancing, and charity in Washington DC.",
+    //   cover_photo_url:
+    //     "https://images.unsplash.com/photo-1519068737630-e5db30e12e42?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    //   location_name: "Piedmont Park",
+    //   location_address: "1320 Monroe Dr NE, Atlanta, GA 30306, USA",
+    //   date_time: "2025-12-20T12:00:00",
+    // },
+    // {
+    //   id: 4,
+    //   name: "New York City Tech Meetup",
+    //   description:
+    //     "Networking event for tech enthusiasts and startup founders in NYC.",
+    //   cover_photo_url:
+    //     "https://images.unsplash.com/photo-1564910443496-5fd2d76b47fa?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    //   location_name: "NYC Tech Hub",
+    //   location_address: "50 Broad St, New York, NY 10004, USA",
+    //   date_time: "2025-12-18T18:00:00",
+    // },
+    // {
+    //   id: 5,
+    //   name: "Washington DC Winter Gala",
+    //   description:
+    //     "An elegant evening of dinner, dancing, and charity in Washington DC.",
+    //   cover_photo_url:
+    //     "https://images.unsplash.com/photo-1526374870839-e155464bb9b2?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    //   location_name: "DC Grand Hall",
+    //   location_address: "600 Pennsylvania Ave NW, Washington, DC 20001, USA",
+    //   date_time: "2025-12-22T20:00:00",
+    // },
   ];
   const [dummmyevents, setdummyEvents] = useState(dummyEvents);
   const [rsvps, setRsvps] = useState([]);
@@ -392,17 +392,38 @@ const EventsCarousel = () => {
     );
   }
 
-  // if (events.length === 0) {
-  if (dummmyevents.length === 0) {
+  if (events.length === 0) {
+  // if (dummmyevents.length === 0) {
     return (
-      <div className="h-96 flex items-center justify-center text-center text-muted-foreground bg-background rounded-xl">
-        <div>
-          <h3 className="text-2xl font-semibold mb-2">No Featured Events yet</h3>
-          {/* <Link to={"/create-event"}>
-            <Button>Create Event</Button>
-          </Link> */}
+      <div className="flex items-center justify-center bg-background">
+        <div className="flex items-center justify-center bg-background">
+          {/* <span className="relative inline-block">
+            <span className="absolute inset-0 text-7xl font-script font-extrabold text-transparent stroke-foreground">
+              No Featured Events yet
+            </span>
+            <span className="loader-fill text-7xl font-script font-extrabold">
+              No Featured Events yet
+            </span>
+          </span> */}
+          <div className="flex flex-col justify-center items-center text-center max-w-2xl px-2 sm:px-0">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 leading-tight text-primary font-script">
+              No Featured Events Available
+            </h2>
+            <p className="text-base sm:text-lg md:text-xl mb-2 text-gray-200 text-center">
+              Please check back later for upcoming events.
+            </p>
+          </div>
         </div>
       </div>
+
+      // <div className="h-96 flex items-center justify-center text-center text-muted-foreground bg-background rounded-xl">
+      //   <div>
+      //     <h3 className="text-2xl font-semibold mb-2">No Featured Events yet</h3>
+      //     {/* <Link to={"/create-event"}>
+      //       <Button>Create Event</Button>
+      //     </Link> */}
+      //   </div>
+      // </div>
     );
   }
 
@@ -561,7 +582,7 @@ const EventsCarousel = () => {
           className="rounded-xl overflow-visible"
         >
           <div className="swiper-pagination"></div>
-          {dummmyevents.map((event) => {
+          {events.map((event) => {
             const rsvpStatus = getRSVPStatus(event.id);
             const attendeeCount = attendeeCounts[event.id] || 0;
 
@@ -592,17 +613,15 @@ const EventsCarousel = () => {
 
                     {/* Text Content */}
                     <div className="w-full lg:w-[50%] h-full text-center lg:text-left flex flex-col items-center lg:items-start space-y-3 sm:space-y-4">
-                      <h2
-                        className="font-script text-xl sm:text-2xl md:text-4xl lg:text-4xl p-1 font-bold text-white line-clamp-1 leading-[1.35]"
-                      >
+                      <h2 className="font-script text-xl sm:text-2xl md:text-4xl lg:text-4xl p-1 font-bold text-white line-clamp-1 leading-[1.35]">
                         {event.name}
                       </h2>
                       {/* <div className="w-full min-h-[60px] sm:min-h-[80px] md:min-h-[100px] max-h-[110px] overflow-hidden"> */}
-                        {event.description && (
-                          <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-200 line-clamp-2 sm:line-clamp-3">
-                            {event.description}
-                          </p>
-                        )}
+                      {event.description && (
+                        <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-200 line-clamp-2 sm:line-clamp-3">
+                          {event.description}
+                        </p>
+                      )}
                       {/* </div> */}
                       <div className="w-full space-y-1">
                         <div className="text-gray-100 text-sm sm:text-base">

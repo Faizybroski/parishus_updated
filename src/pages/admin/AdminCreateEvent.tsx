@@ -1,16 +1,32 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import bcrypt from "bcryptjs";
+import { Input } from "@/components/ui/input";
+import { LoaderText } from "@/components/loader/Loader";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useProfile } from "@/hooks/useProfile";
 import { useRestaurants, Restaurant } from "@/hooks/useRestaurants";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { LoaderText } from "@/components/loader/Loader";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -18,38 +34,57 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { InfoTooltip } from "@/components/tooltip/InfoTooltip";
 import {
   Calendar,
   Clock,
   MapPin,
-  Upload,
+  Repeat2,
+  Eye,
   Edit2,
+  Salad,
+  ChefHat,
+  SlidersHorizontal,
+  UserCheck,
+  Send,
+  Mail,
+  Settings2,
+  Lock,
+  Settings,
+  Shield,
+  Tags,
+  Hash,
+  Bookmark,
+  Tag,
+  Sparkles,
   Trash2,
+  UtensilsCrossed,
   PlusCircle,
+  EyeOff,
+  Upload,
+  UsersRound,
+  Camera,
   Plus,
   X,
   Users,
   DollarSign,
-  ArrowLeft,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate, Link } from "react-router-dom";
 import { format } from "date-fns";
 const today = format(new Date(), "yyyy-MM-dd");
-import { RestaurantSearchDropdown } from "@/components/restaurants/RestaurantSearchDropdown";
 import { EmailInviteModal } from "@/components/Invitationmodals/EmailInviteModal";
 import { CrossedPathInviteModal } from "@/components/Invitationmodals/CrossedPathInviteModal";
 import { getEmailsFromIds } from "@/lib/getEmailsFromIds";
 import { sendEventInvite } from "@/lib/sendInvite";
+import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
+import { RestaurantSearchDropdown } from "@/components/restaurants/RestaurantSearchDropdown";
 import GooglePlacesEventsForm from "@/components/restaurants/GooglePlacesEventsForm";
 import FlyerUpload from "@/components/flyer/Flyerupload";
 import ImageGalleryUpload from "@/components/imageGallery/ImageGalleryUpload";
 import FeatureDialog from "@/components/eventfeatures/FeaturedDialog";
 import RecurringEventDialog from "@/components/recurringEvent/AddRecurringEvent";
 import ColorThief from "colorthief";
-import bcrypt from "bcryptjs";
-
 const AdminCreateEvent = () => {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -92,6 +127,7 @@ const AdminCreateEvent = () => {
     recurrenceDates: [],
     end_date: "",
     end_time: "",
+    bg_color: false,
   });
   const [newTag, setNewTag] = useState("");
   const { user, loading: authLoading } = useAuth();
@@ -109,7 +145,9 @@ const AdminCreateEvent = () => {
   const [selectedFont, setSelectedFont] = useState("Dancing Script");
   const [selectedColor, setSelectedColor] = useState("#E4D7CD");
   const [selectedBgColor, setSelectedBgColor] = useState("#F8F6F1");
+  const [applyAccentBg, setApplyAccentBg] = useState(true); // default checked
   const [showRecurringDialog, setShowRecurringDialog] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     if (!formData.flyer_url) return;
@@ -120,6 +158,7 @@ const AdminCreateEvent = () => {
       const colorThief = new ColorThief();
       const palette = colorThief.getPalette(img, 10);
       setColors(palette.map(([r, g, b]) => `rgb(${r},${g},${b})`));
+      setIsLoaded(true);
     };
   }, [formData.flyer_url]);
 
@@ -202,16 +241,53 @@ const AdminCreateEvent = () => {
     handleInputChange("title_font", font);
   };
 
+  // const handleColorChange = (color: string) => {
+  //   setSelectedColor(color);
+  //   const bgColor = lightenColor(color, 30);
+  //   if (formData.bg_color) {
+  //     setSelectedBgColor("#F8F6F1");
+  //   } else {
+  //     setSelectedBgColor(bgColor);
+  //   }
+
+  //   handleInputChange("accent_color", color);
+  //   handleInputChange("accent_bg", bgColor);
+
+  //   document.documentElement.style.setProperty("--accent-color", color);
+  //   document.documentElement.style.setProperty("--accent-bg", bgColor);
+  // };
+
   const handleColorChange = (color: string) => {
     setSelectedColor(color);
     const bgColor = lightenColor(color, 30);
-    setSelectedBgColor(bgColor);
+    if (applyAccentBg) {
+      // If checkbox ON → bg = selected color
+      setSelectedBgColor(bgColor);
+    } else {
+      // checkbox OFF → bg = transparent
+      setSelectedBgColor("#F8F6F1");
+    }
 
-    handleInputChange("accent_color", color);
-    handleInputChange("accent_bg", bgColor);
-
+    // OPTIONAL: update CSS vars
     document.documentElement.style.setProperty("--accent-color", color);
-    document.documentElement.style.setProperty("--accent-bg", bgColor);
+    document.documentElement.style.setProperty(
+      "--accent-bg",
+      applyAccentBg ? bgColor : "#F8F6F1"
+    );
+  };
+
+  const handleToggleBg = (checked: boolean) => {
+    setApplyAccentBg(checked);
+
+    if (checked) {
+      // If turning ON → bg = selectedColor
+      setSelectedBgColor(selectedColor);
+      document.documentElement.style.setProperty("--accent-bg", selectedColor);
+    } else {
+      // If turning OFF → bg transparent
+      setSelectedBgColor("#F8F6F1");
+      document.documentElement.style.setProperty("--accent-bg", "#F8F6F1");
+    }
   };
 
   const handleFlyerChange = (url: string) => {
@@ -529,13 +605,14 @@ const AdminCreateEvent = () => {
           event_features: formData.features ? formData.eventFeatures : null,
           title_font: selectedFont,
           accent_color: selectedColor,
+          bg_color: formData.bg_color,
           accent_bg: selectedBgColor,
           recurrence: formData.recurring,
           recurrence_dates: formData.recurring
             ? formData.recurrenceDates
             : null,
           eventEndDateTime: eventEndDateTime.toISOString(),
-          location: `${formData.location_name}, ${formData.location_address}`
+          location: `${formData.location_name}, ${formData.location_address}`,
         } as any)
         .select()
         .single();
@@ -592,6 +669,12 @@ const AdminCreateEvent = () => {
   const handleFeatureDelete = (index) => {
     const updated = formData.eventFeatures.filter((_, i) => i !== index);
     handleInputChange("eventFeatures", updated);
+  };
+
+  const handleAutoGrow = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const el = e.target;
+    el.style.height = "auto"; // reset height
+    el.style.height = `${el.scrollHeight}px`; // grow to fit
   };
 
   const isFormValid =
@@ -665,22 +748,6 @@ const AdminCreateEvent = () => {
           </div> */}
 
       <EmailInviteModal
-        style={
-          {
-            "--accent-bg": lightenColor(selectedColor),
-            background:
-              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-            transition: "background 0.5s ease",
-          } as React.CSSProperties
-        }
-        style_button={
-          selectedColor
-            ? {
-                backgroundColor: selectedColor,
-                borderColor: selectedColor,
-              }
-            : {}
-        }
         open={emailInviteModelOpen}
         onClose={() => setEmailInviteModelOpen(false)}
         onInviteResolved={(guestIds) => setInvitedGuestIds(guestIds)}
@@ -689,22 +756,6 @@ const AdminCreateEvent = () => {
       />
 
       <CrossedPathInviteModal
-        style={
-          {
-            "--accent-bg": lightenColor(selectedColor),
-            background:
-              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-            transition: "background 0.5s ease",
-          } as React.CSSProperties
-        }
-        style_button={
-          selectedColor
-            ? {
-                backgroundColor: selectedColor,
-                borderColor: selectedColor,
-              }
-            : {}
-        }
         open={crossedPathInviteModelOpen}
         onClose={() => setCrossedPathInviteModelOpen(false)}
         onInviteResolved={(guestIds) => setInvitedGuestIds(guestIds)}
@@ -727,73 +778,49 @@ const AdminCreateEvent = () => {
               type="button"
               size="sm"
               onClick={() => setMode("sell")}
-              className={`rounded-full px-4 text-sm font-medium transition-all duration-200 ${
-                mode === "sell"
-                  ? "bg-primary text-primary-foreground shadow-lg text-lg"
-                  : "bg-transparent text-muted-foreground hover:text-foreground"
-              }`}
-              style={{
-                backgroundColor:
-                  mode === "sell" ? "var(--accent-color)" : "transparent",
-                borderColor: "var(--accent-color)",
-              }}
+              className={`rounded-full flex-1 px-4 text-sm font-medium transition-all duration-200 
+                        hover:none hover:bg-transparent hover:!text-inherit hover:!shadow-none ${
+                          mode === "sell"
+                            ? "text-primary-foreground shadow-lg text-lg bg-transparent hover:bg-transparent backdrop-blur-md bg-white/10"
+                            : "bg-transparent text-muted-foreground"
+                        }`}
             >
-              Sell Tickets
+              Paid
             </Button>
 
             <Button
               type="button"
               size="sm"
               onClick={() => setMode("rsvp")}
-              className={`rounded-full px-4 text-sm font-medium transition-all duration-200 ${
-                mode === "rsvp"
-                  ? "bg-primary text-primary-foreground shadow-lg text-lg"
-                  : "bg-transparent text-muted-foreground hover:text-foreground"
-              }`}
-              style={{
-                backgroundColor:
-                  mode === "rsvp" ? "var(--accent-color)" : "transparent",
-                borderColor: "var(--accent-color)",
-              }}
+              className={`rounded-full flex-1 px-4 text-sm font-medium transition-all duration-200 
+                        hover:none hover:bg-transparent hover:!text-inherit hover:!shadow-none ${
+                          mode === "rsvp"
+                            ? "text-primary-foreground shadow-lg text-lg bg-transparent hover:bg-transparent backdrop-blur-md bg-white/10"
+                            : "bg-transparent text-muted-foreground"
+                        }`}
             >
-              RSVP
+              Free
             </Button>
           </div>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6 p-6">
           <div className="flex-1 space-y-6 min-w-0">
-            <Card
-              className="space-y-2"
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
-              <CardHeader>
-                <CardTitle>Name & Description</CardTitle>
-              </CardHeader>
+            <Card className="space-y-2 bg-transparent border-none shadow-none">
               <CardContent className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Event Name *</Label>
-                  <Input
+                  <Textarea
                     id="name"
-                    placeholder="e.g., Wine Tasting Social"
+                    placeholder="My Event Name *"
                     value={formData.name}
-                    onChange={(e) => handleInputChange("name", e.target.value)}
-                    style={
-                      {
-                        "--accent-bg": lightenColor(selectedColor),
-                        background:
-                          "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                        transition: "background 0.5s ease",
-                        fontFamily: selectedFont,
-                      } as React.CSSProperties
-                    }
+                    rows={1}
+                    onChange={(e) => {
+                      handleAutoGrow(e);
+                      handleInputChange("name", e.target.value);
+                    }}
+                    required
+                    className={`!leading-[1.2] resize-none overflow-hidden px-2 text-black placeholder:text-black/60 bg-transparent font-${selectedFont} border-none ring-0 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none text-[1.75rem] sm:text-[2rem] md:text-[3rem] lg:text-[3.5rem] xl:text-[4rem] min-h-[3rem]`}
+                    style={{ fontFamily: selectedFont }}
                   />
                 </div>
 
@@ -801,36 +828,22 @@ const AdminCreateEvent = () => {
                   <Label htmlFor="description">Description *</Label>
                   <Textarea
                     id="description"
-                    placeholder="Describe your event, what to expect, dress code, etc."
+                    placeholder="a brief description of the event."
+                    maxLength={140}
                     value={formData.description}
+                    required
                     onChange={(e) =>
                       handleInputChange("description", e.target.value)
                     }
-                    rows={4}
-                    style={
-                      {
-                        "--accent-bg": lightenColor(selectedColor),
-                        background:
-                          "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                        transition: "background 0.5s ease",
-                      } as React.CSSProperties
-                    }
+                    rows={1}
+                    className="bg-transparent backdrop-blur-md bg-white/40 border-none focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
                   />
                 </div>
               </CardContent>
             </Card>
 
-            <Card
-              className="space-y-2"
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
+            <Card className="space-y-2 bg-transparent shadow-none border-none">
+              <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
                 <CardTitle>Date & Time</CardTitle>
               </CardHeader>
@@ -848,15 +861,7 @@ const AdminCreateEvent = () => {
                         onChange={(e) =>
                           handleInputChange("start_date", e.target.value)
                         }
-                        className="pl-10"
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
+                        className="pl-10 border-none bg-transparent backdrop-blur-md bg-white/10 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
                       />
                     </div>
                   </div>
@@ -872,15 +877,7 @@ const AdminCreateEvent = () => {
                         onChange={(e) =>
                           handleInputChange("start_time", e.target.value)
                         }
-                        className="pl-10"
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
+                        className="pl-10 border-none bg-transparent backdrop-blur-md bg-white/10 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
                       />
                     </div>
                   </div>
@@ -894,19 +891,11 @@ const AdminCreateEvent = () => {
                         id="end_date"
                         type="date"
                         min={today}
-                        className="pl-10"
                         value={formData.end_date}
                         onChange={(e) =>
                           handleInputChange("end_date", e.target.value)
                         }
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
+                        className="pl-10 border-none bg-transparent backdrop-blur-md bg-white/10 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
                       />
                     </div>
                   </div>
@@ -921,15 +910,7 @@ const AdminCreateEvent = () => {
                         onChange={(e) =>
                           handleInputChange("end_time", e.target.value)
                         }
-                        className="pl-10"
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
+                        className="pl-10 border-none bg-transparent backdrop-blur-md bg-white/10 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
                       />
                     </div>
                   </div>
@@ -948,14 +929,7 @@ const AdminCreateEvent = () => {
                       onChange={(e) =>
                         handleInputChange("rsvp_deadline_date", e.target.value)
                       }
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
+                      className="pl-10 border-none bg-transparent backdrop-blur-md bg-white/10 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
                     />
                   </div>
                   <div className="space-y-2">
@@ -969,14 +943,7 @@ const AdminCreateEvent = () => {
                       onChange={(e) =>
                         handleInputChange("rsvp_deadline_time", e.target.value)
                       }
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
+                      className="pl-10 border-none bg-transparent backdrop-blur-md bg-white/10 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
                     />
                   </div>
                 </div>
@@ -994,19 +961,12 @@ const AdminCreateEvent = () => {
                         parseInt(e.target.value)
                       )
                     }
-                    style={
-                      {
-                        "--accent-bg": lightenColor(selectedColor),
-                        background:
-                          "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                        transition: "background 0.5s ease",
-                      } as React.CSSProperties
-                    }
+                    className="pl-10 border-none bg-transparent backdrop-blur-md bg-white/10 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="recurring">Recurring Series *</Label>
-                  <div className="border py-3 px-4 rounded-md">
+                  <div className="border-none py-3 px-4 rounded-md bg-transparent t backdrop-blur-md bg-white/40">
                     <div className="flex justify-between items-center">
                       <Label htmlFor="recurring">
                         {formData.recurring == true ? "Yes" : "No"}
@@ -1017,20 +977,17 @@ const AdminCreateEvent = () => {
                         onCheckedChange={(checked) => {
                           handleInputChange("recurring", checked);
                         }}
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
+                        className={`w-4 h-4 border  ${
+                          formData.recurring
+                            ? "backdrop-blur-md bg-white/40 border-black"
+                            : "bg-transparent border-red"
+                        }`}
                       />
                     </div>
                     {formData.recurring && (
                       <div className="space-y-4 mt-2 rounded-lg p-3">
                         {formData.recurrenceDates.length === 0 ? (
-                          <div className="flex justify-between items-center border rounded-lg px-4 py-3">
+                          <div className="border-none flex flex-col sm:flex-row sm:justify-between sm:items-center border rounded-lg px-4 py-3 gap-2 sm:gap-0 bg-transparent backdrop-blur-md bg-white/40">
                             <p className="text-sm text-muted-foreground italic">
                               No event recurring dates added yet.
                             </p>
@@ -1038,21 +995,13 @@ const AdminCreateEvent = () => {
                               variant="outline"
                               size="sm"
                               type="button"
-                              onClick={() => {
-                                setShowRecurringDialog(true);
-                              }}
-                              className="rounded-full"
-                              style={
-                                selectedColor
-                                  ? {
-                                      backgroundColor: selectedColor,
-                                      borderColor: selectedColor,
-                                    }
-                                  : {}
-                              }
+                              onClick={() => setShowRecurringDialog(true)}
+                              className="border-none rounded-full mt-2 sm:mt-0 flex flex-wrap justify-center items-center bg-transparent hover:bg-transparent hover:backdrop-blur-md hover:bg-white/40 backdrop-blur-md bg-white/40"
                             >
-                              <PlusCircle className="w-4 h-4 mr-1" />
-                              Add Recurrence date
+                              <PlusCircle className="w-4 h-4 mr-1 flex-shrink-0" />
+                              <span className="break-words text-center">
+                                Add Recurrence date
+                              </span>
                             </Button>
                           </div>
                         ) : (
@@ -1062,15 +1011,6 @@ const AdminCreateEvent = () => {
                                 <div
                                   key={i}
                                   className="bg-secondary border rounded-xl p-4 flex justify-between items-center hover:shadow-md transition-all"
-                                  style={
-                                    {
-                                      "--accent-bg":
-                                        lightenColor(selectedColor),
-                                      background:
-                                        "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                                      transition: "background 0.5s ease",
-                                    } as React.CSSProperties
-                                  }
                                 >
                                   <div className="flex items-center space-x-4">
                                     {new Date(date).toLocaleDateString(
@@ -1095,14 +1035,6 @@ const AdminCreateEvent = () => {
                                   setShowRecurringDialog(true);
                                 }}
                                 className="rounded-full mt-2"
-                                style={
-                                  selectedColor
-                                    ? {
-                                        backgroundColor: selectedColor,
-                                        borderColor: selectedColor,
-                                      }
-                                    : {}
-                                }
                               >
                                 <PlusCircle className="w-4 h-4 mr-1" />
                                 Add Recurrence Date
@@ -1117,16 +1049,8 @@ const AdminCreateEvent = () => {
               </CardContent>
             </Card>
 
-            <Card
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
+            <Card className="space-y-2 bg-transparent shadow-none border-none">
+              <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
                 <CardTitle>Location</CardTitle>
               </CardHeader>
@@ -1136,14 +1060,7 @@ const AdminCreateEvent = () => {
                     Choose Restaurant (Optional)
                   </Label>
                   <RestaurantSearchDropdown
-                    style={
-                      {
-                        "--accent-bg": lightenColor(selectedColor),
-                        background:
-                          "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                        transition: "background 0.5s ease",
-                      } as React.CSSProperties
-                    }
+                    className="border-none bg-transparent backdrop-blur-md bg-white/40 hover:bg-transparent text-black placeholder:text-black"
                     placeholder="Search and select a restaurant"
                     restaurants={restaurants}
                     value={formData.restaurant_id}
@@ -1174,31 +1091,17 @@ const AdminCreateEvent = () => {
                   />
                 </div>
                 <GooglePlacesEventsForm
-                  style={
-                    {
-                      "--accent-bg": lightenColor(selectedColor),
-                      background:
-                        "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                      transition: "background 0.5s ease",
-                    } as React.CSSProperties
-                  }
+                  required={true}
                   formData={formData}
+                  className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black text-black"
                   onChange={handleInputChange}
                 />
               </CardContent>
             </Card>
 
             {mode === "sell" && (
-              <Card
-                style={
-                  {
-                    "--accent-bg": lightenColor(selectedColor),
-                    background:
-                      "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                    transition: "background 0.5s ease",
-                  } as React.CSSProperties
-                }
-              >
+              <Card className="space-y-2 bg-transparent shadow-none border-none">
+                <div className="border-t border-gray-300 mx-6" />
                 <CardHeader>
                   <CardTitle>Payment Settings</CardTitle>
                 </CardHeader>
@@ -1220,16 +1123,8 @@ const AdminCreateEvent = () => {
                             parseFloat(e.target.value)
                           )
                         }
-                        className="pl-10"
+                        className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
                         required={mode === "sell"}
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
                       />
                     </div>
                   </div>
@@ -1238,16 +1133,8 @@ const AdminCreateEvent = () => {
             )}
 
             {/* Event Type Card */}
-            <Card
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
+            {/* <Card className="space-y-2 bg-transparent shadow-none border-none">
+                          <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Users className="h-5 w-5" />
@@ -1277,49 +1164,42 @@ const AdminCreateEvent = () => {
                   />
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
 
             {/* Guest Invitation Type Card */}
-            <Card
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
+            <Card className="space-y-2 bg-transparent shadow-none border-none">
+              <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Users className="h-5 w-5" />
-                  <span>Guest Invitation Type</span>
+                <CardTitle className="flex gap-3">
+                  Guest Invitation Type
                 </CardTitle>
               </CardHeader>
+
               <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
+                <div className="border-none py-2 rounded-md bg-transparent backdrop-blur-md bg-white/40">
+                  <div className="flex justify-between items-center px-4">
+                    <Label htmlFor="manual">Manually Invite Guests</Label>
                     <Checkbox
                       id="manual"
                       name="guest_invitation_type"
                       value="manual"
                       checked={formData.guest_invitation_type === "manual"}
-                      onCheckedChange={(e) =>
+                      onCheckedChange={() =>
                         handleInputChange("guest_invitation_type", "manual")
                       }
-                      className="w-4 h-4"
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
+                      className={`w-4 h-4 ${
+                        formData.guest_invitation_type === "manual"
+                          ? "backdrop-blur-md bg-white/40 border-black"
+                          : "bg-transparent"
+                      }`}
                     />
-                    <Label htmlFor="manual">Manually Invite Guests</Label>
                   </div>
-                  <div className="flex items-center space-x-2">
+                </div>
+                <div className="border-none py-2 rounded-md bg-transparent backdrop-blur-md bg-white/40">
+                  <div className="flex justify-between items-center px-4">
+                    <Label htmlFor="crossed_paths">
+                      Suggest from Crossed Paths
+                    </Label>
                     <Checkbox
                       id="crossed_paths"
                       name="guest_invitation_type"
@@ -1327,67 +1207,53 @@ const AdminCreateEvent = () => {
                       checked={
                         formData.guest_invitation_type === "crossed_paths"
                       }
-                      onCheckedChange={(e) =>
+                      onCheckedChange={() =>
                         handleInputChange(
                           "guest_invitation_type",
                           "crossed_paths"
                         )
                       }
-                      className="w-4 h-4"
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
+                      className={`w-4 h-4 border  ${
+                        formData.guest_invitation_type === "crossed_paths"
+                          ? "backdrop-blur-md bg-white/40 border-black"
+                          : "bg-transparent"
+                      }`}
                     />
-                    <Label htmlFor="crossed_paths">
-                      Suggest from Crossed Paths
-                    </Label>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    Crossed Paths suggests users you've recently visited the
-                    same restaurants with
-                  </p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
+            <Card className="space-y-2 bg-transparent shadow-none border-none">
+              <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
+                <CardTitle className="flex gap-3">
+                  <Sparkles className="w-5 h-5" />
                   Extras
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="border py-2 rounded-md">
+                <div className="border-none py-2 rounded-md bg-transparent backdrop-blur-md bg-white/40">
                   <div className="flex justify-between items-center px-4">
-                    <Label htmlFor="guestList">Guestlist</Label>
+                    <Label
+                      htmlFor="guestList"
+                      className="flex items-center gap-2"
+                    >
+                      Guestlist
+                      <InfoTooltip content="Show how is going to your event." />
+                    </Label>
+
                     <Checkbox
                       id="guestList"
                       checked={formData.guestList}
                       onCheckedChange={(checked) =>
                         handleInputChange("guestList", checked)
                       }
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
+                      className={`w-4 h-4 border  ${
+                        formData.guestList
+                          ? "backdrop-blur-md bg-white/40 border-black"
+                          : "bg-transparent"
+                      }`}
                     />
                   </div>
 
@@ -1408,30 +1274,34 @@ const AdminCreateEvent = () => {
                   )}
                 </div>
 
-                <div className="border px-4 py-2 rounded-md">
+                <div className="border-none px-4 py-2 rounded-md bg-transparent backdrop-blur-md bg-white/40">
                   <div className="flex justify-between items-center">
-                    <Label htmlFor="features">Event Features</Label>
+                    <Label
+                      htmlFor="features"
+                      className="flex items-center gap-2"
+                    >
+                      Event Features
+                      <InfoTooltip content="Showcase your event's performers, sponcers and more." />
+                    </Label>
                     <Checkbox
                       id="features"
                       checked={formData.features}
                       onCheckedChange={(checked) =>
                         handleInputChange("features", checked)
                       }
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
+                      className={`w-4 h-4 border  ${
+                        formData.features
+                          ? "backdrop-blur-md bg-white/40 border-black"
+                          : "bg-transparent"
+                      }`}
                     />
                   </div>
                   {formData.features && (
-                    <div className="space-y-4 mt-2 rounded-lg p-3">
+                    <div className="space-y-4 mt-2 rounded-lg py-3">
                       {/* Empty state */}
                       {formData.eventFeatures.length === 0 ? (
-                        <div className="flex justify-between items-center border rounded-lg px-4 py-3">
+                        // <div className="flex justify-between items-center border rounded-lg px-4 py-3">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-none rounded-lg px-4 py-3 gap-2 sm:gap-0 bg-transparent backdrop-blur-md bg-white/10">
                           <p className="text-sm text-muted-foreground italic">
                             No event features added yet.
                           </p>
@@ -1443,15 +1313,8 @@ const AdminCreateEvent = () => {
                               setEditFeatureIndex(null);
                               setShowFeatures(true);
                             }}
-                            className="rounded-full"
-                            style={
-                              selectedColor
-                                ? {
-                                    backgroundColor: selectedColor,
-                                    borderColor: selectedColor,
-                                  }
-                                : {}
-                            }
+                            // className="rounded-full"
+                            className="border-none rounded-full mt-2 sm:mt-0 flex flex-wrap justify-center items-center bg-transparent hover:bg-transparent backdrop-blur-md bg-white/20"
                           >
                             <PlusCircle className="w-4 h-4 mr-1" />
                             Add Feature
@@ -1463,22 +1326,14 @@ const AdminCreateEvent = () => {
                             {formData.eventFeatures.map((feature, i) => (
                               <div
                                 key={i}
-                                className="bg-secondary border rounded-xl p-4 flex justify-between items-center hover:shadow-md transition-all"
-                                style={
-                                  {
-                                    "--accent-bg": lightenColor(selectedColor),
-                                    background:
-                                      "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                                    transition: "background 0.5s ease",
-                                  } as React.CSSProperties
-                                }
+                                className="bg-transparent backdrop-blur-md bg-white/10 border-none rounded-xl p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center hover:shadow-md transition-all"
                               >
                                 {/* Feature content */}
                                 <div className="flex items-center space-x-4">
                                   <img
                                     src={feature.image || "/placeholder.png"}
                                     alt={feature.title || "Feature image"}
-                                    className="w-20 h-20 object-cover rounded-full border"
+                                    className="w-14 h-14 object-cover rounded-full border"
                                     onError={(e) =>
                                       (e.currentTarget.src = "/placeholder.png")
                                     }
@@ -1487,12 +1342,12 @@ const AdminCreateEvent = () => {
                                     <h3 className="font-semibold text-lg">
                                       {feature.title || "Untitled Feature"}
                                     </h3>
-                                    {feature.description && (
+                                    {/* {feature.description && (
                                       <p className="text-sm text-muted-foreground line-clamp-2">
                                         {feature.description}
                                       </p>
-                                    )}
-                                    {feature.url && (
+                                    )} */}
+                                    {/* {feature.url && (
                                       <Link
                                         to={feature.url}
                                         target="_blank"
@@ -1501,7 +1356,7 @@ const AdminCreateEvent = () => {
                                       >
                                         {feature.url}
                                       </Link>
-                                    )}
+                                    )} */}
                                     {feature.start_date &&
                                       feature.start_time && (
                                         <div className="text-xs text-muted-foreground mt-1">
@@ -1538,21 +1393,7 @@ const AdminCreateEvent = () => {
                                             };
 
                                             return (
-                                              <span
-                                                className="bg-background border px-2 py-1 rounded-md"
-                                                style={
-                                                  {
-                                                    "--accent-bg":
-                                                      lightenColor(
-                                                        selectedColor
-                                                      ),
-                                                    background:
-                                                      "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                                                    transition:
-                                                      "background 0.5s ease",
-                                                  } as React.CSSProperties
-                                                }
-                                              >
+                                              <span className="pr-2 py-1">
                                                 {formatDateTime(start)}
                                                 {end
                                                   ? ` - ${formatDateTime(end)}`
@@ -1566,7 +1407,15 @@ const AdminCreateEvent = () => {
                                 </div>
 
                                 {/* Action buttons */}
-                                <div className="flex space-x-1">
+                                <div className="flex justify-center  items-center gap-2 mt-2 sm:mt-0 sm:justify-start">
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    type="button"
+                                    onClick={() => handleFeatureDelete(i)}
+                                  >
+                                    <Trash2 className="w-4 h-4 text-muted-foreground" />
+                                  </Button>
                                   <Button
                                     size="icon"
                                     variant="ghost"
@@ -1577,14 +1426,6 @@ const AdminCreateEvent = () => {
                                     }}
                                   >
                                     <Edit2 className="w-4 h-4 text-muted-foreground" />
-                                  </Button>
-                                  <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    type="button"
-                                    onClick={() => handleFeatureDelete(i)}
-                                  >
-                                    <Trash2 className="w-4 h-4 text-destructive" />
                                   </Button>
                                 </div>
                               </div>
@@ -1601,18 +1442,10 @@ const AdminCreateEvent = () => {
                                 setEditFeatureIndex(null);
                                 setShowFeatures(true);
                               }}
-                              className="rounded-full mt-2"
-                              style={
-                                selectedColor
-                                  ? {
-                                      backgroundColor: selectedColor,
-                                      borderColor: selectedColor,
-                                    }
-                                  : {}
-                              }
+                              // className="rounded-full mt-2"
+                              className="rounded-full mt-2 sm:mt-0 flex flex-wrap justify-center items-center bg-transparent hover:bg-transparent border-none"
                             >
-                              <PlusCircle className="w-4 h-4 mr-1" />
-                              Add Feature
+                              <Plus className="w-4 h-4" />
                             </Button>
                           </div>
                         </>
@@ -1621,102 +1454,75 @@ const AdminCreateEvent = () => {
                   )}
                 </div>
 
-                <div className="border px-4 py-2 rounded-md">
+                <div className="border-none px-4 py-2 rounded-md bg-transparent backdrop-blur-md bg-white/40">
                   <div className="flex justify-between items-center">
-                    <Label htmlFor="tiktok">TikTok Video</Label>
+                    <Label htmlFor="tiktok" className="flex items-center gap-2">
+                      TikTok Video
+                      <InfoTooltip content="Embed a video to give guests a preview of what to expect." />
+                    </Label>
                     <Checkbox
                       id="tiktok"
                       checked={formData.tiktok}
                       onCheckedChange={(checked) =>
                         handleInputChange("tiktok", checked)
                       }
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
+                      className={`w-4 h-4 border ${
+                        formData.tiktok
+                          ? "backdrop-blur-md bg-white/40 border-black"
+                          : "bg-transparent"
+                      }`}
                     />
                   </div>
 
                   {formData.tiktok && (
-                    <div
-                      className="bg-primary rounded-md mt-2 px-4 py-3"
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
-                    >
-                      <div className="space-y-2">
-                        <Label htmlFor="tiktokLink">Link for TikTok *</Label>
-                        <div className="relative">
-                          <Input
-                            id="tiktokLink"
-                            type="url"
-                            value={formData.tiktokLink ?? ""}
-                            onChange={(e) =>
-                              handleInputChange("tiktokLink", e.target.value)
-                            }
-                            placeholder="Enter link *"
-                            style={
-                              {
-                                "--accent-bg": lightenColor(selectedColor),
-                                background:
-                                  "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                                transition: "background 0.5s ease",
-                              } as React.CSSProperties
-                            }
-                          />
-                        </div>
-                      </div>
+                    // <div
+                    //   className="bg-transparent backdrop-blur-md bg-white/40 rounded-md mt-2 px-4 py-3"
+                    // >
+                    <div className="space-y-2">
+                      {/* <Label htmlFor="tiktokLink">Link for TikTok *</Label> */}
+                      {/* <div className="relative"> */}
+                      <Input
+                        id="tiktokLink"
+                        type="url"
+                        value={formData.tiktokLink ?? ""}
+                        onChange={(e) =>
+                          handleInputChange("tiktokLink", e.target.value)
+                        }
+                        placeholder="Enter link *"
+                        className="border-none bg-transparent backdrop-blur-md bg-white/10 mt-2 placeholder:text-black placeholder:text-sm placeholder:font-medium focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
+                      />
                     </div>
+                    // </div>
+                    // </div>
                   )}
                 </div>
 
-                <div className="border px-4 py-2 rounded-md w-full min-w-0">
+                <div className="border-none px-4 py-2 rounded-md w-full min-w-0 bg-transparent backdrop-blur-md bg-white/40">
                   <div className="flex justify-between items-center">
-                    <Label htmlFor="imageGallery">Image Gallery</Label>
+                    <Label
+                      htmlFor="imageGallery"
+                      className="flex ites-center gap-2"
+                    >
+                      Image Gallery
+                      <InfoTooltip content="Add images to showcase your event's vibe." />
+                    </Label>
                     <Checkbox
                       id="imageGallery"
                       checked={formData.imageGallery}
                       onCheckedChange={(checked) =>
                         handleInputChange("imageGallery", checked)
                       }
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
+                      className={`w-4 h-4 border  ${
+                        formData.imageGallery
+                          ? "backdrop-blur-md bg-white/40 border-black"
+                          : "bg-transparent"
+                      }`}
                     />
                   </div>
 
                   {formData.imageGallery && (
                     <ImageGalleryUpload
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
-                      style_button={
-                        selectedColor
-                          ? {
-                              backgroundColor: selectedColor,
-                              borderColor: selectedColor,
-                            }
-                          : {}
-                      }
+                      className="bg-transparent backdrop-blur-md bg-white/40"
                       onImagesUploaded={(urls) => {
                         handleInputChange("imageGalleryLinks", urls);
                       }}
@@ -1727,20 +1533,12 @@ const AdminCreateEvent = () => {
               </CardContent>
             </Card>
 
-            <Card
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
+            <Card className="space-y-2 bg-transparent shadow-none border-none">
+              <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Users className="h-5 w-5" />
-                  <span>Event Preferences</span>
+                <CardTitle className="flex gap-3">
+                  <UtensilsCrossed className="h-5 w-5" />
+                  Event Preferences
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -1753,28 +1551,10 @@ const AdminCreateEvent = () => {
                         handleInputChange("dining_style", value)
                       }
                     >
-                      <SelectTrigger
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
-                      >
+                      <SelectTrigger className="border-none space-y-2 bg-transparent backdrop-blur-md bg-white/40 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none">
                         <SelectValue placeholder="Select dining style" />
                       </SelectTrigger>
-                      <SelectContent
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
-                      >
+                      <SelectContent>
                         <SelectItem value="adventurous">Adventurous</SelectItem>
                         <SelectItem value="foodie_enthusiast">
                           Foodie Enthusiast
@@ -1800,28 +1580,10 @@ const AdminCreateEvent = () => {
                         handleInputChange("dietary_theme", value)
                       }
                     >
-                      <SelectTrigger
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
-                      >
+                      <SelectTrigger className="space-y-2 bg-transparent backdrop-blur-md bg-white/40 border-none focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none">
                         <SelectValue placeholder="Select dietary preferences" />
                       </SelectTrigger>
-                      <SelectContent
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
-                      >
+                      <SelectContent>
                         <SelectItem value="no_restrictions">
                           No Restrictions
                         </SelectItem>
@@ -1840,18 +1602,13 @@ const AdminCreateEvent = () => {
               </CardContent>
             </Card>
 
-            <Card
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
+            <Card className="space-y-2 bg-transparent shadow-none border-none">
+              <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
-                <CardTitle>Tags</CardTitle>
+                <CardTitle className="flex gap-3">
+                  <Tags className="w-5 h-5" />
+                  Tags
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex space-x-2">
@@ -1862,47 +1619,34 @@ const AdminCreateEvent = () => {
                     onKeyPress={(e) =>
                       e.key === "Enter" && (e.preventDefault(), addTag())
                     }
-                    style={
-                      {
-                        "--accent-bg": lightenColor(selectedColor),
-                        background:
-                          "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                        transition: "background 0.5s ease",
-                      } as React.CSSProperties
-                    }
+                    className="space-y-2 bg-transparent backdrop-blur-md bg-white/40 shadow-none border-none focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
                   />
                   <Button
                     type="button"
                     onClick={addTag}
                     variant="outline"
-                    style={
-                      selectedColor
-                        ? {
-                            backgroundColor: selectedColor,
-                            borderColor: selectedColor,
-                          }
-                        : {}
-                    }
+                    className="bg-transparent backdrop-blur-md bg-white/40 hover:bg-white/40 border-none"
+                    // style={
+                    //   selectedColor
+                    //     ? {
+                    //         backgroundColor: selectedColor,
+                    //         borderColor: selectedColor,
+                    //         color: getContrastColor(selectedColor)
+                    //       }
+                    //     : {}
+                    // }
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
-
                 {formData.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {formData.tags.map((tag) => (
                       <Badge
                         key={tag}
                         variant="secondary"
-                        className="cursor-pointer hover:bg-destructive/20"
-                        style={
-                          selectedColor
-                            ? {
-                                backgroundColor: selectedColor,
-                                borderColor: selectedColor,
-                              }
-                            : {}
-                        }
+                        className="cursor-pointer bg-transparent backdrop-blur-md bg-white/40"
+
                         // onClick={() => removeTag(tag)}
                       >
                         {tag}
@@ -1915,44 +1659,37 @@ const AdminCreateEvent = () => {
                 )}
               </CardContent>
             </Card>
-            <Card
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
+
+            <Card className="space-y-2 bg-transparent shadow-none border-none pb-4 lg:pb-0">
+              <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
+                <CardTitle className="flex gap-3">
+                  <Settings className="w-5 h-5" />
                   Page Settings
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex justify-between items-center border px-4 py-2 rounded-md mb-2">
-                  <Label htmlFor="explore">Show on Explore</Label>
+                <div className="flex justify-between items-center border-none px-4 py-2 rounded-md mb-2 bg-transparent backdrop-blur-md bg-white/40">
+                  <Label htmlFor="explore" className="flex ites-center gap-2">
+                    Show on Explore
+                    <InfoTooltip content="This lists your event publicly on the Parish Explore Page for increased visibility and sales." />
+                  </Label>
                   <Checkbox
                     id="explore"
                     checked={formData.explore}
                     onCheckedChange={(checked) =>
                       handleInputChange("explore", checked)
                     }
-                    style={
-                      {
-                        "--accent-bg": lightenColor(selectedColor),
-                        background:
-                          "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                        transition: "background 0.5s ease",
-                      } as React.CSSProperties
-                    }
                   />
                 </div>
-                <div className="border px-4 py-2 rounded-md">
+                <div className="border-none px-4 py-2 rounded-md bg-transparent backdrop-blur-md bg-white/40">
                   <div className="flex justify-between items-center">
-                    <Label htmlFor="is_password_protected">
+                    <Label
+                      htmlFor="is_password_protected"
+                      className="flex items-center gap-2"
+                    >
                       Password Protected Event
+                      <InfoTooltip content="Attendees will need a password to access the event page." />
                     </Label>
                     <Checkbox
                       id="is_password_protected"
@@ -1960,43 +1697,22 @@ const AdminCreateEvent = () => {
                       onCheckedChange={(checked) =>
                         handleInputChange("is_password_protected", checked)
                       }
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
                     />
                   </div>
 
                   {formData.is_password_protected && (
                     <div className="rounded-md mt-2 px-4 py-3">
-                      <div className="space-y-2 border rounded-lg px-4 py-3">
-                        <Label htmlFor="event_password">Password *</Label>
-                        <div className="relative">
-                          <Input
-                            id="event_password"
-                            type="password"
-                            value={formData.event_password ?? ""}
-                            onChange={(e) =>
-                              handleInputChange(
-                                "event_password",
-                                e.target.value
-                              )
-                            }
-                            placeholder="Enter event password *"
-                            style={
-                              {
-                                "--accent-bg": lightenColor(selectedColor),
-                                background:
-                                  "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                                transition: "background 0.5s ease",
-                              } as React.CSSProperties
-                            }
-                          />
-                        </div>
+                      <div className="relative">
+                        <Input
+                          id="event_password"
+                          type="password"
+                          value={formData.event_password ?? ""}
+                          onChange={(e) =>
+                            handleInputChange("event_password", e.target.value)
+                          }
+                          placeholder="Enter event password *"
+                          className="border-none bg-transparent backdrop-blur-md bg-white/10 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
+                        />
                       </div>
                     </div>
                   )}
@@ -2010,16 +1726,7 @@ const AdminCreateEvent = () => {
               value={formData.flyer_url}
               onChange={handleFlyerChange}
             />
-            <Card
-              style={
-                {
-                  "--accent-bg": lightenColor(selectedColor),
-                  background:
-                    "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                  transition: "background 0.5s ease",
-                } as React.CSSProperties
-              }
-            >
+            <Card className="space-y-2 bg-transparent backdrop-blur-md bg-white/40 shadow-none border-none">
               <CardHeader>
                 <CardTitle>Customize Event Style</CardTitle>
               </CardHeader>
@@ -2034,38 +1741,18 @@ const AdminCreateEvent = () => {
                       handleFontChange(font);
                     }}
                   >
-                    <SelectTrigger
-                      className="rounded-lg border bg-background/60 hover:bg-background transition"
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
-                    >
+                    <SelectTrigger className="rounded-lg border-none bg-background/60 hover:bg-transparent transition bg-transparent backdrop-blur-md bg-white/40 focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none">
                       <SelectValue
                         placeholder="Select font"
                         className="capitalize"
                       />
                     </SelectTrigger>
-                    <SelectContent
-                      className="max-h-60 overflow-y-auto"
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
-                    >
+                    <SelectContent className="max-h-60 overflow-y-auto">
                       {FONT_OPTIONS.map((font) => (
                         <SelectItem
                           key={font}
                           value={font}
-                          className="cursor-pointer hover:bg-accent/60"
+                          className="cursor-pointer"
                         >
                           <span
                             className="block text-base"
@@ -2118,8 +1805,8 @@ const AdminCreateEvent = () => {
                         ))}
                         {/* Custom Picker */}
                         {/* <Label className="w-7 h-7 rounded-md border flex items-center justify-center text-xs text-muted-foreground cursor-pointer hover:bg-primary transition">
-                      +
-                    </Label> */}
+                            +
+                          </Label> */}
                         <div
                           className="w-8 h-8 rounded-md border cursor-pointer shadow-sm hover:ring-2 hover:ring-primary transition-all"
                           style={{ backgroundColor: selectedColor }}
@@ -2145,42 +1832,66 @@ const AdminCreateEvent = () => {
                         />
 
                         {/* <div className="flex items-center gap-3">
-                      <label
-                        htmlFor="color-picker"
-                        className="text-sm font-medium"
-                      >
-                        Choose Color:
-                      </label>
-                      <div
-                        className="w-8 h-8 rounded-md border cursor-pointer shadow-sm hover:ring-2 hover:ring-primary transition-all"
-                        style={{ backgroundColor: selectedColor }}
-                        onClick={() =>
-                          document.getElementById("color-picker").click()
-                        }
-                      ></div>
-                      <input
-                        id="color-picker"
-                        type="color"
-                        value={selectedColor}
-                        onChange={(e) => {
-                          setSelectedColor(e.target.value);
-                          handleColorChange(e.target.value);
-                          handleInputChange("color", e.target.value);
-                        }}
-                        className="hidden"
-                      />
-                    </div> */}
+                          <label
+                            htmlFor="color-picker"
+                            className="text-sm font-medium"
+                          >
+                            Choose Color:
+                          </label>
+                          <div
+                            className="w-8 h-8 rounded-md border cursor-pointer shadow-sm hover:ring-2 hover:ring-primary transition-all"
+                            style={{ backgroundColor: selectedColor }}
+                            onClick={() =>
+                              document.getElementById("color-picker").click()
+                            }
+                          ></div>
+                          <input
+                            id="color-picker"
+                            type="color"
+                            value={selectedColor}
+                            onChange={(e) => {
+                              setSelectedColor(e.target.value);
+                              handleColorChange(e.target.value);
+                              handleInputChange("color", e.target.value);
+                            }}
+                            className="hidden"
+                          />
+                        </div> */}
                       </div>
 
                       {/* Color Preview */}
                       {selectedColor && (
-                        <div className="mt-2 text-xs text-muted-foreground pl-1 flex items-center gap-2">
-                          <div
-                            className="w-4 h-4 rounded border"
-                            style={{ backgroundColor: selectedColor }}
-                          ></div>
-                          <span>{selectedColor}</span>
-                        </div>
+                        <>
+                          <div className="mt-2 text-xs text-muted-foreground pl-1 flex items-center gap-2">
+                            <div
+                              className="w-4 h-4 rounded border"
+                              style={{ backgroundColor: selectedColor }}
+                            ></div>
+                            <span>{selectedColor}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <Label
+                              className="flex gap-3 items-center"
+                              htmlFor="bg_color"
+                            >
+                              Apply Accent Color to Background
+                            </Label>
+                            <Checkbox
+                              id="bg_color"
+                              checked={formData.bg_color}
+                              onCheckedChange={(checked) => {
+                                handleInputChange("bg_color", checked);
+                                handleColorChange(selectedColor);
+                                handleToggleBg(!!checked);
+                              }}
+                              className={`w-4 h-4 border  ${
+                                formData.bg_color
+                                  ? "backdrop-blur-md bg-white/40 border-black"
+                                  : "bg-transparent border-red"
+                              }`}
+                            />
+                          </div>
+                        </>
                       )}
                     </>
                   ) : (
