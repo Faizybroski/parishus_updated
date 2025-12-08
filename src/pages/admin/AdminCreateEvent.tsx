@@ -189,7 +189,7 @@ const AdminCreateEvent = () => {
     "Crimson Text",
   ];
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value) => {
     // setFormData((prev) => ({
     //   ...prev,
     //   [field]: value,
@@ -338,7 +338,7 @@ const AdminCreateEvent = () => {
         title: "Photo uploaded!",
         description: "Your event cover photo has been saved.",
       });
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Upload failed",
         description: error.message || "Failed to upload photo",
@@ -611,9 +611,9 @@ const AdminCreateEvent = () => {
           recurrence_dates: formData.recurring
             ? formData.recurrenceDates
             : null,
-          eventEndDateTime: eventEndDateTime.toISOString(),
+          eventEndDateTime: eventEndDateTime? eventEndDateTime.toISOString() : null,
           location: `${formData.location_name}, ${formData.location_address}`,
-        } as any)
+        })
         .select()
         .single();
 
@@ -654,7 +654,7 @@ const AdminCreateEvent = () => {
       });
 
       navigate("/admin/events");
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Error creating event",
         description: error.message || "Failed to create event",
@@ -785,9 +785,8 @@ const AdminCreateEvent = () => {
                             : "bg-transparent text-muted-foreground"
                         }`}
             >
-              Paid
+              Paid Event
             </Button>
-
             <Button
               type="button"
               size="sm"
@@ -799,7 +798,7 @@ const AdminCreateEvent = () => {
                             : "bg-transparent text-muted-foreground"
                         }`}
             >
-              Free
+              Free Event
             </Button>
           </div>
         </div>
