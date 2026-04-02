@@ -1,0 +1,338 @@
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/OnboardingCarousel/ui/card";
+import { Checkbox } from "@/components/OnboardingCarousel/ui/checkbox";
+import { Input } from "@/components/OnboardingCarousel/ui/input";
+import { Label } from "@/components/OnboardingCarousel/ui/label";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  EyeOff,
+  Loader2,
+  Mail,
+} from "lucide-react";
+import { SiGoogle, SiApple } from "react-icons/si";
+import { useState } from "react";
+import { useLocation, useNavigate, Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import ParishLogo from "../ui/logo";
+
+const onboardingCards = [
+  { id: 0, type: "intro-logo" },
+  {
+    id: 1,
+    type: "intro-title",
+    title: "Parish",
+    description: "UNIQUE DINING EXPERIENCES EVERY WEEK",
+    image: null,
+  },
+  {
+    id: 2,
+    title: "Join Our Weekly Mystery Dinners",
+    description:
+      "Every Thursday RSVP for a dining event. We'll reveal the restaurant and guests the day before.",
+    image: "/images/Carousel 1.png",
+  },
+  {
+    id: 3,
+    title: "Create Your Own Dining Events",
+    description: "Host your own event and invite your friends to RSVP",
+    image: "/images/Carousel 2.png",
+  },
+  {
+    id: 4,
+    title: "Find Your Dining Companion",
+    description:
+      "We’ll help you connect with others who enjoy the same places you do.",
+    image: "/images/Carousel 3.png",
+  },
+];
+export const OAuth = ({ startStep = 0 }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const passedStep = location.state?.startStep ?? startStep;
+  const [currentStep, setCurrentStep] = useState(passedStep);
+  const [instagram, setInstagram] = useState("");
+  const [linkedin, setLinkedin] = useState("");
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { signInWithGoogle, signInWithApple } = useAuth();
+
+  const handleNext = () => {
+    if (currentStep < onboardingCards.length) setCurrentStep(currentStep + 1);
+  };
+
+  const handleBack = () => {
+    if (currentStep > 0) setCurrentStep(currentStep - 1);
+  };
+
+  if (currentStep === onboardingCards.length) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="w-full max-w-md p-6 bg-gradient-card border-border shadow-card animate-fade-in">
+          <div className="flex items-center justify-between mb-6">
+            <Button onClick={handleBack} variant="ghost" size="icon">
+              <ChevronLeft className="w-5 h-5" />
+            </Button>
+            <div className="flex flex-col items-center">
+              <div className="mb-6 ">
+                <ParishLogo />
+              </div>
+              <div>
+                <h1
+                  className="text-2xl font-extrabold font-playfair text-black font-script"
+                  style={{
+                    fontSize: "60px",
+                  }}
+                >
+                  Parish
+                </h1>
+              </div>
+            </div>
+            <div className="w-6" />
+          </div>
+
+          <form className="space-y-5">
+            <div>
+              <Label htmlFor="linkedin">LinkedIn Profile</Label>
+              <Input
+                id="linkedin"
+                type="text"
+                placeholder="Enter your LinkedIn username*"
+                value={linkedin}
+                onChange={(e) => setLinkedin(e.target.value)}
+                className="mt-2"
+              />
+            </div>
+
+            <div className="flex items-center justify-center">
+              <div className="flex-grow border-t border-primary"></div>
+              <span className="text-primary font-semibold px-2">OR</span>
+              <div className="flex-grow border-t border-primary"></div>
+            </div>
+
+            {/* Instagram */}
+            <div>
+              <Label htmlFor="instagram">Instagram</Label>
+              <Input
+                id="instagram"
+                type="text"
+                placeholder="Enter your Instagram username*"
+                value={instagram}
+                onChange={(e) => setInstagram(e.target.value)}
+                className="mt-2"
+              />
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="terms"
+                checked={agreeToTerms}
+                onCheckedChange={(checked) => setAgreeToTerms(checked === true)}
+                required
+              />
+              <Label htmlFor="terms">
+                I agree to the{" "}
+                <Link to="/terms-conditions" className="text-primary underline">
+                  Terms & Conditions
+                </Link>
+              </Label>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                onClick={async () => {
+                  if (!linkedin && !instagram) {
+                    toast({
+                      title: "Social Media Required",
+                      description:
+                        "Please enter LinkedIn or Instagram before continuing.",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+                  if (!agreeToTerms) {
+                    toast({
+                      title: "Terms & Conditions",
+                      description: "You must agree to the Terms & Conditions.",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+
+                  if (instagram)
+                    localStorage.setItem("signup_instagram", instagram.trim());
+                  if (linkedin)
+                    localStorage.setItem("signup_linkedin", linkedin.trim());
+
+                  const { error } = await signInWithGoogle();
+                  if (error) {
+                    console.error("Google login error:", error.message);
+                  }
+                }}
+                className="flex-1 py-3 border hover:bg-secondary/40 text-foreground bg-transparent"
+              >
+                <SiGoogle size={22} color="black" /> Google
+              </Button>
+              <Button
+                onClick={async () => {
+                  if (!linkedin && !instagram) {
+                    toast({
+                      title: "Social Media Required",
+                      description:
+                        "Please enter LinkedIn or Instagram before continuing.",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+
+                  if (!agreeToTerms) {
+                    toast({
+                      title: "Terms & Conditions",
+                      description: "You must agree to the Terms & Conditions.",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+
+                  if (instagram)
+                    localStorage.setItem("signup_instagram", instagram.trim());
+                  if (linkedin)
+                    localStorage.setItem("signup_linkedin", linkedin.trim());
+
+                  const { error } = await signInWithApple();
+                  if (error) {
+                    console.error("Apple login error:", error.message);
+                  }
+                }}
+                className="flex-1 py-3 text-foreground hover:bg-secondary/40 bg-transparent border"
+              >
+                <SiApple size={22} color="black" /> Apple
+              </Button>
+            </div>
+          </form>
+
+          <div className="mt-6">
+            <div className="relative mb-4">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="bg-background px-3 text-muted-foreground">
+                  OR CONTINUE WITH
+                </span>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <Link to={"/auth"} className="flex-1">
+                <Button className="w-full py-3 text-foreground hover:bg-secondary/40 bg-transparent border">
+                  <Mail size={22} color="black" /> Email
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  const currentCard = onboardingCards[currentStep];
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <Card className="w-full max-w-md p-8 bg-gradient-card border-border shadow-card animate-fade-in text-center">
+        {currentCard.type === "intro-logo" ? (
+          <div
+            className="flex flex-col items-center space-y-6"
+            style={{ textAlign: "center !important" }}
+          >
+            <img
+              src="https://udlsywpejkcnrygeeqvd.supabase.co/storage/v1/object/public/Parish/Parishus%20logo.png"
+              alt="Parish Logo"
+              style={{
+                width: "50%",
+                paddingTop: "120px",
+                paddingBottom: "120px",
+              }}
+            />
+          </div>
+        ) : currentCard.type === "intro-title" ? (
+          <>
+            <img
+              src="https://udlsywpejkcnrygeeqvd.supabase.co/storage/v1/object/public/Parish/Parishus%20logo.png"
+              alt="Parish Logo"
+              style={{
+                width: "20%",
+                paddingTop: "90px",
+                margin: "0px auto",
+                marginBottom: "30px",
+              }}
+            />
+            <h1
+              className="text-3xl font-playfair font-extrabold mb-4 font-script"
+              style={{
+                fontSize: "70px",
+              }}
+            >
+              {currentCard.title}
+            </h1>
+            <p
+              className="font-montserrat text-muted-foreground"
+              style={{
+                fontWeight: "600",
+                paddingBottom: "90px",
+                fontSize: "21px",
+              }}
+            >
+              {currentCard.description}
+            </p>
+          </>
+        ) : (
+          <>
+            <h1 className="text-3xl font-playfair font-extrabold text-[#c4b0a2] mb-2 font-script">
+              {currentCard.title}
+            </h1>
+            <div className="flex justify-center my-6">
+              <div className="flex space-x-2">
+                {onboardingCards.slice(2).map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-1 h-1 rounded-full transition-all ${
+                      index + 2 === currentStep
+                        ? "bg-secondary scale-150"
+                        : index + 2 < currentStep
+                          ? "bg-secondary/60"
+                          : "bg-border"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+            <p className="font-montserrat text-muted-foreground mb-8">
+              {currentCard.description}
+            </p>
+            <div className="flex justify-center mb-8 font-montserrat">
+              <img className="max-w-60" src={currentCard.image} alt="image" />
+            </div>
+          </>
+        )}
+        <div className="flex justify-between items-center mt-4">
+          <Button
+            onClick={handleBack}
+            variant="onboardingSecondary"
+            disabled={currentStep === 0}
+          >
+            <ChevronLeft className="w-4 h-4" /> Back
+          </Button>
+          <Button variant="onboardingSecondary" onClick={handleNext}>
+            {currentStep === onboardingCards.length - 1
+              ? "Get Started"
+              : "Continue"}
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
+      </Card>
+    </div>
+  );
+};

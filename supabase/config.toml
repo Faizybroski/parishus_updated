@@ -1,0 +1,7 @@
+project_id = "udlsywpejkcnrygeeqvd"
+
+[functions.create-rsvp-payment]
+verify_jwt = false
+
+[functions.verify-rsvp-payment] 
+verify_jwt = false

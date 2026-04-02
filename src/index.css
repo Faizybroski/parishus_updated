@@ -1,0 +1,435 @@
+@import url("https://fonts.cdnfonts.com/css/sergio-trendy");
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Dancing+Script:wght@400..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&family=Unbounded:wght@200..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Unbounded:wght@200..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Tagesschrift&family=Unbounded:wght@200..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Raleway:ital,wght@0,100..900;1,100..900&family=Tagesschrift&family=Unbounded:wght@200..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Raleway:ital,wght@0,100..900;1,100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Tagesschrift&family=Unbounded:wght@200..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Caprasimo&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Raleway:ital,wght@0,100..900;1,100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Tagesschrift&family=Unbounded:wght@200..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Caprasimo&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Metal+Mania&family=Raleway:ital,wght@0,100..900;1,100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Tagesschrift&family=Unbounded:wght@200..900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --parish-stroke: 2px; /* outline width */
+    --parish-padding: 0.18em; /* safe padding so stroke never clips */
+    --parish-anim-duration: 2.6s;
+    --parish-ease: cubic-bezier(0.22, 0.9, 0.28, 1);
+
+    --background: 39 33% 96%; /* Warm cream/parchment */
+    --foreground: 0 0% 18%; /* Deep charcoal for text */
+
+    --card: 39 33% 98%;
+    --card-foreground: 0 0% 18%;
+
+    --popover: 39 33% 98%;
+    --popover-foreground: 0 0% 18%;
+
+    --accent: 0 0% 18%;
+    --accent-foreground: 39 33% 96%;
+
+    --secondary: 39 20% 88%;
+    --secondary-foreground: 0 0% 18%;
+
+    --muted: 39 20% 88%;
+    --muted-foreground: 0 0% 45%;
+
+    --primary: 25 30% 85%;
+    --primary-foreground: 0 0% 18%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 39 33% 96%;
+
+    --border: 39 20% 82%;
+    --input: 39 20% 85%;
+    --ring: 0 0% 18%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+    background-color: hsl(var(--background));
+    padding: 0;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--primary));
+    border-radius: 9999px;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--primary));
+    background: hsl(var(--primary));
+  }
+
+  .scroll-hidden {
+    overflow: auto; /* or scroll */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE & Edge (legacy) */
+  }
+
+  /* Chrome, Safari, Edge (Chromium) */
+  .scroll-hidden::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary)) hsl(var(--background));
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+.touch-pan-y {
+  touch-action: pan-y !important;
+}
+
+/* .parish-loader {
+  color: hsl(var(--muted));
+  -webkit-text-stroke: 2px hsl(var(--foreground, 0 0% 18%)); 
+  position: relative;
+  overflow: hidden;
+}
+
+.parish-loader::before {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  color: #d2bdad;
+  clip-path: inset(0 100% 0 0); 
+  animation: fillText 3s ease-in-out infinite alternate;
+} */
+
+/* .parish-loader {
+  position: relative;
+  display: inline-block;
+  font-weight: 900;
+  font-size: clamp(2rem, 8vw, 6rem);
+  color: transparent;
+
+  -webkit-text-stroke: 1px hsl(var(--foreground));
+  text-stroke: 1px hsl(var(--foreground));
+
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.parish-loader::before {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  color: transparent;
+
+  background: linear-gradient(
+    90deg,
+    hsl(var(--primary)) 0%,
+    hsl(var(--primary)) 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  animation: parish-breath 3s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes parish-breath {
+  from { background-position: 200% 0; } 
+  to   { background-position: 0% 0; }   
+  */
+
+@layer utilities {
+  .stroke-foreground {
+    -webkit-text-stroke: 1px hsl(var(--foreground));
+  }
+  .loader-fill {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--primary)) 0%,
+      transparent 50%,
+      hsl(var(--primary)) 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: loader-sweep 3s ease-in-out infinite alternate;
+  }
+
+  @keyframes loader-sweep {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  @keyframes bgFadeZoom {
+    0% {
+      opacity: 0;
+      transform: scale(1.05);
+      filter: blur(6px);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+      filter: blur(0px);
+    }
+  }
+
+  .animate-bgFadeZoom {
+    animation: bgFadeZoom 0.2s ease-out forwards;
+  }
+}
+
+@keyframes spin-slow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.icon-animate {
+  transition: transform 0.3s ease;
+}
+
+.group:hover .icon-animate {
+  animation: spin-slow 1.5s linear infinite;
+}
+
+/* In your CSS file */
+.event-container {
+  container-type: inline-size;
+}
+
+.event-card {
+  width: 400px;
+  transition: width 0.3s ease;
+}
+
+.gradient-animate {
+  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background-size: 400% 400%;
+  animation: gradientMove 15s ease infinite;
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Container queries for responsive behavior */
+@container (max-width: 400px) {
+  .event-card {
+    width: 350px;
+  }
+}
+
+@container (max-width: 350px) {
+  .event-card {
+    width: 300px;
+  }
+}
+
+/* Or use standard media queries */
+@media (max-width: 1920px) {
+  .event-card {
+    width: 400px;
+  }
+}
+
+@media (max-width: 1536px) {
+  .event-card {
+    width: 375px;
+  }
+}
+
+@media (max-width: 1366px) {
+  .event-card {
+    width: 350px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .event-card {
+    width: 315px;
+  }
+}
+
+/* @keyframes fillText {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+  50% {
+    clip-path: inset(0 0 0 0);
+  }
+  100% {
+    clip-path: inset(0 100% 0 0); 
+  }
+} */
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    @apply font-serif;
+  }
+
+  body {
+    overflow: auto;
+    -ms-overflow-style: none; /* IE/Edge */
+    /* scrollbar-width: none;  */
+  }
+  /* body::-webkit-scrollbar {
+    display: none; 
+  } */
+}
+
+/* Line clamp utilities */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+#profileWrapper {
+  @media (max-width: 445px) {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+#notificationSheet {
+  @media (min-width: 320px) and (max-width: 640px) {
+    width: 330px;
+  }
+}
+
+h1:empty::before {
+  content: attr(data-placeholder);
+  color: #9ca3af; /* Tailwind's muted color, adjust if needed */
+  pointer-events: none;
+}
+
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge, and Firefox */
+/* * {
+  -ms-overflow-style: none;  
+  scrollbar-width: none;     
+} */
+
+.swiper-pagination-bullet {
+  background: hsl(var(--muted-foreground)) !important;
+  width: 10px !important;
+  height: 10px !important;
+  opacity: 1 !important;
+}
+
+.swiper-pagination-bullet-active {
+  background: hsl(var(--primary)) !important;
+  width: 12px !important;
+  height: 12px !important;
+}
