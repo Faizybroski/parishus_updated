@@ -100,6 +100,7 @@ const AdminCreateEvent = () => {
     location_lat: "",
     location_lng: "",
     restaurant_id: "",
+    location_status: "confirmed",
     max_attendees: 10,
     dining_style: "",
     dietary_theme: "",
@@ -406,13 +407,15 @@ const AdminCreateEvent = () => {
       return;
     }
 
-    if (!formData.location_name.trim()) {
-      toast({
-        title: "Validation Error",
-        description: "Event location cannot be empty.",
-        variant: "destructive",
-      });
-      return;
+    if (formData.location_status === "confirmed") {
+      if (!formData.location_name || !formData.location_address) {
+        toast({
+          title: "Validation Error",
+          description: "Event location cannot be empty.",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     if (
@@ -563,6 +566,7 @@ const AdminCreateEvent = () => {
       } else {
         rsvpDeadline = eventDateTime;
       }
+      const isTBD = formData.location_status === "tbd";
 
       const { data, error } = await supabase
         .from("events")
@@ -570,11 +574,12 @@ const AdminCreateEvent = () => {
           creator_id: profile.id,
           guest_user_ids: invitedGuestIds,
           date_time: eventDateTime.toISOString(),
-          location_name: formData.location_name.trim(),
-          location_address: formData.location_address.trim(),
-          location_lng: formData.location_lng,
-          location_lat: formData.location_lat,
-          restaurant_id: formData.restaurant_id || null,
+          location_status: isTBD ? "tbd" : "confirmed",
+          location_name: isTBD ? null : formData.location_name.trim(),
+          location_address: isTBD ? null : formData.location_address.trim(),
+          location_lng: isTBD ? null : formData.location_lng,
+          location_lat: isTBD ? null : formData.location_lat,
+          restaurant_id: isTBD ? null : formData.restaurant_id || null,
           max_attendees: formData.max_attendees,
           status: "active",
           dining_style: formData.dining_style || null,
@@ -614,7 +619,9 @@ const AdminCreateEvent = () => {
           eventEndDateTime: eventEndDateTime
             ? eventEndDateTime.toISOString()
             : null,
-          location: `${formData.location_name}, ${formData.location_address}`,
+          location: isTBD
+            ? null
+            : `${formData.location_name}, ${formData.location_address}`,
         })
         .select()
         .single();
@@ -1054,7 +1061,101 @@ const AdminCreateEvent = () => {
                 <CardTitle>Location</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="sspace-y-2 relative">
+                <div className="border-none px-4 py-2 rounded-md bg-transparent backdrop-blur-md bg-white/40">
+                  <div className="flex justify-between items-center">
+                    <Label
+                      htmlFor="location_now"
+                      className="flex items-center gap-2"
+                    >
+                      Set Location Now
+                      <InfoTooltip content="Set the location of the event now" />
+                    </Label>
+                    <Checkbox
+                      id="location_now"
+                      checked={formData.location_status === "confirmed"}
+                      onCheckedChange={(checked) =>
+                        handleInputChange(
+                          "location_status",
+                          checked ? "confirmed" : "tbd",
+                        )
+                      }
+                    />
+                  </div>
+                  {/* <div className="flex items-center gap-4 px-6">
+                                    <button
+                                      type="button"
+                                      onClick={() => setLocationMode("now")}
+                                      className={`px-4 py-2 rounded-md ${
+                                        locationMode === "now"
+                                          ? "bg-primary text-white"
+                                          : "bg-gray-200 text-black"
+                                      }`}
+                                    >
+                                      Set Location Now
+                                    </button>
+                
+                                    <button
+                                      type="button"
+                                      onClick={() => setLocationMode("tbd")}
+                                      className={`px-4 py-2 rounded-md ${
+                                        locationMode === "tbd"
+                                          ? "bg-primary text-white"
+                                          : "bg-gray-200 text-black"
+                                      }`}
+                                    >
+                                      Decide Later (TBD)
+                                    </button>
+                                  </div> */}
+                  {formData.location_status === "confirmed" && (
+                    <div className="rounded-md mt-2 px-4 py-3">
+                      <div className="space-y-2 relative">
+                        <Label htmlFor="restaurant">
+                          Choose Restaurant (Optional)
+                        </Label>
+                        <RestaurantSearchDropdown
+                          className="border-none bg-transparent backdrop-blur-md bg-white/40 hover:bg-transparent text-black placeholder:text-black"
+                          placeholder="Search and select a restaurant"
+                          restaurants={restaurants}
+                          value={formData.restaurant_id}
+                          onSelect={(restaurant: Restaurant | null) => {
+                            if (restaurant) {
+                              handleInputChange("restaurant_id", restaurant.id);
+                              handleInputChange(
+                                "location_name",
+                                restaurant.name,
+                              );
+                              handleInputChange(
+                                "location_lat",
+                                restaurant.latitude.toString(),
+                              );
+                              handleInputChange(
+                                "location_lng",
+                                restaurant.longitude.toString(),
+                              );
+                              handleInputChange(
+                                "location_address",
+                                restaurant.full_address,
+                              );
+                            } else {
+                              handleInputChange("restaurant_id", "");
+                              handleInputChange("location_name", "");
+                              handleInputChange("location_address", "");
+                              handleInputChange("location_lat", "");
+                              handleInputChange("location_lng", "");
+                            }
+                          }}
+                        />
+                      </div>
+                      <GooglePlacesEventsForm
+                        required={true}
+                        className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black text-black"
+                        formData={formData}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                  )}
+                </div>
+                {/* <div className="sspace-y-2 relative">
                   <Label htmlFor="restaurant">
                     Choose Restaurant (Optional)
                   </Label>
@@ -1094,7 +1195,7 @@ const AdminCreateEvent = () => {
                   formData={formData}
                   className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black text-black"
                   onChange={handleInputChange}
-                />
+                /> */}
               </CardContent>
             </Card>
 

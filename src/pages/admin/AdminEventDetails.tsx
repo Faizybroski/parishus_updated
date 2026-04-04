@@ -46,6 +46,7 @@ interface Event {
   date_time: string;
   location_name: string;
   location_address: string;
+  location_status: string;
   rsvp_deadline: string;
   restaurant_id: string | null;
   max_attendees: number;
@@ -917,31 +918,39 @@ const AdminEventDetails = () => {
                   <div className="flex items-center space-x-3">
                     <MapPin className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <p className="font-medium">
-                        <Link
-                          to={`https://www.google.com/maps?q=${encodeURIComponent(
-                            `${event.location_name}, ${event.location_address}`,
-                          )}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {event.location_name}
-                        </Link>
-                      </p>
+                      <>
+                        {event.location_status === "confirmed" && (
+                          <p className="font-medium">
+                            <Link
+                              to={`https://www.google.com/maps?q=${encodeURIComponent(
+                                `${event.location_name}, ${event.location_address}`,
+                              )}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {event.location_name}
+                            </Link>
+                          </p>
+                        )}
 
-                      {event.location_address && (
-                        <p className="text-sm text-muted-foreground">
-                          <Link
-                            to={`https://www.google.com/maps?q=${encodeURIComponent(
-                              `${event.location_name}, ${event.location_address}`,
-                            )}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            {event.location_address}
-                          </Link>
-                        </p>
-                      )}
+                        {event.location_status === "confirmed" &&
+                          event.location_address && (
+                            <p className="text-sm ">
+                              <Link
+                                to={`https://www.google.com/maps?q=${encodeURIComponent(
+                                  `${event.location_name}, ${event.location_address}`,
+                                )}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                {event.location_address}
+                              </Link>
+                            </p>
+                          )}
+                        {event.location_status === "tbd" && (
+                          <p className="font-medium">Location: To Be Decided</p>
+                        )}
+                      </>
                     </div>
                   </div>
                   <div className="flex items-center space-x-3">
@@ -997,19 +1006,20 @@ const AdminEventDetails = () => {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Location</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <MapContainer
-                  lat={Number(event.location_lat)}
-                  lng={Number(event.location_lng)}
-                  name={event.location_name}
-                  add={event.location_address}
-                />
-              </CardContent>
-            </Card>
+            {event.location_status === "confirmed" && (
+              <Card className="space-y-2 bg-transparent shadow-none border-none">
+                <div className="border-t border-gray-300 mx-6" />
+                <CardHeader className="pt-1"></CardHeader>
+                <CardContent>
+                  <MapContainer
+                    lat={Number(event.location_lat)}
+                    lng={Number(event.location_lng)}
+                    name={event.location_name}
+                    add={event.location_address}
+                  />
+                </CardContent>
+              </Card>
+            )}
 
             {event.recurrence && (
               <Card>

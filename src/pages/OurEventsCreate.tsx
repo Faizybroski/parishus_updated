@@ -12,21 +12,13 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useProfile } from "@/hooks/useProfile";
 import { useRestaurants, Restaurant } from "@/hooks/useRestaurants";
 import { supabase } from "@/integrations/supabase/client";
-import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -37,36 +29,18 @@ import {
 import { InfoTooltip } from "@/components/tooltip/InfoTooltip";
 import {
   Calendar,
-  Clock,
   MapPin,
   Repeat2,
-  Eye,
   Edit2,
-  Salad,
-  ChefHat,
-  SlidersHorizontal,
-  UserCheck,
-  Send,
-  Mail,
-  Settings2,
-  Lock,
   Settings,
-  Shield,
   Tags,
-  Hash,
-  Bookmark,
-  Tag,
   Sparkles,
   Trash2,
   UtensilsCrossed,
   PlusCircle,
-  EyeOff,
-  Upload,
   UsersRound,
-  Camera,
   Plus,
   X,
-  Users,
   DollarSign,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -75,7 +49,6 @@ import { format } from "date-fns";
 const today = format(new Date(), "yyyy-MM-dd");
 import { EmailInviteModal } from "@/components/Invitationmodals/EmailInviteModal";
 import { CrossedPathInviteModal } from "@/components/Invitationmodals/CrossedPathInviteModal";
-import { getEmailsFromIds } from "@/lib/getEmailsFromIds";
 import { sendEventInvite } from "@/lib/sendInvite";
 import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 import { RestaurantSearchDropdown } from "@/components/restaurants/RestaurantSearchDropdown";
@@ -94,19 +67,16 @@ const OurEventsCreate = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    // start_time: "",
-    // start_date: "",
     start_datetime: "",
     location_name: "",
     location_address: "",
+    location_status: "confirmed",
     location_lat: "",
     location_lng: "",
     restaurant_id: "",
     max_attendees: 10,
     dining_style: "",
     dietary_theme: "",
-    // rsvp_deadline_date: "",
-    // rsvp_deadline_time: "",
     rsvp_deadline: "",
     tags: [] as string[],
     cover_photo_url: "",
@@ -127,8 +97,6 @@ const OurEventsCreate = () => {
     eventFeatures: [],
     recurring: false,
     recurrenceDates: [],
-    // end_date: "",
-    // end_time: "",
     end_datetime: "",
     bg_color: false,
   });
@@ -136,6 +104,7 @@ const OurEventsCreate = () => {
   const { user, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
   const { restaurants, loading: restaurantsLoading } = useRestaurants();
+  const [locationMode, setLocationMode] = useState<"now" | "tbd">("now");
   const [emailInviteModelOpen, setEmailInviteModelOpen] = useState(false);
   const [mode, setMode] = useState<"sell" | "rsvp">("sell");
   const [invitedGuestIds, setInvitedGuestIds] = useState<string[]>([]);
@@ -150,8 +119,6 @@ const OurEventsCreate = () => {
   const [applyAccentBg, setApplyAccentBg] = useState(true);
   const [showRecurringDialog, setShowRecurringDialog] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-
-  // Optional: handle blur or Enter key to confirm editing
 
   const navigate = useNavigate();
   const subscriptionStatus = useSubscriptionStatus(profile?.id);
@@ -168,17 +135,6 @@ const OurEventsCreate = () => {
       setIsLoaded(true);
     };
   }, [formData.flyer_url]);
-
-  // useEffect(() => {
-  //   if (!formData.flyer_url) return;
-
-  //   const img = new Image();
-  //   img.src = formData.flyer_url;
-
-  //   img.onload = () => {
-  //     setIsLoaded(true);
-  //   };
-  // }, [formData.flyer_url]);
 
   const dummyPictures = [
     "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=500&q=80",
@@ -212,7 +168,6 @@ const OurEventsCreate = () => {
       ...prev,
       [field]: value,
     }));
-    // if (ref.current) setText(ref.current.innerText);
     if (field === "guest_invitation_type" && value === "manual") {
       setEmailInviteModelOpen(true);
     }
@@ -222,7 +177,6 @@ const OurEventsCreate = () => {
   };
 
   function lightenColor(color: string, percent = 20) {
-    // Convert to RGB
     let r, g, b;
 
     if (color.startsWith("#")) {
@@ -238,7 +192,6 @@ const OurEventsCreate = () => {
       return color;
     }
 
-    // Apply lighten factor
     r = Math.min(255, Math.floor(r + (255 - r) * (percent / 100)));
     g = Math.min(255, Math.floor(g + (255 - g) * (percent / 100)));
     b = Math.min(255, Math.floor(b + (255 - b) * (percent / 100)));
@@ -249,10 +202,8 @@ const OurEventsCreate = () => {
   function getContrastColor(hex: string) {
     if (!hex) return "black";
 
-    // Normalize hex
     hex = hex.replace("#", "");
 
-    // Convert shorthand hex (#abc → #aabbcc)
     if (hex.length === 3) {
       hex = hex
         .split("")
@@ -264,22 +215,15 @@ const OurEventsCreate = () => {
     const g = parseInt(hex.substring(2, 4), 16) / 255;
     const b = parseInt(hex.substring(4, 6), 16) / 255;
 
-    // Gamma correction (WCAG formula)
     const R = r <= 0.03928 ? r / 12.92 : Math.pow((r + 0.055) / 1.055, 2.4);
     const G = g <= 0.03928 ? g / 12.92 : Math.pow((g + 0.055) / 1.055, 2.4);
     const B = b <= 0.03928 ? b / 12.92 : Math.pow((b + 0.055) / 1.055, 2.4);
 
-    // Calculate luminance
     const luminance = 0.2126 * R + 0.7152 * G + 0.0722 * B;
 
-    // Thresholds:
-    // - < 0.25 is dark    → use white
-    // - > 0.7 is light    → use black
-    // - between           → pick black or white based on which has better contrast
     if (luminance < 0.25) return "white";
     if (luminance > 0.7) return "black";
 
-    // Middle zone — choose best contrast
     const contrastWithWhite = 1.05 / (luminance + 0.05);
     const contrastWithBlack = (luminance + 0.05) / 0.05;
 
@@ -291,34 +235,15 @@ const OurEventsCreate = () => {
     handleInputChange("title_font", font);
   };
 
-  // const handleColorChange = (color: string) => {
-  //   setSelectedColor(color);
-  //   const bgColor = lightenColor(color, 30);
-  //   if (formData.bg_color) {
-  //     setSelectedBgColor("#F8F6F1");
-  //   } else {
-  //     setSelectedBgColor(bgColor);
-  //   }
-
-  //   handleInputChange("accent_color", color);
-  //   handleInputChange("accent_bg", bgColor);
-
-  //   document.documentElement.style.setProperty("--accent-color", color);
-  //   document.documentElement.style.setProperty("--accent-bg", bgColor);
-  // };
-
   const handleColorChange = (color: string) => {
     setSelectedColor(color);
     const bgColor = lightenColor(color, 30);
     if (applyAccentBg) {
-      // If checkbox ON → bg = selected color
       setSelectedBgColor(bgColor);
     } else {
-      // checkbox OFF → bg = transparent
       setSelectedBgColor("#F8F6F1");
     }
 
-    // OPTIONAL: update CSS vars
     document.documentElement.style.setProperty("--accent-color", color);
     document.documentElement.style.setProperty(
       "--accent-bg",
@@ -330,11 +255,9 @@ const OurEventsCreate = () => {
     setApplyAccentBg(checked);
 
     if (checked) {
-      // If turning ON → bg = selectedColor
       setSelectedBgColor(selectedColor);
       document.documentElement.style.setProperty("--accent-bg", selectedColor);
     } else {
-      // If turning OFF → bg transparent
       setSelectedBgColor("#F8F6F1");
       document.documentElement.style.setProperty("--accent-bg", "#F8F6F1");
     }
@@ -353,10 +276,6 @@ const OurEventsCreate = () => {
       setNewTag("");
     }
   };
-
-  // const handleInput = () => {
-  //   setText(ref.current?.innerText || "");
-  // };
 
   const removeTag = (tag: string) => {
     setFormData((prev) => ({
@@ -442,24 +361,6 @@ const OurEventsCreate = () => {
       return;
     }
 
-    // if (!formData.start_date) {
-    //   toast({
-    //     title: "Validation Error",
-    //     description: "Please select event start date.",
-    //     variant: "destructive",
-    //   });
-    //   return;
-    // }
-
-    // if (!formData.start_time) {
-    //   toast({
-    //     title: "Validation Error",
-    //     description: "Please select event start time.",
-    //     variant: "destructive",
-    //   });
-    //   return;
-    // }
-
     if (!formData.start_datetime) {
       toast({
         title: "Validation Error",
@@ -469,25 +370,25 @@ const OurEventsCreate = () => {
       return;
     }
 
-    if (!formData.location_name.trim()) {
-      toast({
-        title: "Validation Error",
-        description: "Event location cannot be empty.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // if (
-    //   new Date(`${formData.start_date}T${formData.start_time}`) < new Date()
-    // ) {
+    // if (!formData.location_name.trim()) {
     //   toast({
     //     title: "Validation Error",
-    //     description: "Event start date and time must be in the future.",
+    //     description: "Event location cannot be empty.",
     //     variant: "destructive",
     //   });
     //   return;
     // }
+
+    if (formData.location_status === "confirmed") {
+      if (!formData.location_name || !formData.location_address) {
+        toast({
+          title: "Validation Error",
+          description: "Event location cannot be empty.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
 
     if (new Date(`${formData.start_datetime}`) < new Date()) {
       toast({
@@ -611,55 +512,14 @@ const OurEventsCreate = () => {
         passwordHashed = await bcrypt.hash(trimmedPassword, salt);
       }
 
-      // const eventDateTime = new Date(
-      //   `${formData.start_date}T${formData.start_time}`
-      // );
-
       const eventDateTime = new Date(formData.start_datetime);
 
       let eventEndDateTime: Date | null = null;
-
-      // if (formData.end_date || formData.end_time) {
-      //   if (!formData.end_date || !formData.end_time) {
-      //     toast({
-      //       title: "Invalid end time",
-      //       description: "Please provide both end date and end time.",
-      //       variant: "destructive",
-      //     });
-      //     return;
-      //   }
-
-      //   const endDateTime = new Date(
-      //     `${formData.end_date}T${formData.end_time}`
-      //   );
-
-      //   if (isNaN(endDateTime.getTime())) {
-      //     toast({
-      //       title: "Invalid date or time format",
-      //       description: "Please ensure the end date and time are valid.",
-      //       variant: "destructive",
-      //     });
-      //     return;
-      //   }
-
-      //   const now = new Date();
-      //   if (endDateTime < now) {
-      //     toast({
-      //       title: "End time in the past",
-      //       description: "End date and time cannot be in the past.",
-      //       variant: "destructive",
-      //     });
-      //     return;
-      //   }
-
-      //   eventEndDateTime = endDateTime;
-      // }
 
       if (formData.end_datetime) {
         const endDateTime = new Date(formData.end_datetime);
         const now = new Date();
 
-        // Validate datetime parsing
         if (isNaN(endDateTime.getTime())) {
           toast({
             title: "Invalid date or time format",
@@ -669,7 +529,6 @@ const OurEventsCreate = () => {
           return;
         }
 
-        // Validate that it’s not in the past
         if (endDateTime <= now) {
           toast({
             title: "End time in the past",
@@ -681,18 +540,6 @@ const OurEventsCreate = () => {
 
         eventEndDateTime = endDateTime;
       }
-
-      // let rsvpDeadline = null;
-
-      // if (formData.rsvp_deadline_date && formData.rsvp_deadline_time) {
-      //   rsvpDeadline = new Date(
-      //     `${formData.rsvp_deadline_date}T${formData.rsvp_deadline_time}`
-      //   );
-      // } else if (formData.rsvp_deadline_date) {
-      //   rsvpDeadline = new Date(`${formData.rsvp_deadline_date}T23:59`);
-      // } else {
-      //   rsvpDeadline = eventDateTime;
-      // }
 
       let rsvpDeadline: Date | null = null;
 
@@ -720,17 +567,20 @@ const OurEventsCreate = () => {
         return;
       }
 
+      const isTBD = formData.location_status === "tbd";
+
       const { data, error } = await supabase
         .from("events")
         .insert({
           creator_id: profile.id,
           guest_user_ids: invitedGuestIds,
           date_time: eventDateTime.toISOString(),
-          location_name: formData.location_name.trim(),
-          location_address: formData.location_address.trim(),
-          location_lng: formData.location_lng,
-          location_lat: formData.location_lat,
-          restaurant_id: formData.restaurant_id || null,
+          location_status: isTBD ? "tbd" : "confirmed",
+          location_name: isTBD ? null : formData.location_name.trim(),
+          location_address: isTBD ? null : formData.location_address.trim(),
+          location_lng: isTBD ? null : formData.location_lng,
+          location_lat: isTBD ? null : formData.location_lat,
+          restaurant_id: isTBD ? null : formData.restaurant_id || null,
           max_attendees: formData.max_attendees,
           status: "active",
           dining_style: formData.dining_style || null,
@@ -769,7 +619,9 @@ const OurEventsCreate = () => {
           eventEndDateTime: eventEndDateTime
             ? eventEndDateTime.toISOString()
             : null,
-          location: `${formData.location_name}, ${formData.location_address}`,
+          location: isTBD
+            ? null
+            : `${formData.location_name}, ${formData.location_address}`,
         } as any)
         .select()
         .single();
@@ -794,7 +646,6 @@ const OurEventsCreate = () => {
         navigate("/events");
         return;
       }
-      // const emails = await getEmailsFromIds(invitedGuestIds);
       await sendEventInvite({
         to: emails,
         subject: "You're Invited to a Secret TableTalk 🍷",
@@ -836,14 +687,6 @@ const OurEventsCreate = () => {
     handleInputChange("eventFeatures", updated);
   };
 
-  // const isFormValid =
-  //   formData.name &&
-  //   formData.description &&
-  //   // formData.start_time &&
-  //   // formData.start_date &&
-  //   formData.start_datetime &&
-  //   formData.location_name &&
-  //   formData.flyer_url;
   if (authLoading || profileLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -874,22 +717,10 @@ const OurEventsCreate = () => {
   }
   const handleAutoGrow = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const el = e.target;
-    el.style.height = "auto"; // reset height
-    el.style.height = `${el.scrollHeight}px`; // grow to fit
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
   };
   return (
-    // <div
-    //   className="min-h-screen bg-background font-serif"
-    //   style={
-    //     selectedColor
-    //       ? ({
-    //           "--accent-bg": lightenColor(selectedBgColor),
-    //           background: "var(--accent-bg)",
-    //           transition: "background 0.5s ease",
-    //         } as React.CSSProperties)
-    //       : ({ transition: "background 0.5s ease" } as React.CSSProperties)
-    //   }
-    // >
     <div
       className="min-h-screen font-serif relative z-0 pt-16"
       style={
@@ -900,7 +731,6 @@ const OurEventsCreate = () => {
         } as React.CSSProperties
       }
     >
-      {/* Fixed top 45vh background image */}
       {formData.flyer_url && (
         <div
           className={`fixed top-0 left-0 w-full z-[-1] transition-opacity duration-500 ease-out ${
@@ -926,7 +756,6 @@ const OurEventsCreate = () => {
         </div>
       )}
 
-      {/* Full-page blurred background color */}
       <div
         className="absolute top-0 left-0 w-full h-full z-[-2]"
         style={{
@@ -1009,10 +838,8 @@ const OurEventsCreate = () => {
                     )}
                   </div>
 
-                  {/* Divider */}
                   <div className="h-px bg-border/40 my-2" />
 
-                  {/* Color Selector */}
                   <div className="flex flex-col gap-1">
                     <Label>Accent Color</Label>
                     {formData.flyer_url ? (
@@ -1061,7 +888,6 @@ const OurEventsCreate = () => {
                           />
                         </div>
 
-                        {/* Color Preview */}
                         {selectedColor && (
                           <>
                             <div className="mt-2 text-xs text-muted-foreground pl-1 flex items-center gap-2">
@@ -1102,31 +928,12 @@ const OurEventsCreate = () => {
                   </div>
                 </CardContent>
               </Card>
-              {/* <Button
-                type="submit"
-                // disabled={!isFormValid || loading}
-                disabled={loading}
-                className="block lg:hidden bg-primary hover:bg-secondary lg:static fixed bottom-4 left-0 right-0 mx-6 lg:mx-0 lg:mt-4"
-                style={
-                  selectedColor
-                    ? {
-                        backgroundColor: selectedColor,
-                        borderColor: selectedColor,
-                      }
-                    : {}
-                }
-              >
-                {loading ? "Creating..." : "Create Event"}
-              </Button> */}
             </div>
 
             <Card className="space-y-2 bg-transparent border-none shadow-none">
               <CardContent className="space-y-6 pt-4">
                 <div className="flex justify-center">
-                  <div
-                    className="flex items-center w-full space-x-1 mt-3 px-1 py-1 
-                       rounded-full backdrop-blur-md bg-white/40" // <- blur + translucent bg
-                  >
+                  <div className="flex items-center w-full space-x-1 mt-3 px-1 py-1 rounded-full backdrop-blur-md bg-white/40">
                     <Button
                       type="button"
                       size="sm"
@@ -1204,12 +1011,7 @@ const OurEventsCreate = () => {
               <CardContent className="space-y-6">
                 <div className="space-y-2">
                   <div className="border-none py-3 px-4 rounded-md flex flex-col sm:flex-row sm:justify-between sm:items-center justify-between items-center bg-transparent backdrop-blur-md bg-white/40">
-                    <Label
-                      htmlFor="start_datetime"
-                      // className="text-sm font-medium"
-                    >
-                      Start
-                    </Label>
+                    <Label htmlFor="start_datetime">Start</Label>
                     <Input
                       id="start_datetime"
                       type="datetime-local"
@@ -1223,54 +1025,6 @@ const OurEventsCreate = () => {
                     />
                   </div>
                 </div>
-                {/* <div className="space-y-2">
-                    <Label htmlFor="start_date">Start date *</Label>
-                    <div className="relative">
-                      <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="start_date"
-                        type="date"
-                        min={today}
-                        value={formData.start_date}
-                        onChange={(e) =>
-                          handleInputChange("start_date", e.target.value)
-                        }
-                        className="pl-10"
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="start_time">Time Start *</Label>
-                    <div className="relative">
-                      <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="start_time"
-                        type="time"
-                        value={formData.start_time}
-                        onChange={(e) =>
-                          handleInputChange("start_time", e.target.value)
-                        }
-                        className="pl-10"
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
-                      />
-                    </div>
-                  </div> */}
 
                 <div className="space-y-2">
                   <div className="border-none py-3 px-4 rounded-md flex flex-col sm:flex-row sm:justify-between sm:items-center justify-between items-center bg-transparent backdrop-blur-md bg-white/40">
@@ -1288,56 +1042,6 @@ const OurEventsCreate = () => {
                   </div>
                 </div>
 
-                {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="end_date">End Date</Label>
-                    <div className="relative">
-                      <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="end_date"
-                        type="date"
-                        min={today}
-                        className="pl-10"
-                        value={formData.end_date}
-                        onChange={(e) =>
-                          handleInputChange("end_date", e.target.value)
-                        }
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="end_time">Time End</Label>
-                    <div className="relative">
-                      <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="end_time"
-                        type="time"
-                        value={formData.end_time}
-                        onChange={(e) =>
-                          handleInputChange("end_time", e.target.value)
-                        }
-                        className="pl-10"
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
-                      />
-                    </div>
-                  </div>
-                </div> */}
-
                 <div className="space-y-2">
                   <div className="border-none py-3 px-4 rounded-md flex flex-col sm:flex-row sm:justify-between sm:items-center justify-between items-center bg-transparent backdrop-blur-md bg-white/40">
                     <Label htmlFor="rsvp_deadline">RSVP Deadline</Label>
@@ -1353,52 +1057,6 @@ const OurEventsCreate = () => {
                     />
                   </div>
                 </div>
-
-                {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="rsvp_deadline_date">
-                      RSVP Deadline Date
-                    </Label>
-                    <Input
-                      id="rsvp_deadline_date"
-                      type="date"
-                      min={today}
-                      value={formData.rsvp_deadline_date}
-                      onChange={(e) =>
-                        handleInputChange("rsvp_deadline_date", e.target.value)
-                      }
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="rsvp_deadline_time">
-                      RSVP Deadline Time
-                    </Label>
-                    <Input
-                      id="rsvp_deadline_time"
-                      type="time"
-                      value={formData.rsvp_deadline_time}
-                      onChange={(e) =>
-                        handleInputChange("rsvp_deadline_time", e.target.value)
-                      }
-                      style={
-                        {
-                          "--accent-bg": lightenColor(selectedColor),
-                          background:
-                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                          transition: "background 0.5s ease",
-                        } as React.CSSProperties
-                      }
-                    />
-                  </div>
-                </div> */}
 
                 <div className="space-y-2">
                   <div className="border-none py-3 px-4 rounded-md flex flex-col sm:flex-row sm:justify-between sm:items-center justify-between items-center bg-transparent backdrop-blur-md bg-white/40">
@@ -1420,23 +1078,6 @@ const OurEventsCreate = () => {
                   </div>
                 </div>
 
-                {/* <div className="space-y-2">
-                  <Label htmlFor="max_attendees">Maximum Attendees *</Label>
-                  <Input
-                    id="max_attendees"
-                    type="number"
-                    min="2"
-                    max="50"
-                    value={formData.max_attendees}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "max_attendees",
-                        parseInt(e.target.value)
-                      )
-                    }
-                    className="bg-transparent bg-transparent backdrop-blur-md bg-white/40"
-                  />
-                </div> */}
                 <div className="space-y-2">
                   <div className="border-none py-3 px-4 rounded-md bg-transparent t backdrop-blur-md bg-white/40">
                     <div className="flex justify-between items-center">
@@ -1532,54 +1173,100 @@ const OurEventsCreate = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="space-y-2 relative">
-                  <Label htmlFor="restaurant">
-                    Choose Restaurant (Optional)
-                  </Label>
-                  <RestaurantSearchDropdown
-                    // style={
-                    //   {
-                    //     background:
-                    //       " bg-transparent backdrop-blur-md bg-white/40",
-                    //     transition: "background 0.5s ease",
-                    //   } as React.CSSProperties
-                    // }
-                    className="border-none bg-transparent backdrop-blur-md bg-white/40 hover:bg-transparent text-black placeholder:text-black"
-                    placeholder="Search and select a restaurant"
-                    restaurants={restaurants}
-                    value={formData.restaurant_id}
-                    onSelect={(restaurant: Restaurant | null) => {
-                      if (restaurant) {
-                        handleInputChange("restaurant_id", restaurant.id);
-                        handleInputChange("location_name", restaurant.name);
+                <div className="border-none px-4 py-2 rounded-md bg-transparent backdrop-blur-md bg-white/40">
+                  <div className="flex justify-between items-center">
+                    <Label
+                      htmlFor="location_now"
+                      className="flex items-center gap-2"
+                    >
+                      Set Location Now
+                      <InfoTooltip content="Set the location of the event now" />
+                    </Label>
+                    <Checkbox
+                      id="location_now"
+                      checked={formData.location_status === "confirmed"}
+                      onCheckedChange={(checked) =>
                         handleInputChange(
-                          "location_lat",
-                          restaurant.latitude.toString(),
-                        );
-                        handleInputChange(
-                          "location_lng",
-                          restaurant.longitude.toString(),
-                        );
-                        handleInputChange(
-                          "location_address",
-                          restaurant.full_address,
-                        );
-                      } else {
-                        handleInputChange("restaurant_id", "");
-                        handleInputChange("location_name", "");
-                        handleInputChange("location_address", "");
-                        handleInputChange("location_lat", "");
-                        handleInputChange("location_lng", "");
+                          "location_status",
+                          checked ? "confirmed" : "tbd",
+                        )
                       }
-                    }}
-                  />
+                    />
+                  </div>
+                  {/* <div className="flex items-center gap-4 px-6">
+                    <button
+                      type="button"
+                      onClick={() => setLocationMode("now")}
+                      className={`px-4 py-2 rounded-md ${
+                        locationMode === "now"
+                          ? "bg-primary text-white"
+                          : "bg-gray-200 text-black"
+                      }`}
+                    >
+                      Set Location Now
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setLocationMode("tbd")}
+                      className={`px-4 py-2 rounded-md ${
+                        locationMode === "tbd"
+                          ? "bg-primary text-white"
+                          : "bg-gray-200 text-black"
+                      }`}
+                    >
+                      Decide Later (TBD)
+                    </button>
+                  </div> */}
+                  {formData.location_status === "confirmed" && (
+                    <div className="rounded-md mt-2 px-4 py-3">
+                      <div className="space-y-2 relative">
+                        <Label htmlFor="restaurant">
+                          Choose Restaurant (Optional)
+                        </Label>
+                        <RestaurantSearchDropdown
+                          className="border-none bg-transparent backdrop-blur-md bg-white/40 hover:bg-transparent text-black placeholder:text-black"
+                          placeholder="Search and select a restaurant"
+                          restaurants={restaurants}
+                          value={formData.restaurant_id}
+                          onSelect={(restaurant: Restaurant | null) => {
+                            if (restaurant) {
+                              handleInputChange("restaurant_id", restaurant.id);
+                              handleInputChange(
+                                "location_name",
+                                restaurant.name,
+                              );
+                              handleInputChange(
+                                "location_lat",
+                                restaurant.latitude.toString(),
+                              );
+                              handleInputChange(
+                                "location_lng",
+                                restaurant.longitude.toString(),
+                              );
+                              handleInputChange(
+                                "location_address",
+                                restaurant.full_address,
+                              );
+                            } else {
+                              handleInputChange("restaurant_id", "");
+                              handleInputChange("location_name", "");
+                              handleInputChange("location_address", "");
+                              handleInputChange("location_lat", "");
+                              handleInputChange("location_lng", "");
+                            }
+                          }}
+                        />
+                      </div>
+                      <GooglePlacesEventsForm
+                        required={true}
+                        className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black text-black"
+                        formData={formData}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                  )}
                 </div>
-                <GooglePlacesEventsForm
-                  required={true}
-                  className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black text-black"
-                  formData={formData}
-                  onChange={handleInputChange}
-                />
               </CardContent>
             </Card>
 
@@ -1753,9 +1440,7 @@ const OurEventsCreate = () => {
                   </div>
                   {formData.features && (
                     <div className="space-y-4 mt-2 rounded-lg py-3">
-                      {/* Empty state */}
                       {formData.eventFeatures.length === 0 ? (
-                        // <div className="flex justify-between items-center border rounded-lg px-4 py-3">
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-none rounded-lg px-4 py-3 gap-2 sm:gap-0 bg-transparent backdrop-blur-md bg-white/10">
                           <p className="text-sm text-muted-foreground italic">
                             No event features added yet.
@@ -1768,7 +1453,6 @@ const OurEventsCreate = () => {
                               setEditFeatureIndex(null);
                               setShowFeatures(true);
                             }}
-                            // className="rounded-full"
                             className="border-none rounded-full mt-2 sm:mt-0 flex flex-wrap justify-center items-center bg-transparent hover:bg-transparent backdrop-blur-md bg-white/20"
                           >
                             <PlusCircle className="w-4 h-4 mr-1" />
@@ -1783,7 +1467,6 @@ const OurEventsCreate = () => {
                                 key={i}
                                 className="bg-transparent backdrop-blur-md bg-white/10 border-none rounded-xl p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center hover:shadow-md transition-all"
                               >
-                                {/* Feature content */}
                                 <div className="flex items-center space-x-4">
                                   <img
                                     src={feature.image || "/placeholder.png"}
@@ -1797,26 +1480,11 @@ const OurEventsCreate = () => {
                                     <h3 className="font-semibold text-lg">
                                       {feature.title || "Untitled Feature"}
                                     </h3>
-                                    {/* {feature.description && (
-                                      <p className="text-sm text-muted-foreground line-clamp-2">
-                                        {feature.description}
-                                      </p>
-                                    )} */}
-                                    {/* {feature.url && (
-                                      <Link
-                                        to={feature.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-xs text-blue-600 hover:underline break-all"
-                                      >
-                                        {feature.url}
-                                      </Link>
-                                    )} */}
+
                                     {feature.start_date &&
                                       feature.start_time && (
                                         <div className="text-xs text-muted-foreground mt-1">
                                           {(() => {
-                                            // Parse dates/times safely
                                             const start = new Date(
                                               `${feature.start_date}T${feature.start_time}`,
                                             );
@@ -1828,7 +1496,6 @@ const OurEventsCreate = () => {
                                                   )
                                                 : null;
 
-                                            // Format like 28/10 04:23pm
                                             const formatDateTime = (
                                               dt: Date,
                                             ) => {
@@ -1861,7 +1528,6 @@ const OurEventsCreate = () => {
                                   </div>
                                 </div>
 
-                                {/* Action buttons */}
                                 <div className="flex justify-center  items-center gap-2 mt-2 sm:mt-0 sm:justify-start">
                                   <Button
                                     size="icon"
@@ -1887,7 +1553,6 @@ const OurEventsCreate = () => {
                             ))}
                           </div>
 
-                          {/* Add Feature CTA */}
                           <div className="flex justify-center">
                             <Button
                               variant="outline"
@@ -1897,7 +1562,6 @@ const OurEventsCreate = () => {
                                 setEditFeatureIndex(null);
                                 setShowFeatures(true);
                               }}
-                              // className="rounded-full mt-2"
                               className="rounded-full mt-2 sm:mt-0 flex flex-wrap justify-center items-center bg-transparent hover:bg-transparent border-none"
                             >
                               <Plus className="w-4 h-4" />
@@ -1930,12 +1594,7 @@ const OurEventsCreate = () => {
                   </div>
 
                   {formData.tiktok && (
-                    // <div
-                    //   className="bg-transparent backdrop-blur-md bg-white/40 rounded-md mt-2 px-4 py-3"
-                    // >
                     <div className="space-y-2">
-                      {/* <Label htmlFor="tiktokLink">Link for TikTok *</Label> */}
-                      {/* <div className="relative"> */}
                       <Input
                         id="tiktokLink"
                         type="url"
@@ -1947,8 +1606,6 @@ const OurEventsCreate = () => {
                         className="border-none bg-transparent backdrop-blur-md bg-white/10 mt-2 placeholder:text-black placeholder:text-sm placeholder:font-medium focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
                       />
                     </div>
-                    // </div>
-                    // </div>
                   )}
                 </div>
 
@@ -2081,15 +1738,6 @@ const OurEventsCreate = () => {
                     onClick={addTag}
                     variant="outline"
                     className="bg-transparent backdrop-blur-md bg-white/40 hover:bg-white/40 border-none"
-                    // style={
-                    //   selectedColor
-                    //     ? {
-                    //         backgroundColor: selectedColor,
-                    //         borderColor: selectedColor,
-                    //         color: getContrastColor(selectedColor)
-                    //       }
-                    //     : {}
-                    // }
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
@@ -2101,8 +1749,6 @@ const OurEventsCreate = () => {
                         key={tag}
                         variant="secondary"
                         className="cursor-pointer bg-transparent backdrop-blur-md bg-white/40"
-
-                        // onClick={() => removeTag(tag)}
                       >
                         {tag}
                         <span className="" onClick={() => removeTag(tag)}>
@@ -2176,8 +1822,6 @@ const OurEventsCreate = () => {
             </Card>
           </div>
 
-          {/* <div className="lg:w-1/3 flex flex-col space-y-4 lg:sticky lg:top-1 lg:translate-y-[1%] self-start"> */}
-          {/* <div className="flex flex-col space-y-4 order-1 lg:order-2 lg:w-1/3 lg:sticky lg:top-1 lg:translate-y-[1%] self-start"> */}
           <div className="lg:w-1/3 flex flex-col space-y-4 lg:sticky lg:top-6 lg:self-start order-last lg:order-none hidden lg:flex">
             <FlyerUpload
               value={formData.flyer_url}
@@ -2189,7 +1833,6 @@ const OurEventsCreate = () => {
               </CardHeader>
 
               <CardContent className="space-y-4">
-                {/* Font Selector */}
                 <div className="flex flex-col gap-1">
                   <Label>Title Font</Label>
                   <Select
@@ -2233,10 +1876,8 @@ const OurEventsCreate = () => {
                   )}
                 </div>
 
-                {/* Divider */}
                 <div className="h-px bg-border/40 my-2" />
 
-                {/* Color Selector */}
                 <div className="flex flex-col gap-1">
                   <Label>Accent Color</Label>
                   {formData.flyer_url ? (
@@ -2260,10 +1901,7 @@ const OurEventsCreate = () => {
                             }}
                           />
                         ))}
-                        {/* Custom Picker */}
-                        {/* <Label className="w-7 h-7 rounded-md border flex items-center justify-center text-xs text-muted-foreground cursor-pointer hover:bg-primary transition">
-                      +
-                    </Label> */}
+
                         <div
                           className="w-8 h-8 rounded-md border cursor-pointer shadow-sm hover:ring-2 hover:ring-primary transition-all"
                           style={{ backgroundColor: selectedColor }}
@@ -2287,36 +1925,7 @@ const OurEventsCreate = () => {
                           }}
                           className="hidden"
                         />
-
-                        {/* <div className="flex items-center gap-3">
-                      <label
-                        htmlFor="color-picker"
-                        className="text-sm font-medium"
-                      >
-                        Choose Color:
-                      </label>
-                      <div
-                        className="w-8 h-8 rounded-md border cursor-pointer shadow-sm hover:ring-2 hover:ring-primary transition-all"
-                        style={{ backgroundColor: selectedColor }}
-                        onClick={() =>
-                          document.getElementById("color-picker").click()
-                        }
-                      ></div>
-                      <input
-                        id="color-picker"
-                        type="color"
-                        value={selectedColor}
-                        onChange={(e) => {
-                          setSelectedColor(e.target.value);
-                          handleColorChange(e.target.value);
-                          handleInputChange("color", e.target.value);
-                        }}
-                        className="hidden"
-                      />
-                    </div> */}
                       </div>
-
-                      {/* Color Preview */}
                       {selectedColor && (
                         <>
                           <div className="mt-2 text-xs text-muted-foreground pl-1 flex items-center gap-2">
@@ -2394,12 +2003,9 @@ const OurEventsCreate = () => {
         <RecurringEventDialog
           open={showRecurringDialog}
           onClose={() => {
-            // when dialog closes, keep it "Yes"
             setShowRecurringDialog(false);
             handleInputChange("recurring", true);
           }}
-          // start_date={formData.start_date}
-          // start_time={formData.start_time}
           start_time={formData.start_datetime}
           onSubmit={(data) => {
             handleInputChange("recurrenceDates", data);

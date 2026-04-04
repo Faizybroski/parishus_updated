@@ -100,6 +100,7 @@ const EventEdit = () => {
     start_datetime: "",
     location_name: "",
     location_address: "",
+    location_status: "confirmed",
     location_lat: "",
     location_lng: "",
     restaurant_id: "",
@@ -241,23 +242,18 @@ const EventEdit = () => {
         // start_date: eventDate.toISOString().split("T")[0],
         // start_time: eventDate.toTimeString().slice(0, 5),
         start_datetime: eventDate.toISOString().slice(0, 16),
-        location_name: data.location_name.trim() || "",
-        location_address: data.location_address.trim() || "",
-        location_lat: data.location_lat || "",
-        location_lng: data.location_lng || "",
-        restaurant_id: data.restaurant_id || "",
+        location_name: data.location_name?.trim() || null,
+        location_address: data.location_address?.trim() || null,
+        location_lat: data.location_lat || null,
+        location_lng: data.location_lng || null,
+        location_status: data.location_status || "confirmed",
+        restaurant_id: data.restaurant_id || null,
         max_attendees: data.max_attendees || 10,
         dining_style: data.dining_style || "",
         dietary_theme: data.dietary_theme || "",
         guest_invitation_type: data.guest_invitation_type,
         is_paid: data.is_paid,
         event_fee: data.event_fee,
-        // rsvp_deadline_date: rsvpDeadline
-        //   ? rsvpDeadline.toISOString().split("T")[0]
-        //   : "",
-        // rsvp_deadline_time: rsvpDeadline
-        //   ? rsvpDeadline.toTimeString().slice(0, 5)
-        //   : "",
         rsvp_deadline: rsvpDeadline
           ? rsvpDeadline.toISOString().slice(0, 16)
           : "",
@@ -270,12 +266,6 @@ const EventEdit = () => {
         imageGalleryLinks: data.imageGalleryLinks || [],
         recurring: data.recurrence || false,
         recurrenceDates: data.recurrence_dates || [],
-        // end_date: eventEndDateTime
-        //   ? eventEndDateTime.toISOString().split("T")[0]
-        //   : "",
-        // end_time: eventEndDateTime
-        //   ? eventEndDateTime.toTimeString().slice(0, 5)
-        //   : "",
         end_datetime: eventEndDateTime
           ? eventEndDateTime.toISOString().slice(0, 16)
           : "",
@@ -516,13 +506,24 @@ const EventEdit = () => {
       return;
     }
 
-    if (!formData.location_name.trim()) {
-      toast({
-        title: "Validation Error",
-        description: "Event location cannot be empty.",
-        variant: "destructive",
-      });
-      return;
+    // if (!formData.location_name.trim()) {
+    //   toast({
+    //     title: "Validation Error",
+    //     description: "Event location cannot be empty.",
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
+
+    if (formData.location_status === "confirmed") {
+      if (!formData.location_name || !formData.location_address) {
+        toast({
+          title: "Validation Error",
+          description: "Event location cannot be empty.",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     // if (
@@ -779,6 +780,7 @@ const EventEdit = () => {
           location_address: formData.location_address,
           location_lng: formData.location_lng,
           location_lat: formData.location_lat,
+          location_status: formData.location_status,
           restaurant_id: formData.restaurant_id || null,
           max_attendees: formData.max_attendees,
           status: "active",
@@ -818,7 +820,10 @@ const EventEdit = () => {
           eventEndDateTime: eventEndDateTime
             ? eventEndDateTime.toISOString()
             : null,
-          location: `${formData.location_name}, ${formData.location_address}`,
+          location:
+            formData.location_status === "confirmed"
+              ? `${formData.location_name}, ${formData.location_address}`
+              : null,
         } as any)
         .eq("id", eventId);
 
@@ -1568,7 +1573,101 @@ const EventEdit = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="space-y-2 relative">
+                <div className="border-none px-4 py-2 rounded-md bg-transparent backdrop-blur-md bg-white/40">
+                  <div className="flex justify-between items-center">
+                    <Label
+                      htmlFor="location_now"
+                      className="flex items-center gap-2"
+                    >
+                      Set Location Now
+                      <InfoTooltip content="Set the location of the event now" />
+                    </Label>
+                    <Checkbox
+                      id="location_now"
+                      checked={formData.location_status === "confirmed"}
+                      onCheckedChange={(checked) =>
+                        handleInputChange(
+                          "location_status",
+                          checked ? "confirmed" : "tbd",
+                        )
+                      }
+                    />
+                  </div>
+                  {/* <div className="flex items-center gap-4 px-6">
+                                    <button
+                                      type="button"
+                                      onClick={() => setLocationMode("now")}
+                                      className={`px-4 py-2 rounded-md ${
+                                        locationMode === "now"
+                                          ? "bg-primary text-white"
+                                          : "bg-gray-200 text-black"
+                                      }`}
+                                    >
+                                      Set Location Now
+                                    </button>
+                
+                                    <button
+                                      type="button"
+                                      onClick={() => setLocationMode("tbd")}
+                                      className={`px-4 py-2 rounded-md ${
+                                        locationMode === "tbd"
+                                          ? "bg-primary text-white"
+                                          : "bg-gray-200 text-black"
+                                      }`}
+                                    >
+                                      Decide Later (TBD)
+                                    </button>
+                                  </div> */}
+                  {formData.location_status === "confirmed" && (
+                    <div className="rounded-md mt-2 px-4 py-3">
+                      <div className="space-y-2 relative">
+                        <Label htmlFor="restaurant">
+                          Choose Restaurant (Optional)
+                        </Label>
+                        <RestaurantSearchDropdown
+                          className="border-none bg-transparent backdrop-blur-md bg-white/40 hover:bg-transparent text-black placeholder:text-black"
+                          placeholder="Search and select a restaurant"
+                          restaurants={restaurants}
+                          value={formData.restaurant_id}
+                          onSelect={(restaurant: Restaurant | null) => {
+                            if (restaurant) {
+                              handleInputChange("restaurant_id", restaurant.id);
+                              handleInputChange(
+                                "location_name",
+                                restaurant.name,
+                              );
+                              handleInputChange(
+                                "location_lat",
+                                restaurant.latitude.toString(),
+                              );
+                              handleInputChange(
+                                "location_lng",
+                                restaurant.longitude.toString(),
+                              );
+                              handleInputChange(
+                                "location_address",
+                                restaurant.full_address,
+                              );
+                            } else {
+                              handleInputChange("restaurant_id", "");
+                              handleInputChange("location_name", "");
+                              handleInputChange("location_address", "");
+                              handleInputChange("location_lat", "");
+                              handleInputChange("location_lng", "");
+                            }
+                          }}
+                        />
+                      </div>
+                      <GooglePlacesEventsForm
+                        required={true}
+                        className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black text-black"
+                        formData={formData}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                  )}
+                </div>
+                {/* <div className="space-y-2 relative">
                   <Label htmlFor="restaurant">
                     Choose Restaurant (Optional)
                   </Label>
@@ -1615,7 +1714,7 @@ const EventEdit = () => {
                   className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black text-black focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
                   formData={formData}
                   onChange={handleInputChange}
-                />
+                /> */}
               </CardContent>
             </Card>
 

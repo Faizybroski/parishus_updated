@@ -22,10 +22,8 @@ import { sendEventInvite } from "@/lib/sendInvite";
 import { sendRSVPedEmail } from "@/lib/sendRSVPedEmail";
 import { generateTrackCode } from "@/utils/generateTrackCode";
 import { generateQRCodeDataURL } from "@/utils/generateQRCode";
-import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import {
-  Calendar,
   Clock,
   CreditCard,
   Upload,
@@ -35,7 +33,6 @@ import {
   ArrowLeft,
   ArrowRight,
   Loader2,
-  ChevronLeft,
   MapPin,
   Share2,
   Hourglass,
@@ -49,13 +46,7 @@ import MapContainer from "@/components/map/MapContainer";
 import { Input } from "@/components/ui/input";
 import bcrypt from "bcryptjs";
 import { Swiper, SwiperSlide } from "swiper/react";
-import {
-  Autoplay,
-  Navigation,
-  Pagination,
-  EffectFade,
-  EffectCreative,
-} from "swiper/modules";
+import { Navigation, Pagination, EffectFade } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-fade";
 import "swiper/css/pagination";
@@ -73,6 +64,7 @@ interface Event {
   location_lat: string;
   restaurant_id: string | null;
   max_attendees: number;
+  location_status: string;
   dining_style: string;
   dietary_theme: string;
   event_fee: number | null;
@@ -226,7 +218,7 @@ const OurEventDetails = () => {
     const url = event?.cover_photo_url;
     if (!url) return;
 
-    setIsLoaded(false); // optional: reset when URL changes
+    setIsLoaded(false);
 
     const img = new Image();
     img.crossOrigin = "anonymous";
@@ -258,7 +250,7 @@ const OurEventDetails = () => {
         variant: "destructive",
       });
     } else {
-      setIsInterested((prev) => !prev); // optimistic toggle
+      setIsInterested((prev) => !prev);
     }
   };
 
@@ -475,199 +467,6 @@ const OurEventDetails = () => {
     }
   };
 
-  //   const handleRSVP = async () => {
-  //   if (!user || !userProfileId || !event) return;
-
-  //   const hasRSVP = (event.rsvps || []).some(
-  //     (rsvp) => rsvp.user_id === userProfileId
-  //   );
-
-  //   const userConfirmed = await new Promise((resolve) => {
-  //     toast({
-  //       title: hasRSVP ? "Cancel your RSVP?" : "Confirm RSVP?",
-  //       description: hasRSVP
-  //         ? "Are you sure you want to cancel your RSVP?"
-  //         : "Do you want to RSVP to this event?",
-  //       action: (
-  //         <div className="flex gap-2">
-  //           <Button onClick={() => resolve(true)}>Yes</Button>
-  //           <Button variant="outline" onClick={() => resolve(false)}>No</Button>
-  //         </div>
-  //       ),
-  //     });
-  //   });
-
-  //   if (!userConfirmed) return;
-
-  //   try {
-  //     if (hasRSVP) {
-  //       const { error } = await supabase
-  //         .from("rsvps")
-  //         .delete()
-  //         .eq("event_id", eventId)
-  //         .eq("user_id", userProfileId);
-  //       if (error) throw error;
-
-  //       const { error: reservationError } = await supabase
-  //         .from("reservations")
-  //         .delete()
-  //         .eq("event_id", eventId)
-  //         .eq("user_id", userProfileId);
-  //       if (reservationError) throw reservationError;
-
-  //       const { error: paymentUpdateError } = await supabase
-  //         .from("events_payments")
-  //         .update({ payment_status: "refunded" })
-  //         .eq("event_id", eventId)
-  //         .eq("creator_id", profile.user_id);
-  //       if (paymentUpdateError) {
-  //         console.error(
-  //           "Failed to update payment status:",
-  //           paymentUpdateError.message
-  //         );
-  //       }
-
-  //       toast({
-  //         title: "RSVP Cancelled",
-  //         description: "You're no longer attending this event.",
-  //       });
-  //     } else {
-  //       const { error: rsvpError } = await supabase
-  //         .from("rsvps")
-  //         .insert({
-  //           event_id: eventId,
-  //           user_id: userProfileId,
-  //           status: "confirmed",
-  //         });
-  //       if (rsvpError) throw rsvpError;
-
-  //       const { error: reservationError } = await supabase
-  //         .from("reservations")
-  //         .insert({
-  //           event_id: eventId,
-  //           user_id: userProfileId,
-  //           reservation_type: "standard",
-  //           reservation_status: "confirmed",
-  //         });
-  //       if (reservationError) throw reservationError;
-
-  //       const { data: eventData, error: eventError } = await supabase
-  //         .from("events")
-  //         .select("location_name")
-  //         .eq("id", eventId)
-  //         .single();
-  //       if (eventError) throw eventError;
-
-  //       const locationName = eventData?.location_name;
-
-  //       const { data: restaurantData, error: restaurantError } = await supabase
-  //         .from("restaurants")
-  //         .select("*")
-  //         .eq("name", locationName)
-  //         .single();
-  //       if (restaurantError) throw restaurantError;
-
-  //       const {
-  //         id: restaurant_id,
-  //         name: restaurant_name,
-  //         longitude: restaurant_long,
-  //         latitude: restaurant_lat,
-  //       } = restaurantData;
-
-  //       const { data: visit, error: visitError } = await supabase
-  //         .from("restaurant_visits")
-  //         .insert({
-  //           user_id: user.id,
-  //           restaurant_id,
-  //           restaurant_name,
-  //           latitude: restaurant_long,
-  //           longitude: restaurant_lat,
-  //           visited_at: new Date().toISOString(),
-  //         })
-  //         .select()
-  //         .single();
-  //       if (visitError) throw visitError;
-
-  //       const { data: sameRestaurantVisits } = await supabase
-  //         .from("restaurant_visits")
-  //         .select("user_id")
-  //         .eq("restaurant_id", restaurant_id)
-  //         .neq("user_id", userProfileId);
-
-  //       for (const match of sameRestaurantVisits || []) {
-  //         const otherUserId = match.user_id;
-  //         const userAId =
-  //           userProfileId < otherUserId ? userProfileId : otherUserId;
-  //         const userBId =
-  //           userProfileId < otherUserId ? otherUserId : user.id;
-
-  //         const { data: existingCrossedPath } = await supabase
-  //           .from("crossed_paths_log")
-  //           .select("*")
-  //           .eq("user_a_id", userAId)
-  //           .eq("user_b_id", userBId)
-  //           .eq("restaurant_id", restaurant_id)
-  //           .single();
-
-  //         if (existingCrossedPath) {
-  //           await supabase
-  //             .from("crossed_paths_log")
-  //             .update({
-  //               cross_count: existingCrossedPath.cross_count + 1,
-  //               updated_at: new Date().toISOString(),
-  //             })
-  //             .eq("id", existingCrossedPath.id);
-  //         } else {
-  //           await supabase.from("crossed_paths_log").insert({
-  //             user_a_id: userAId,
-  //             user_b_id: userBId,
-  //             restaurant_id,
-  //             restaurant_name,
-  //             location_lat: restaurant_long,
-  //             location_lng: restaurant_lat,
-  //             cross_count: 1,
-  //           });
-
-  //           const { data: existingPath } = await supabase
-  //             .from("crossed_paths")
-  //             .select("*")
-  //             .eq("user1_id", userAId)
-  //             .eq("user2_id", userBId)
-  //             .single();
-
-  //           if (!existingPath) {
-  //             await supabase.from("crossed_paths").insert({
-  //               user1_id: userAId,
-  //               user2_id: userBId,
-  //               location_name: restaurant_name,
-  //               location_lat: restaurant_long,
-  //               location_lng: restaurant_lat,
-  //               is_active: true,
-  //             });
-  //           }
-  //         }
-  //       }
-
-  //       toast({
-  //         title: "RSVP Confirmed!",
-  //         description: "You're now attending this event.",
-  //       });
-
-  //       navigate("/rsvp-success");
-  //     }
-
-  //     fetchEvent(); // Refresh event data after all operations
-
-  //   } catch (error) {
-  //     console.error("Error handling RSVP:", error);
-  //     toast({
-  //       title: "Error",
-  //       description: "Failed to update RSVP",
-  //       variant: "destructive",
-  //     });
-  //   }
-  // };
-
   const handleRSVP = async () => {
     if (!user || !userProfileId || !event) {
       toast({
@@ -682,10 +481,9 @@ const OurEventDetails = () => {
   };
 
   const confirmRSVP = async () => {
-    setShowRSVPConfirm(false); // Hide Modal
+    setShowRSVPConfirm(false);
     try {
       setLoadingStatus(true);
-      // --- Send Email via Supabase Edge Function ---
       if (invitedUser?.email) {
         const inviterName = `${profile?.first_name} ${profile?.last_name}`;
         const profileSlug = profile.email.split("@")[0];
@@ -740,7 +538,6 @@ const OurEventDetails = () => {
         });
       }
 
-      // --- Store Notification in DB ---
       if (invitedUser?.id) {
         await supabase.from("notifications").insert({
           title: "Invited to event",
@@ -750,10 +547,6 @@ const OurEventDetails = () => {
           is_read: false,
         });
       }
-      // --- Same Supabase Logic Here --- (No Changes)
-      // If hasRSVP => cancel RSVP flow
-      // Else => RSVP, Reservations, Crossed Paths etc.
-      // ... (Keep it as is)
 
       const hasRSVP = (event.rsvps || []).some(
         (rsvp) => rsvp.user_id === userProfileId,
@@ -791,46 +584,6 @@ const OurEventDetails = () => {
           description: "You're no longer attending this event.",
         });
       } else {
-        // NOTE: Free user RSVP limit validation commented out
-        // if (
-        //   subscriptionStatus === "free" &&
-        //   (!event.event_fee || event.event_fee == 0)
-        // ) {
-        //   const startOfMonth = new Date();
-        //   startOfMonth.setDate(1);
-        //   startOfMonth.setHours(0, 0, 0, 0);
-        //
-        //   const { count, error } = await supabase
-        //     .from("rsvps")
-        //     .select("*", { count: "exact", head: true })
-        //     .eq("user_id", userProfileId)
-        //     .eq("status", "confirmed")
-        //     .gte("created_at", startOfMonth.toISOString());
-        //
-        //   if (error) {
-        //     console.error("Failed to fetch RSVP count", error.message);
-        //     toast({
-        //       title: "Error",
-        //       description: "Couldn't check your RSVP limit. Try again.",
-        //       variant: "destructive",
-        //     });
-        //     return;
-        //   }
-        //
-        //   if (count >= 2) {
-        //     toast({
-        //       title: "RSVP Limit Reached",
-        //       description:
-        //         "Free users can RSVP to only 2 free events per month.",
-        //       variant: "destructive",
-        //     });
-        //     setTimeout(() => {
-        //       navigate("/subscription");
-        //     }, 1500);
-        //     return;
-        //   }
-        // }
-
         if (event.is_password_protected) {
           const correctPassword = await bcrypt.compare(
             password.trim(),
@@ -967,13 +720,13 @@ const OurEventDetails = () => {
               }
             }
           }
-
-          // Send RSVP email (free event — send immediately after RSVP)
           try {
             const ownerProfile = event.profiles;
             await sendRSVPedEmail({
               rsvpedUserEmail: profile?.email || user?.email || "",
-              rsvpedUserName: `${profile?.first_name || ""} ${profile?.last_name || ""}`.trim() || "Guest",
+              rsvpedUserName:
+                `${profile?.first_name || ""} ${profile?.last_name || ""}`.trim() ||
+                "Guest",
               eventName: event.name,
               eventDateTime: event.date_time,
               eventLocation: event.location_name || event.location || "",
@@ -983,7 +736,9 @@ const OurEventDetails = () => {
               isPaid: false,
               paymentStatus: "unpaid",
               organizerEmail: ownerProfile?.email || "",
-              organizerName: `${ownerProfile?.first_name || ""} ${ownerProfile?.last_name || ""}`.trim() || "Event Owner",
+              organizerName:
+                `${ownerProfile?.first_name || ""} ${ownerProfile?.last_name || ""}`.trim() ||
+                "Event Owner",
             });
           } catch (emailErr) {
             console.error("Failed to send RSVP email:", emailErr);
@@ -1121,12 +876,13 @@ const OurEventDetails = () => {
             }
           }
 
-          // Send RSVP email (free event — send immediately after RSVP)
           try {
             const ownerProfile2 = event.profiles;
             await sendRSVPedEmail({
               rsvpedUserEmail: profile?.email || user?.email || "",
-              rsvpedUserName: `${profile?.first_name || ""} ${profile?.last_name || ""}`.trim() || "Guest",
+              rsvpedUserName:
+                `${profile?.first_name || ""} ${profile?.last_name || ""}`.trim() ||
+                "Guest",
               eventName: event.name,
               eventDateTime: event.date_time,
               eventLocation: event.location_name || event.location || "",
@@ -1136,7 +892,9 @@ const OurEventDetails = () => {
               isPaid: false,
               paymentStatus: "unpaid",
               organizerEmail: ownerProfile2?.email || "",
-              organizerName: `${ownerProfile2?.first_name || ""} ${ownerProfile2?.last_name || ""}`.trim() || "Event Owner",
+              organizerName:
+                `${ownerProfile2?.first_name || ""} ${ownerProfile2?.last_name || ""}`.trim() ||
+                "Event Owner",
             });
           } catch (emailErr) {
             console.error("Failed to send RSVP email:", emailErr);
@@ -1199,7 +957,6 @@ const OurEventDetails = () => {
           <Button
             variant="outline"
             onClick={() => {
-              // just dismiss toast
               toast({
                 title: "Cancelled",
                 description: "Event deletion cancelled.",
@@ -1221,7 +978,6 @@ const OurEventDetails = () => {
         url: window.location.origin + `/event/${event?.id}/details`,
       });
     } catch (error) {
-      // Fallback to copying URL
       navigator.clipboard.writeText(
         window.location.origin + `/event/${eventId}/details`,
       );
@@ -1297,14 +1053,13 @@ const OurEventDetails = () => {
             backgroundPosition: "top",
             backgroundRepeat: "no-repeat",
             zIndex: -1,
-            // Remove blur here since we want the background color to blur
           }}
         >
           <div className="absolute inset-0 backdrop-blur-lg"></div>
           <div
             className="absolute bottom-0 w-full"
             style={{
-              height: "50vh", // adjust how gradual the fade is
+              height: "50vh",
               background: `linear-gradient(to bottom, rgba(255,255,255,0) 0%, var(--accent-bg) 100%)`,
             }}
           />
@@ -1420,7 +1175,6 @@ const OurEventDetails = () => {
               <div className="border-t border-gray-300 mx-6" />
               <CardHeader>
                 <div className="flex flex-wrap items-center justify-between gap-y-1.5 lg:gap-y-2">
-                  {/* LEFT SIDE */}
                   <div className="flex items-center gap-3 min-w-0">
                     <Avatar className="h-10 w-10 sm:h-12 sm:w-12">
                       <AvatarImage src={event.profiles.profile_photo_url} />
@@ -1443,7 +1197,6 @@ const OurEventDetails = () => {
                     </span>
                   </div>
 
-                  {/* RIGHT SIDE */}
                   <div className="flex items-center space-x-2 flex-shrink-0">
                     {!isCreator && isBeforeDeadline && (
                       <Button
@@ -1533,16 +1286,18 @@ const OurEventDetails = () => {
                   {event.name}
                 </div>
                 <div>
-                  <Link
-                    to={`https://www.google.com/maps?q=${encodeURIComponent(
-                      `${event.location_name}, ${event.location_address}`,
-                    )}`}
-                    className="text-[1.2rem] font-semibold"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {event.location_name}
-                  </Link>
+                  {event.location_status === "confirmed" && (
+                    <Link
+                      to={`https://www.google.com/maps?q=${encodeURIComponent(
+                        `${event.location_name}, ${event.location_address}`,
+                      )}`}
+                      className="text-[1.2rem] font-semibold"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {event.location_name}
+                    </Link>
+                  )}
                 </div>
                 <div className="flex flex-wrap items-center gap-2 text-[1.1rem] sm:text-[1.2rem] font-semibold leading-snug">
                   <span>
@@ -1599,31 +1354,39 @@ const OurEventDetails = () => {
                   <div className="flex items-center space-x-3">
                     <MapPin className="h-5 w-5 " />
                     <div>
-                      <p className="font-medium">
-                        <Link
-                          to={`https://www.google.com/maps?q=${encodeURIComponent(
-                            `${event.location_name}, ${event.location_address}`,
-                          )}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {event.location_name}
-                        </Link>
-                      </p>
+                      <>
+                        {event.location_status === "confirmed" && (
+                          <p className="font-medium">
+                            <Link
+                              to={`https://www.google.com/maps?q=${encodeURIComponent(
+                                `${event.location_name}, ${event.location_address}`,
+                              )}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {event.location_name}
+                            </Link>
+                          </p>
+                        )}
 
-                      {event.location_address && (
-                        <p className="text-sm ">
-                          <Link
-                            to={`https://www.google.com/maps?q=${encodeURIComponent(
-                              `${event.location_name}, ${event.location_address}`,
-                            )}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            {event.location_address}
-                          </Link>
-                        </p>
-                      )}
+                        {event.location_status === "confirmed" &&
+                          event.location_address && (
+                            <p className="text-sm ">
+                              <Link
+                                to={`https://www.google.com/maps?q=${encodeURIComponent(
+                                  `${event.location_name}, ${event.location_address}`,
+                                )}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                {event.location_address}
+                              </Link>
+                            </p>
+                          )}
+                        {event.location_status === "tbd" && (
+                          <p className="font-medium">Location: To Be Decided</p>
+                        )}
+                      </>
                     </div>
                   </div>
                   <div className="flex items-center space-x-3">
@@ -1757,18 +1520,20 @@ const OurEventDetails = () => {
               </Card>
             )}
 
-            <Card className="space-y-2 bg-transparent shadow-none border-none">
-              <div className="border-t border-gray-300 mx-6" />
-              <CardHeader className="pt-1"></CardHeader>
-              <CardContent>
-                <MapContainer
-                  lat={Number(event.location_lat)}
-                  lng={Number(event.location_lng)}
-                  name={event.location_name}
-                  add={event.location_address}
-                />
-              </CardContent>
-            </Card>
+            {event.location_status === "confirmed" && (
+              <Card className="space-y-2 bg-transparent shadow-none border-none">
+                <div className="border-t border-gray-300 mx-6" />
+                <CardHeader className="pt-1"></CardHeader>
+                <CardContent>
+                  <MapContainer
+                    lat={Number(event.location_lat)}
+                    lng={Number(event.location_lng)}
+                    name={event.location_name}
+                    add={event.location_address}
+                  />
+                </CardContent>
+              </Card>
+            )}
 
             {event.features && event.event_features.length > 0 && (
               <Card className="space-y-2 bg-transparent shadow-none border-none">
@@ -1867,7 +1632,7 @@ const OurEventDetails = () => {
                       fadeEffect={{ crossFade: true }}
                       slidesPerView={1}
                       loop={true}
-                      allowTouchMove={false} // disables swipe/drag
+                      allowTouchMove={false}
                       navigation={{
                         prevEl: prevRef.current,
                         nextEl: nextRef.current,
@@ -1894,7 +1659,6 @@ const OurEventDetails = () => {
                       ))}
                     </Swiper>
 
-                    {/* Custom buttons */}
                     <div
                       ref={prevRef}
                       className="absolute top-1/2 left-2 -translate-y-1/2 z-20 cursor-pointer text-black bg-white/20 backdrop-blur-md p-2 lg:p-3 md:p-3 sm:p-3 rounded-full hover:bg-white/30 transition-colors duration-200 flex items-center justify-center shadow-md"
@@ -1914,13 +1678,7 @@ const OurEventDetails = () => {
             )}
 
             {event.tiktok && event.tiktok_Link && (
-              // <Card className="space-y-2 bg-transparent shadow-none border-none">
-              //   <div className="border-t border-gray-300 mx-6" />
-              //   <CardHeader className="pt-1"></CardHeader>
-              //   <CardContent className="space-y-6">
               <TikTokPlayer url={event.tiktok_Link} />
-              //   </CardContent>
-              // </Card>
             )}
 
             {eventReviews.length > 0 && (
@@ -1936,7 +1694,6 @@ const OurEventDetails = () => {
                   <div className="space-y-4">
                     {eventReviews.length > 0 && (
                       <div className="py-4 px-7 bg-muted/50 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        {/* Rating Box */}
                         <div className="flex items-center gap-4">
                           <div className="text-center">
                             <div className="text-3xl font-bold">
@@ -1948,7 +1705,6 @@ const OurEventDetails = () => {
                               ).toFixed(1)}
                             </div>
 
-                            {/* Stars */}
                             <div className="flex items-center justify-center mt-1">
                               {[1, 2, 3, 4, 5].map((star) => (
                                 <Star
@@ -1968,12 +1724,8 @@ const OurEventDetails = () => {
                               ))}
                             </div>
                           </div>
-
-                          {/* Vertical Divider (desktop only) */}
-                          {/* <div className="hidden sm:block w-px h-10 bg-gray-300 opacity-40" /> */}
                         </div>
 
-                        {/* Text */}
                         <p className="text-sm text-muted-foreground text-center sm:text-left">
                           Based on {eventReviews.length} review
                           {eventReviews.length !== 1 ? "s" : ""}
@@ -2121,66 +1873,6 @@ const OurEventDetails = () => {
                 </CardContent>
               </Card>
             )}
-
-            {/* {event.guest_list && confirmedRSVPs.length > 0 && !isCreator && (
-              <Card className="space-y-2 bg-transparent shadow-none border-none">
-                <div className="border-t border-gray-300 mx-6" />
-                <CardHeader>
-                  <CardTitle>Attendees ({confirmedRSVPs.length})</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {confirmedRSVPs.map((rsvp) => (
-                      <div
-                        key={rsvp.id}
-                        className="flex items-center justify-between"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage
-                              src={rsvp.profiles?.profile_photo_url}
-                            />
-                            <AvatarFallback>
-                              {rsvp.profiles?.first_name?.[0] || "U"}
-                              {rsvp.profiles?.last_name?.[0] || "U"}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex flex-col">
-                            <span className="text-sm font-medium">
-                              <Link to={`/profile/${rsvp.profiles?.username}`}>
-                                {rsvp.profiles?.first_name || "Unknown"}{" "}
-                                {rsvp.profiles?.last_name || "User"}
-                              </Link>
-                              {rsvp.profiles.payments?.[0]?.status ===
-                              "completed" ? (
-                                <span className="px-2 py-1 text-xs font-semibold text-black bg-yellow-400 rounded-full ml-2">
-                                  🌟 Paid
-                                </span>
-                              ) : (
-                                <span className="px-2 py-1 text-xs font-semibold text-white bg-[rgb(0,30,83)] rounded-full ml-2">
-                                  {" "}
-                                  🆓 Free
-                                </span>
-                              )}
-                            </span>
-                            {isCreator && (
-                              <span className="text-xs text-muted-foreground">
-                                {rsvp.profiles?.email || "No email"}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        {isCreator && event.event_fee ? (
-                          <span className="text-sm   font-semibold">
-                            ${event.event_fee}
-                          </span>
-                        ) : null}
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )} */}
 
             {confirmedRSVPs.length > 0 && isCreator && (
               <Card className="space-y-2 bg-transparent shadow-none border-none">
@@ -2377,22 +2069,6 @@ const OurEventDetails = () => {
                 ) : (
                   <Button
                     onClick={() => {
-                      // NOTE: Free user paid-event RSVP validation commented out
-                      // if (!event.explore) {
-                      //   if (subscriptionStatus === "free") {
-                      //     toast({
-                      //       title: "Premium Required",
-                      //       description:
-                      //         "You need a premium subscription to RSVP private paid events.",
-                      //       variant: "destructive",
-                      //     });
-                      //     setTimeout(() => {
-                      //       navigate("/subscription");
-                      //     }, 1200);
-                      //     return;
-                      //   }
-                      // }
-
                       if (event.recurrence && !hasRSVP) {
                         setShowRecurrenceDialog(true);
                         return;
@@ -2441,7 +2117,6 @@ const OurEventDetails = () => {
           event.is_password_protected && (
             <div className="fixed bottom-4 left-0 right-0 px-4 sm:px-6 md:px-14 lg:px-36 z-50">
               {isBeforeDeadline ? (
-                // If event is FREE
                 !event.event_fee || event.event_fee == 0 ? (
                   hasRSVP ? (
                     <Button
@@ -2495,7 +2170,7 @@ const OurEventDetails = () => {
                             handleRSVP();
                           }
                           if (event.recurrence) {
-                            setShowRecurrenceDialog(true); // show dialog instead
+                            setShowRecurrenceDialog(true);
                             return;
                           }
 
@@ -2512,8 +2187,7 @@ const OurEventDetails = () => {
                       </Button>
                     </div>
                   )
-                ) : // If event is PAID
-                hasRSVP ? (
+                ) : hasRSVP ? (
                   <Button
                     onClick={handleRSVP}
                     className="w-full"
@@ -2536,22 +2210,6 @@ const OurEventDetails = () => {
 
                     <Button
                       onClick={async () => {
-                        // NOTE: Free user paid-event RSVP validation commented out
-                        // if (event.explore) {
-                        //   if (subscriptionStatus === "free") {
-                        //     toast({
-                        //       title: "Premium Required",
-                        //       description:
-                        //         "You need a premium subscription to RSVP private paid events.",
-                        //       variant: "destructive",
-                        //     });
-                        //     setTimeout(() => {
-                        //       navigate("/subscription");
-                        //     }, 1200);
-                        //     return;
-                        //   }
-                        // }
-
                         if (event.is_password_protected && !password.trim()) {
                           toast({
                             title: "Password Required",
@@ -2631,7 +2289,6 @@ const OurEventDetails = () => {
             </DialogDescription>
           </DialogHeader>
 
-          {/* Selected date preview */}
           {selectedDate && (
             <div className="p-3 rounded-md bg-blue-50 text-blue-700 text-sm font-medium mb-3">
               Selected: {new Date(selectedDate).toLocaleString()}
@@ -2647,13 +2304,12 @@ const OurEventDetails = () => {
                 <Button
                   key={date}
                   onClick={() => {
-                    // toggle logic
                     if (isSelected) {
-                      setSelectedDate(null); // deselect
+                      setSelectedDate(null);
                       return;
                     }
 
-                    setSelectedDate(date); // select
+                    setSelectedDate(date);
                   }}
                   className={`w-full ${
                     isSelected
@@ -2668,7 +2324,6 @@ const OurEventDetails = () => {
             })}
           </div>
 
-          {/* Continue/Confirm button */}
           <Button
             disabled={!selectedDate}
             onClick={() => {
@@ -2691,196 +2346,3 @@ const OurEventDetails = () => {
 };
 
 export default OurEventDetails;
-
-{
-  /* {event.imageGallery && event.imageGalleryLinks.length > 0 && (
-              <Card className="space-y-2 bg-transparent shadow-none border-none">
-                <div className="border-t border-gray-300 mx-6" />
-                <CardHeader className="pt-1"></CardHeader>
-                <CardContent>
-                  <div className="my-2 pb-2 w-full">
-                    <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-3 px-1">
-                      {event.imageGalleryLinks.map((img) => (
-                        <div
-                          key={img}
-                          className="relative aspect-[4/5] rounded-md overflow-hiddenbg-secondary hover:bg-secondary/70 transition-colors"
-                        >
-                          <img
-                            src={img}
-                            alt={`image ${img}`}
-                            className="absolute rounded-md inset-0 w-full h-full object-cover"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )} */
-}
-
-{
-  /* RSVP Card */
-}
-
-{
-  /* Attendees */
-}
-{
-  /* {confirmedRSVPs.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Attendees ({confirmedRSVPs.length})</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {confirmedRSVPs.slice(0, 5).map((rsvp) => (
-                      <div
-                        key={rsvp.id}
-                        className="flex items-center space-x-3"
-                      >
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={rsvp.profiles?.profile_photo_url} />
-                          <AvatarFallback>
-                            {rsvp.profiles?.first_name?.[0] || "U"}
-                            {rsvp.profiles?.last_name?.[0] || "U"}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="text-sm">
-                          {rsvp.profiles?.first_name || "Unknown"}{" "}
-                          {rsvp.profiles?.last_name || "User"}
-                        </span>
-                      </div>
-                    ))}
-                    {confirmedRSVPs.length > 5 && (
-                      <p className="text-sm text-muted-foreground">
-                        And {confirmedRSVPs.length - 5} more...
-                      </p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )} */
-}
-
-{
-  /* {event.recurrence && (
-              <Card className="space-y-2 bg-transparent shadow-none border-none">
-                <div className="border-t border-gray-300 mx-6" />
-                <CardHeader>
-                  <CardTitle>Recurrence</CardTitle>
-                </CardHeader>
-                <CardContent className="flex gap-4 justify-between">
-                  {event.recurrence_dates.map((date, i) => {
-                    const d = new Date(date);
-                    return (
-                      <div
-                        key={i}
-                        className="bg-transparent backdrop-blur-md bg-white/10 border rounded-xl py-4 px-5  hover:shadow-md transition-all"
-                      >
-                        <div className="">
-                          <span>
-                            {format(d, "EE, MMM d")}
-                            <br />
-                            {format(d, "h:mm a")}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </CardContent>
-              </Card>
-            )} */
-}
-
-{
-  /* {isCreator && event.event_fee ? (
-                        <span className="text-sm   font-semibold">
-                          ${event.event_fee}
-                        </span>
-                      ) : null} */
-}
-
-{
-  /* <div className="flex flex-col">
-                          <span className="text-sm font-medium">
-                            <Link to={`/profile/${rsvp.profiles?.username}`}>
-                              {rsvp.profiles?.first_name || "Unknown"}{" "}
-                              {rsvp.profiles?.last_name || "User"}
-                            </Link>
-                            {rsvp.profiles.payments?.[0]?.status ===
-                            "completed" ? (
-                              <span className="px-2 py-1 text-xs font-semibold text-black bg-yellow-400 rounded-full ml-2">
-                                🌟 Paid
-                              </span>
-                            ) : (
-                              <span className="px-2 py-1 text-xs font-semibold text-white bg-[rgb(0,30,83)] rounded-full ml-2">
-                                {" "}
-                                🆓 Free
-                              </span>
-                            )}
-                          </span>
-                          {isCreator && (
-                            <span className="text-xs text-muted-foreground">
-                              {rsvp.profiles?.email || "No email"}
-                            </span>
-                          )}
-                        </div> */
-}
-
-{
-  /* <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8"> */
-}
-
-{
-  /* Header */
-}
-{
-  /* <div className="mb-8 flex justify-between items-center">
-          {isCreator && (
-            <Link to={"/events"}>
-              <Button
-                variant="ghost"
-                className="mb-4"
-                style={{
-                  backgroundColor: event.accent_color,
-                }}
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Events
-              </Button>
-            </Link>
-          )}
-          {!isCreator && (
-            <Link to={"/explore"}>
-              <Button
-                variant="ghost"
-                className="mb-4"
-                style={{
-                  backgroundColor: event.accent_color,
-                }}
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Events
-              </Button>
-            </Link>
-          )} */
-}
-{
-  /* {!isCreator && isBeforeDeadline && (
-            <Button
-              onClick={handleInterest}
-              disabled={loading}
-              className={isInterested ? "mb-4" : "mb-4"}
-            >
-              {loading
-                ? "Updating..."
-                : isInterested
-                ? "Interested"
-                : "Show Interest"}
-            </Button>
-          )} */
-}
-{
-  /* </div> */
-}
