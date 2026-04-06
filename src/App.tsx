@@ -82,21 +82,13 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <AuthProvider>
-        <BrowserRouter>
+      <BrowserRouter>
+        <AuthProvider>
           <div className="min-h-screen bg-background text-foreground">
             <Routes>
-              {/* <Route
-                path="/auth"
-                element={<div>Auth page rendered by ProtectedRoute}
-              /> */}
               <Route path="/login" element={<AuthLogin />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/o-auth" element={<OAuth />} />
-              {/* <Route 
-                path="/social-media"
-                element={<SocialLinks />}
-              /> */}
               <Route
                 path="/"
                 element={
@@ -115,16 +107,6 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              {/* <Route
-                path="/events-create"
-                element={
-                  <ProtectedRoute>
-                    <Navigation />
-                    <OurEventsCreate />
-                  </ProtectedRoute>
-                }
-              /> */}
-              {/* <Route element={<Layout />}> */}
               <Route
                 path="contact-us"
                 element={
@@ -211,15 +193,6 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              {/* <Route
-                path="/create-event"
-                element={
-                  <ProtectedRoute>
-                    <Navigation />
-                    <CreateEvent />
-                  </ProtectedRoute>
-                }
-              /> */}
               <Route
                 path="/create-event"
                 element={
@@ -229,16 +202,6 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-
-              {/* <Route
-                path="/explore"
-                element={
-                  <ProtectedRoute>
-                    <Navigation />
-                    <ExploreEvents />
-                    </ProtectedRoute>
-                }
-              /> */}
               <Route
                 path="/rsvps"
                 element={
@@ -248,15 +211,6 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              {/* <Route
-                path="/event/:eventId/details"
-                element={
-                  <>
-                    <Navigation />
-                    <EventDetails />
-                  </>
-                }
-              /> */}
               <Route
                 path="/event/:eventId/details"
                 element={
@@ -269,10 +223,10 @@ const App = () => (
               <Route
                 path="/rsvp/:eventId/details"
                 element={
-                  <ProtectedRoute>
+                  <>
                     <Navigation />
                     <RSVPDetails />
-                  </ProtectedRoute>
+                  </>
                 }
               />
               <Route
@@ -705,8 +659,8 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
-        </BrowserRouter>
-      </AuthProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );

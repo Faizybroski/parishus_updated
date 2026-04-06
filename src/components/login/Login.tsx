@@ -85,6 +85,8 @@ export const Login = ({ startStep = 0 }) => {
         title: "Welcome back!",
         description: "Signed in successfully.",
       });
+//       const redirectTo = location.state?.redirectTo;
+// if (redirectTo) navigate(redirectTo);
     } catch (err) {
       toast({
         title: "Error",

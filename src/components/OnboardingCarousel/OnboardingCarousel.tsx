@@ -213,7 +213,12 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
       setPassword("");
       setFirstName("");
       setLastName("");
-      navigate("/");
+      // const redirectTo = location.state?.redirectTo;
+      // if (redirectTo) {
+      //   navigate(redirectTo);
+      // } else {
+        navigate("/");
+      // }
     } catch (err) {
       toast({
         title: "Error",

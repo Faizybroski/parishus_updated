@@ -384,7 +384,16 @@ const OurEventDetails = () => {
   };
 
   const handlePaidRSVP = async () => {
-    if (!eventId || !user?.id) return;
+    if (!eventId) return;
+    if (!user || !userProfileId || !event) {
+      toast({
+        title: "Almost There!",
+        description:
+          "You’ll need to sign in or sign up before you can RSVP and join this event.",
+      });
+      navigate("/login", { state: { startStep: 1 } });
+      return;
+    }
     setIsPaying(true);
     try {
       if (event.is_password_protected) {
@@ -468,13 +477,14 @@ const OurEventDetails = () => {
   };
 
   const handleRSVP = async () => {
-    if (!user || !userProfileId || !event) {
+    if (!eventId) return;
+    if (!user || !userProfileId) {
       toast({
         title: "Almost There!",
         description:
           "You’ll need to sign in or sign up before you can RSVP and join this event.",
       });
-      navigate("/", { state: { startStep: 1 } });
+      navigate("/login", { state: { startStep: 1 } });
       return;
     }
     setShowRSVPConfirm(true);
@@ -2130,13 +2140,16 @@ const OurEventDetails = () => {
                   ) : (
                     <div className="flex flex-col lg:flex-row gap-3">
                       {event.is_password_protected && (
-                        <Input
-                          type="password"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          placeholder="Enter password to RSVP"
-                          className="w-[90%] mb-2 bg-transparent backdrop-blur-md bg-white/10"
-                        />
+                        <>
+                          <Input
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="This event is password protected. Please enter the
+                            password to RSVP"
+                            className="w-[90%] mb-2 bg-transparent backdrop-blur-md bg-white/10"
+                          />
+                        </>
                       )}
                       <Button
                         onClick={async () => {
@@ -2180,7 +2193,7 @@ const OurEventDetails = () => {
                         style={{
                           backgroundColor: event.accent_color,
                         }}
-                        disabled={loadingStatus}
+                        disabled={loadingStatus || !password.trim()}
                       >
                         <Heart className="h-4 w-4 mr-2" />
                         RSVP to Event
@@ -2199,13 +2212,16 @@ const OurEventDetails = () => {
                 ) : (
                   <div className="flex flex-col lg:flex-row gap-3">
                     {event.is_password_protected && (
-                      <Input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter password"
-                        className="w-full mb-2 bg-transparent backdrop-blur-md bg-white/10"
-                      />
+                      <>
+                        <Input
+                          type="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="This event is password protected. Please enter the
+                          password to RSVP"
+                          className="w-full mb-2 bg-transparent backdrop-blur-md bg-white/10 placeholder:text-red"
+                        />
+                      </>
                     )}
 
                     <Button
@@ -2245,7 +2261,7 @@ const OurEventDetails = () => {
                           return;
                         }
                       }}
-                      disabled={isPaying}
+                      disabled={isPaying || !password.trim()}
                       className="w-full lg:w-auto flex-1"
                       style={{ backgroundColor: event.accent_color }}
                     >

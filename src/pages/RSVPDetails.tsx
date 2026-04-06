@@ -152,24 +152,19 @@ const RSVPDetails = () => {
   };
 
   const handlePaidRSVP = async () => {
-    if (!eventId || !user?.id) return;
+    if (!eventId) return;
+    if (!user || !userProfileId || !event) {
+      toast({
+        title: "Almost There!",
+        description:
+          "You’ll need to sign in or sign up before you can RSVP and join this event.",
+      });
+      navigate("/login", { state: { startStep: 1 , redirectTo: `/rsvp/${eventId}/details` } });
+      return;
+    }
     setIsPaying(true);
     try {
       if (event.is_password_protected) {
-        // const correctPassword = await bcrypt.compare(
-        //   password.trim(),
-        //   event.password_hash
-        // );
-
-        // if (!correctPassword) {
-        //   toast({
-        //     title: "Incorrect Password",
-        //     description:
-        //       "The Password you entered for RSVP this event is incorrect",
-        //     variant: "destructive",
-        //   });
-        //   return;
-        // }
         const { data: response, error } = await supabase.functions.invoke(
           "create-event-payment-intent",
           {
@@ -234,7 +229,16 @@ const RSVPDetails = () => {
   };
 
   const handleRSVP = async () => {
-    if (!user || !userProfileId || !event) return;
+    if (!eventId) return;
+    if (!user || !userProfileId) {
+      toast({
+        title: "Almost There!",
+        description:
+          "You’ll need to sign in or sign up before you can RSVP and join this event.",
+      });
+      navigate("/login", { state: { startStep: 1 , redirectTo: `/rsvp/${eventId}/details` } });
+      return;
+    }
 
     const hasRSVP = (event.rsvps || []).some(
       (rsvp) => rsvp.user_id === userProfileId,
@@ -283,63 +287,13 @@ const RSVPDetails = () => {
                     description: "You're no longer attending this event.",
                   });
                 } else {
-                  // NOTE: Free user RSVP limit validation commented out
-                  // if (
-                  //   subscriptionStatus === "free" &&
-                  //   (!event.event_fee || event.event_fee == 0)
-                  // ) {
-                  //   const startOfMonth = new Date();
-                  //   startOfMonth.setDate(1);
-                  //   startOfMonth.setHours(0, 0, 0, 0);
-                  //
-                  //   const { count, error } = await supabase
-                  //     .from("rsvps")
-                  //     .select("*", { count: "exact", head: true })
-                  //     .eq("user_id", userProfileId)
-                  //     .eq("status", "confirmed")
-                  //     .gte("created_at", startOfMonth.toISOString());
-                  //
-                  //   if (error) {
-                  //     console.error("Failed to fetch RSVP count", error.message);
-                  //     toast({
-                  //       title: "Error",
-                  //       description: "Couldn't check your RSVP limit. Try again.",
-                  //       variant: "destructive",
-                  //     });
-                  //     return;
-                  //   }
-                  //
-                  //   if (count >= 2) {
-                  //     toast({
-                  //       title: "RSVP Limit Reached",
-                  //       description:
-                  //         "Free users can RSVP to only 2 free events per month.",
-                  //       variant: "destructive",
-                  //     });
-                  //     setTimeout(() => {
-                  //       navigate("/subscription");
-                  //     }, 1500);
-                  //     return;
-                  //   }
-                  // }
+                 
 
                   if (event.is_password_protected) {
-                    // const correctPassword = await bcrypt.compare(
-                    //   password.trim(),
-                    //   event.password_hash
-                    // );
-
-                    // if (!correctPassword) {
-                    //   toast({
-                    //     title: "Incorrect Password",
-                    //     description:
-                    //       "The Password you entered for RSVP this event is incorrect",
-                    //     variant: "destructive",
-                    //   });
-                    //   return;
-                    // }
+                   
                     const rsvpTrackCode = generateTrackCode();
-                    const rsvpQrCode = await generateQRCodeDataURL(rsvpTrackCode);
+                    const rsvpQrCode =
+                      await generateQRCodeDataURL(rsvpTrackCode);
 
                     const { error: rsvpError } = await supabase
                       .from("rsvps")
@@ -465,11 +419,12 @@ const RSVPDetails = () => {
                       }
                     }
 
-                    // Send RSVP email (free event)
                     try {
                       await sendRSVPedEmail({
                         rsvpedUserEmail: profile?.email || user?.email || "",
-                        rsvpedUserName: `${profile?.first_name || ""} ${profile?.last_name || ""}`.trim() || "Guest",
+                        rsvpedUserName:
+                          `${profile?.first_name || ""} ${profile?.last_name || ""}`.trim() ||
+                          "Guest",
                         eventName: event.name,
                         eventDateTime: event.date_time,
                         eventLocation: event.location_name || "",
@@ -479,7 +434,9 @@ const RSVPDetails = () => {
                         isPaid: false,
                         paymentStatus: "unpaid",
                         organizerEmail: event.profiles?.email || "",
-                        organizerName: `${event.profiles?.first_name || ""} ${event.profiles?.last_name || ""}`.trim() || "Event Owner",
+                        organizerName:
+                          `${event.profiles?.first_name || ""} ${event.profiles?.last_name || ""}`.trim() ||
+                          "Event Owner",
                       });
                     } catch (emailErr) {
                       console.error("Failed to send RSVP email:", emailErr);
@@ -493,7 +450,8 @@ const RSVPDetails = () => {
                     return;
                   } else {
                     const rsvpTrackCode2 = generateTrackCode();
-                    const rsvpQrCode2 = await generateQRCodeDataURL(rsvpTrackCode2);
+                    const rsvpQrCode2 =
+                      await generateQRCodeDataURL(rsvpTrackCode2);
 
                     const { error: rsvpError } = await supabase
                       .from("rsvps")
@@ -619,11 +577,12 @@ const RSVPDetails = () => {
                       }
                     }
 
-                    // Send RSVP email (free event)
                     try {
                       await sendRSVPedEmail({
                         rsvpedUserEmail: profile?.email || user?.email || "",
-                        rsvpedUserName: `${profile?.first_name || ""} ${profile?.last_name || ""}`.trim() || "Guest",
+                        rsvpedUserName:
+                          `${profile?.first_name || ""} ${profile?.last_name || ""}`.trim() ||
+                          "Guest",
                         eventName: event.name,
                         eventDateTime: event.date_time,
                         eventLocation: event.location_name || "",
@@ -633,7 +592,9 @@ const RSVPDetails = () => {
                         isPaid: false,
                         paymentStatus: "unpaid",
                         organizerEmail: event.profiles?.email || "",
-                        organizerName: `${event.profiles?.first_name || ""} ${event.profiles?.last_name || ""}`.trim() || "Event Owner",
+                        organizerName:
+                          `${event.profiles?.first_name || ""} ${event.profiles?.last_name || ""}`.trim() ||
+                          "Event Owner",
                       });
                     } catch (emailErr) {
                       console.error("Failed to send RSVP email:", emailErr);
@@ -896,21 +857,7 @@ const RSVPDetails = () => {
                 ) : (
                   <Button
                     onClick={() => {
-                      // NOTE: Free user paid-event RSVP validation commented out
-                      // if (!event.explore) {
-                      //   if (subscriptionStatus === "free") {
-                      //     toast({
-                      //       title: "Premium Required",
-                      //       description:
-                      //         "You need a premium subscription to RSVP private paid events.",
-                      //       variant: "destructive",
-                      //     });
-                      //     setTimeout(() => {
-                      //       navigate("/subscription");
-                      //     }, 1200);
-                      //     return;
-                      //   }
-                      // }
+                    
                       handlePaidRSVP();
                     }}
                     disabled={isPaying}
@@ -947,7 +894,6 @@ const RSVPDetails = () => {
           event.is_password_protected && (
             <>
               {isBeforeDeadline ? (
-                // If event is FREE
                 !event.event_fee || event.event_fee == 0 ? (
                   hasRSVP ? (
                     <Button onClick={handleRSVP} className="w-full">
@@ -956,15 +902,17 @@ const RSVPDetails = () => {
                     </Button>
                   ) : (
                     <>
-                      {/* ✅ Show password input if event is protected */}
                       {event.is_password_protected && (
-                        <Input
-                          type="password"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          placeholder="Enter password to RSVP"
-                          className="w-full mb-2"
-                        />
+                        <>
+                          <Input
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="This event is password protected. Please enter the
+                            password to RSVP."
+                            className="w-full mb-2"
+                          />
+                        </>
                       )}
                       <Button
                         onClick={async () => {
@@ -992,13 +940,14 @@ const RSVPDetails = () => {
                           handleRSVP();
                         }}
                         className="w-full"
+                        disabled={!password.trim()}
                       >
                         <Heart className="h-4 w-4 mr-2" />
                         RSVP to Event
                       </Button>
                     </>
                   )
-                ) : // If event is PAID
+                ) : 
                 hasRSVP ? (
                   <Button onClick={handleRSVP} className="w-full">
                     <UserCheck className="h-4 w-4 mr-2" />
@@ -1006,34 +955,20 @@ const RSVPDetails = () => {
                   </Button>
                 ) : (
                   <>
-                    {/* ✅ Add password field for paid + protected events */}
                     {event.is_password_protected && (
                       <Input
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter password to RSVP"
+                        placeholder="This event is password protected. Please enter the
+                            password to RSVP."
                         className="w-full mb-2"
                       />
                     )}
 
                     <Button
                       onClick={async () => {
-                        // NOTE: Free user paid-event RSVP validation commented out
-                        // if (event.explore) {
-                        //   if (subscriptionStatus === "free") {
-                        //     toast({
-                        //       title: "Premium Required",
-                        //       description:
-                        //         "You need a premium subscription to RSVP private paid events.",
-                        //       variant: "destructive",
-                        //     });
-                        //     setTimeout(() => {
-                        //       navigate("/subscription");
-                        //     }, 1200);
-                        //     return;
-                        //   }
-                        // }
+                       
 
                         if (event.is_password_protected && !password.trim()) {
                           toast({
@@ -1060,7 +995,7 @@ const RSVPDetails = () => {
 
                         handlePaidRSVP();
                       }}
-                      disabled={isPaying}
+                      disabled={isPaying || !password.trim()}
                       className="w-full text-white flex items-center justify-center"
                     >
                       {isPaying ? (
