@@ -160,6 +160,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     if (profileError) return { error: profileError };
 
     setTimeout(() => {
+      console.log("location in authcontext: ", location.state?.redirectTo)
       switch (profile.role) {
         case "admin":
           window.location.href = location.state?.redirectTo

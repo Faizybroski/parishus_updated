@@ -391,7 +391,7 @@ const OurEventDetails = () => {
         description:
           "You’ll need to sign in or sign up before you can RSVP and join this event.",
       });
-      navigate("/login", { state: { startStep: 1 } });
+      navigate("/login", { state: { startStep: 1 , redirectTo: `/event/${eventId}/details` } });
       return;
     }
     setIsPaying(true);
@@ -484,7 +484,7 @@ const OurEventDetails = () => {
         description:
           "You’ll need to sign in or sign up before you can RSVP and join this event.",
       });
-      navigate("/login", { state: { startStep: 1 } });
+      navigate("/login", { state: { startStep: 1 , redirectTo: `/event/${eventId}/details` } });
       return;
     }
     setShowRSVPConfirm(true);
@@ -2145,8 +2145,7 @@ const OurEventDetails = () => {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            placeholder="This event is password protected. Please enter the
-                            password to RSVP"
+                            placeholder="This event is password protected. Please enter the password to RSVP"
                             className="w-[90%] mb-2 bg-transparent backdrop-blur-md bg-white/10"
                           />
                         </>
@@ -2217,8 +2216,7 @@ const OurEventDetails = () => {
                           type="password"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          placeholder="This event is password protected. Please enter the
-                          password to RSVP"
+                          placeholder="This event is password protected. Please enter the password to RSVP"
                           className="w-full mb-2 bg-transparent backdrop-blur-md bg-white/10 placeholder:text-red"
                         />
                       </>
