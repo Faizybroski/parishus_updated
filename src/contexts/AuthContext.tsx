@@ -161,19 +161,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     setTimeout(() => {
       console.log("location in authcontext: ", location.state?.redirectTo)
-      switch (profile.role) {
-        case "admin":
-          window.location.href = location.state?.redirectTo
-            ? `${window.location.origin}${location.state.redirectTo}`
-            : "/admin/dashboard";
-          break;
-        case "user":
-        default:
-          window.location.href = location.state?.redirectTo
-            ? `${window.location.origin}${location.state.redirectTo}`
-            : "/user/dashboard";
-          break;
-      }
+      window.location.href = location.state?.redirectTo ? `${window.location.origin}${location.state.redirectTo}` : `${window.location.origin}/`;
+      // switch (profile.role) {
+      //   case "admin":
+      //     window.location.href = location.state?.redirectTo
+      //       ? `${window.location.origin}${location.state.redirectTo}`
+      //       : "/admin/dashboard";
+      //     break;
+      //   case "user":
+      //   default:
+      //     window.location.href = location.state?.redirectTo
+      //       ? `${window.location.origin}${location.state.redirectTo}`
+      //       : "/user/dashboard";
+      //     break;
+      // }
     }, 100); // Small delay to ensure auth state is updated
     return { error };
   };
