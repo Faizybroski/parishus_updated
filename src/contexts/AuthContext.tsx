@@ -39,6 +39,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const params = new URLSearchParams(window.location.search);
+  const redirectTo = params.get("redirectTo");
 
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -93,8 +95,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       email,
       password,
       options: {
-        emailRedirectTo: location.state?.redirectTo
-          ? `${window.location.origin}${location.state.redirectTo}`
+        emailRedirectTo: redirectTo
+          ? `${window.location.origin}${redirectTo}`
           : `${window.location.origin}/`,
         data: {
           first_name: metadata?.first_name,
@@ -160,8 +162,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     if (profileError) return { error: profileError };
 
     setTimeout(() => {
-      console.log("location in authcontext: ", location.state?.redirectTo)
-      window.location.href = location.state?.redirectTo ? `${window.location.origin}${location.state.redirectTo}` : `${window.location.origin}/`;
+      console.log("location in authcontext: ", location.state?.redirectTo);
+      navigate(redirectTo || "/");
       // switch (profile.role) {
       //   case "admin":
       //     window.location.href = location.state?.redirectTo
@@ -183,8 +185,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: location.state?.redirectTo
-          ? `${window.location.origin}${location.state.redirectTo}`
+        redirectTo: redirectTo
+          ? `${window.location.origin}${redirectTo}`
           : `${window.location.origin}/`,
       },
     });
@@ -196,8 +198,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "apple",
         options: {
-          redirectTo: location.state?.redirectTo
-            ? `${window.location.origin}${location.state.redirectTo}`
+          redirectTo: redirectTo
+            ? `${window.location.origin}${redirectTo}`
             : `${window.location.origin}/`,
         },
       });

@@ -159,7 +159,7 @@ const RSVPDetails = () => {
         description:
           "You’ll need to sign in or sign up before you can RSVP and join this event.",
       });
-      navigate("/login", { state: { startStep: 1 , redirectTo: `/rsvp/${eventId}/details` } });
+      navigate(`/login?redirectTo=/rsvp/${eventId}/details`);
       return;
     }
     setIsPaying(true);
@@ -236,7 +236,7 @@ const RSVPDetails = () => {
         description:
           "You’ll need to sign in or sign up before you can RSVP and join this event.",
       });
-      navigate("/login", { state: { startStep: 1 , redirectTo: `/rsvp/${eventId}/details` } });
+      navigate(`/login?redirectTo=/rsvp/${eventId}/details`);
       return;
     }
 
@@ -287,10 +287,7 @@ const RSVPDetails = () => {
                     description: "You're no longer attending this event.",
                   });
                 } else {
-                 
-
                   if (event.is_password_protected) {
-                   
                     const rsvpTrackCode = generateTrackCode();
                     const rsvpQrCode =
                       await generateQRCodeDataURL(rsvpTrackCode);
@@ -857,7 +854,6 @@ const RSVPDetails = () => {
                 ) : (
                   <Button
                     onClick={() => {
-                    
                       handlePaidRSVP();
                     }}
                     disabled={isPaying}
@@ -947,8 +943,7 @@ const RSVPDetails = () => {
                       </Button>
                     </>
                   )
-                ) : 
-                hasRSVP ? (
+                ) : hasRSVP ? (
                   <Button onClick={handleRSVP} className="w-full">
                     <UserCheck className="h-4 w-4 mr-2" />
                     Going - Cancel RSVP
@@ -968,8 +963,6 @@ const RSVPDetails = () => {
 
                     <Button
                       onClick={async () => {
-                       
-
                         if (event.is_password_protected && !password.trim()) {
                           toast({
                             title: "Password Required",

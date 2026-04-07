@@ -391,7 +391,8 @@ const OurEventDetails = () => {
         description:
           "You’ll need to sign in or sign up before you can RSVP and join this event.",
       });
-      navigate("/login", { state: { startStep: 1 , redirectTo: `/event/${eventId}/details` } });
+      // navigate("/login", { state: { startStep: 1 , redirectTo: `/event/${eventId}/details` } });
+      navigate(`/login?redirectTo=/event/${eventId}/details`);
       return;
     }
     setIsPaying(true);
@@ -484,7 +485,8 @@ const OurEventDetails = () => {
         description:
           "You’ll need to sign in or sign up before you can RSVP and join this event.",
       });
-      navigate("/login", { state: { startStep: 1 , redirectTo: `/event/${eventId}/details` } });
+      // navigate("/login", { state: { startStep: 1 , redirectTo: `/event/${eventId}/details` } });
+      navigate(`/login?redirectTo=/event/${eventId}/details`);
       return;
     }
     setShowRSVPConfirm(true);
