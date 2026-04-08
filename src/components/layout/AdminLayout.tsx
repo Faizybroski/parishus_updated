@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Crown, Shield, LogOut, Sparkles } from 'lucide-react';
 import AdminSidebar from './AdminSidebar';
+import NotificationCenter from "@/components/notifications/NotificationCenter";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -53,6 +54,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                   {profile?.email}
                 </p>
               </div>
+                                <NotificationCenter />
+              
               <Button 
                 onClick={signOut} 
                 variant="outline" 

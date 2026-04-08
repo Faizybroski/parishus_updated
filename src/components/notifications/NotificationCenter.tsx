@@ -125,8 +125,8 @@ const NotificationCenter = () => {
     try {
       const { error } = await supabase
         .from("notifications")
-        .update({ is_read: true })
-        .eq("user_id", user.id)
+        .update({ "is_read": true })
+        .eq("user_id", profile.id)
         .eq("is_read", false);
 
       if (error) throw error;
