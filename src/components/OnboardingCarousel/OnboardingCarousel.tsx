@@ -9,8 +9,8 @@ import { ChevronLeft, ChevronRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import { SiGoogle, SiApple } from "react-icons/si";
 import { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import ParishLogo from "../ui/logo";
+import { sendEventInvite } from "@/lib/sendInvite";
 
 const onboardingCards = [
   { id: 0, type: "intro-logo" },
@@ -208,6 +208,93 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
         description:
           "Your profile has been registered successfully. Access activation is pending administrative approval.",
       });
+      await sendEventInvite({
+        to: ["support@parishus.com", "supportparishus@gmail.com"],
+        subject: "🎉 New User registered to Parish",
+        html: `<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>New User Registration</title>
+  </head>
+
+  <body style="margin:0; padding:0; background-color:#f9fafb; font-family:Arial, sans-serif; color:#333;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f9fafb; padding:20px;">
+      <tr>
+        <td align="center">
+
+          <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+
+            <!-- Header -->
+            <tr>
+              <td align="center" style="background-color:#2563eb; padding:40px 20px;">
+                <h1 style="margin:0; font-size:26px; color:#ffffff;">
+                  New User Registration 🚀
+                </h1>
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td style="padding:30px; font-size:16px; line-height:1.6; color:#444;">
+
+                <p>Hi Admin 👋,</p>
+
+                <p>
+                  A new user has just registered and is awaiting approval.
+                </p>
+
+                <!-- User Info Card -->
+                <div style="background:#f3f4f6; padding:15px; border-radius:8px; margin:20px 0;">
+                  <p style="margin:0;"><strong>Name:</strong> ${firstName} ${lastName}</p>
+                  <p style="margin:5px 0;"><strong>Email:</strong> ${email}</p>
+                </div>
+
+                <p>
+                  Please review the user details and approve their account to grant access.
+                </p>
+
+                <!-- CTA Buttons -->
+                <div style="text-align:center; margin-top:25px;">
+                  
+                  <a href="https://parishus.com/admin/users"
+                     style="display:inline-block; background-color:#16a34a; color:#ffffff; text-decoration:none; padding:14px 22px; border-radius:8px; font-weight:bold; margin-right:10px;">
+                     Approve User ✅
+                  </a>
+
+                  <a href="https://parishus.com/admin/users"
+                     style="display:inline-block; background-color:#dc2626; color:#ffffff; text-decoration:none; padding:14px 22px; border-radius:8px; font-weight:bold;">
+                     Reject ❌
+                  </a>
+
+                </div>
+
+                <p style="margin-top:30px; font-size:14px; color:#888;">
+                  – Parish System
+                </p>
+
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td align="center" style="background-color:#f3f4f6; padding:20px; font-size:12px; color:#666;">
+                <p style="margin:0;">Parish • Admin Panel</p>
+                <p style="margin:5px 0 0;">
+                  You are receiving this because you are an administrator.
+                </p>
+              </td>
+            </tr>
+
+          </table>
+
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`,
+      });
       if (!error) setEmail("");
       //  navigate('social-media')
       setPassword("");
@@ -217,7 +304,7 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
       // if (redirectTo) {
       //   navigate(redirectTo);
       // } else {
-        navigate("/");
+      navigate("/");
       // }
     } catch (err) {
       toast({
