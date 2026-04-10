@@ -258,12 +258,12 @@ export const OnboardingCarousel = ({ startStep = 0 }) => {
                 <!-- CTA Buttons -->
                 <div style="text-align:center; margin-top:25px;">
                   
-                  <a href="https://parishus.com/admin/users"
+                  <a href="https://parishus.com/admin/login"
                      style="display:inline-block; background-color:#16a34a; color:#ffffff; text-decoration:none; padding:14px 22px; border-radius:8px; font-weight:bold; margin-right:10px;">
                      Approve User ✅
                   </a>
 
-                  <a href="https://parishus.com/admin/users"
+                  <a href="https://parishus.com/admin/login"
                      style="display:inline-block; background-color:#dc2626; color:#ffffff; text-decoration:none; padding:14px 22px; border-radius:8px; font-weight:bold;">
                      Reject ❌
                   </a>
