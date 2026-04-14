@@ -920,11 +920,11 @@ const OurExploreEvents = () => {
               </div>
 
               <div className="text-white flex flex-col justify-center items-center lg:items-start text-center lg:text-left max-w-2xl px-2 sm:px-0">
-                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 leading-tight">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3  truncate line-clamp-1">
                   {event.name}
                 </h2>
                 <p className="text-base sm:text-lg md:text-xl mb-2 text-gray-200">
-                  {event.location_name}
+                  {event?.location_name}
                 </p>
                 <p className="text-sm sm:text-base md:text-lg text-gray-300 mb-6">
                   {new Date(event.date_time).toLocaleDateString("en-US", {

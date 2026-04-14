@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 const DEFAULT_ADMIN_FEE = 10; // fallback if DB fetch fails
 const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes
 
-let cachedFee: number | null = null;
+let cachedFee: Float | null = null;
 let cachedAt: number | null = null;
 
 /**
@@ -13,7 +13,11 @@ let cachedAt: number | null = null;
  */
 export const fetchAdminFeePercentage = async (): Promise<number> => {
   // Return cached value if still valid
-  if (cachedFee !== null && cachedAt && Date.now() - cachedAt < CACHE_DURATION_MS) {
+  if (
+    cachedFee !== null &&
+    cachedAt &&
+    Date.now() - cachedAt < CACHE_DURATION_MS
+  ) {
     return cachedFee;
   }
 
@@ -29,7 +33,15 @@ export const fetchAdminFeePercentage = async (): Promise<number> => {
       return DEFAULT_ADMIN_FEE;
     }
 
-    cachedFee = Number(data.value);
+    // cachedFee = Number(data.value);
+    const parsed = parseFloat(data.value);
+
+    if (isNaN(parsed)) {
+      console.warn("Invalid admin fee value, using default:", data.value);
+      cachedFee = DEFAULT_ADMIN_FEE;
+    } else {
+      cachedFee = parsed;
+    }
     cachedAt = Date.now();
     return cachedFee;
   } catch (err) {
@@ -92,7 +104,10 @@ export const calculateFeeBreakdown = (
   grossAmount: number,
   feePercentage: number,
 ) => {
-  const fee = (grossAmount * feePercentage) / 100;
-  const payout = grossAmount - fee;
-  return { grossAmount, fee, payout, feePercentage };
+  const safeGross = Number(grossAmount) || 0;
+  const safeFeePercent = Number(feePercentage) || 0;
+
+  const fee = (safeGross * safeFeePercent) / 100;
+  const payout = safeGross - fee;
+  return { grossAmount: safeGross, fee, payout, feePercentage: safeFeePercent };
 };

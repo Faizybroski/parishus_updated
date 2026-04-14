@@ -1222,7 +1222,6 @@ const EventEdit = () => {
                   <Textarea
                     id="description"
                     placeholder="a brief description of the event."
-                    maxLength={140}
                     value={formData.description}
                     required
                     onChange={(e) =>

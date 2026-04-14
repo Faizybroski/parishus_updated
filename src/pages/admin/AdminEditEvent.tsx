@@ -910,7 +910,6 @@ const AdminEditEvent = () => {
                     onChange={(e) =>
                       handleInputChange("description", e.target.value)
                     }
-                    rows={4}
                     style={
                       {
                         "--accent-bg": lightenColor(selectedColor),

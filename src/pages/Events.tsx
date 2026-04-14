@@ -1100,7 +1100,7 @@ const Events = () => {
                     <div className="absolute -top-32 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent"></div>
 
                     <div className="pl-5 pr-2 pt-1 flex flex-col gap-2 relative z-10">
-                      <h3 className="text-2xl text-white font-script">
+                      <h3 className="text-2xl text-white font-script truncate">
                         {event.name}
                       </h3>
                       {event.description && (

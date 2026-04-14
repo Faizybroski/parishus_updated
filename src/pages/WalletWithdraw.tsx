@@ -195,6 +195,7 @@ const WalletWithdraw = () => {
       setLoading(false);
     }
   };
+const safe = (n: any) => (typeof n === "number" && !isNaN(n) ? n : 0);
 
   return (
     <div className="container mx-auto px-4 py-8 pt-16">
@@ -213,7 +214,7 @@ const WalletWithdraw = () => {
               <span className="text-sm text-muted-foreground">Total Revenue</span>
             </div>
             <p className="text-2xl font-bold text-foreground">
-              ${totalGross.toFixed(2)}
+              ${safe(totalGross)?.toFixed(2)}
             </p>
           </CardContent>
         </Card>
@@ -229,7 +230,7 @@ const WalletWithdraw = () => {
               </span>
             </div>
             <p className="text-2xl font-bold text-red-500">
-              -${totalFees.toFixed(2)}
+              -${safe(totalFees).toFixed(2)}
             </p>
           </CardContent>
         </Card>
@@ -243,7 +244,7 @@ const WalletWithdraw = () => {
               <span className="text-sm text-muted-foreground">You Receive</span>
             </div>
             <p className="text-2xl font-bold text-green-600">
-              ${totalPayments.toFixed(2)}
+              ${safe(totalPayments).toFixed(2)}
             </p>
           </CardContent>
         </Card>
