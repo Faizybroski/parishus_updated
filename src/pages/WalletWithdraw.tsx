@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Wallet, Loader2, Settings, TrendingUp, DollarSign, Percent } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useAdminFee, calculateFeeBreakdown } from "@/hooks/useAdminFee";
+import {Textarea} from "@/components/ui/textarea"
 
 type WalletPayment = {
   id: string;
@@ -358,7 +359,7 @@ const WalletWithdraw = () => {
             )}
 
             {/* Notes */}
-            <Input
+            <Textarea
               placeholder="Enter details for admin..."
               value={paymentNote}
               onChange={(e) => setPaymentNote(e.target.value)}
