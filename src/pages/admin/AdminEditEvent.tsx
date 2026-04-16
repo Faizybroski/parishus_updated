@@ -718,7 +718,6 @@ const AdminEditEvent = () => {
     formData.description &&
     formData.start_time &&
     formData.start_date &&
-    formData.location_name &&
     formData.flyer_url;
 
   // Show loading while authentication or profile is loading

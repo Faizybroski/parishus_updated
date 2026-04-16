@@ -691,7 +691,6 @@ const AdminCreateEvent = () => {
     formData.description &&
     formData.start_time &&
     formData.start_date &&
-    formData.location_name &&
     formData.flyer_url;
   if (authLoading || profileLoading) {
     return (
