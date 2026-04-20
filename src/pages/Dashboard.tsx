@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
+import { format, parseISO, isValid } from "date-fns";
 import {
   Clock,
   Users,
@@ -411,7 +411,23 @@ const Dashboard = () => {
                     No upcoming events found.
                   </p>
                 ) : (
-                  myUpcomingEvents.map((event) => (
+                  myUpcomingEvents.map((event) => {
+                    const rsvp = event.rsvps?.[0];
+
+  let formattedDate = "N/A";
+  let formattedTime = "N/A";
+
+  if (rsvp?.date) {
+    const parsed = parseISO(rsvp.date);
+    if (isValid(parsed)) {
+      formattedDate = format(parsed, "MMM dd");
+      formattedTime = format(parsed, "hh:mm a");
+    }
+  }
+
+  console.log(rsvp?.date);
+  console.log(event.name);
+                    return (
                     // dummyEvents.map((event) => (
                     <Link to={`/event/${event.id}/details`} key={event.id}>
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 py-4 px-2 bg-dark-surface rounded-lg hover:bg-muted transition-colors duration-200">
@@ -422,11 +438,13 @@ const Dashboard = () => {
                           <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                             <span className="flex items-center gap-1">
                               <Calendar className="h-4 w-4" />
-                              {format(new Date(event.rsvps.date), "MMM dd")}
+                              {/* {format(new Date(event.rsvps?.date), "MMM dd")} */}
+                              {formattedDate}
                             </span>
                             <span className="flex items-center gap-1">
                               <Clock className="h-4 w-4" />
-                              {format(new Date(event.rsvps.date), "hh:mm a")}
+                              {/* {format(new Date(event.rsvps?.date), "hh:mm a")} */}
+                              {formattedTime}
                             </span>
                             <span className="flex items-center gap-1 truncate max-w-[200px]">
                               <MapPin className="h-4 w-4" />
@@ -457,7 +475,7 @@ const Dashboard = () => {
                         </div>
                       </div>
                     </Link>
-                  ))
+                  )})
                 )}
               </CardContent>
             </Card>

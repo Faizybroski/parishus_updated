@@ -331,7 +331,7 @@ const safe = (n: any) => (typeof n === "number" && !isNaN(n) ? n : 0);
                 Select Payment Method:
               </label>
               <div className="flex gap-4">
-                {["Venmo", "CashApp", "PayPal"].map((method) => (
+                {["Venmo", "CashApp", "PayPal", "Zelle"].map((method) => (
                   <label key={method} className="flex items-center gap-2">
                     <input
                       type="radio"

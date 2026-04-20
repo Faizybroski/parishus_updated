@@ -101,6 +101,8 @@ export const useMyUpcomingEvents = () => {
       }));
 
       setMyUpcomingEvents(enrichedEvents);
+      console.log("Fetched upcoming events:", events[0].rsvps[0].date);
+      console.log("Fetched upcoming events:", enrichedEvents);
       setLoading(false);
     };
 

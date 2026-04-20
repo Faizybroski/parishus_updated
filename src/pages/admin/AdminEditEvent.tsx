@@ -182,6 +182,10 @@ const AdminEditEvent = () => {
         ? new Date(data.eventEndDateTime)
         : null;
 
+      console.log("eventDate", eventDate);
+      console.log("rsvpDeadline", rsvpDeadline);
+      console.log("eventEndDateTime", eventEndDateTime);
+
       setSelectedFont(data.title_font || "");
       setSelectedColor(data.accent_color || "#E4D7CD");
       setSelectedBgColor(data.accent_bg || "#F8F6F1");
@@ -232,6 +236,8 @@ const AdminEditEvent = () => {
         features: data.features || false,
         eventFeatures: data.event_features || [],
       });
+      console.log(data);
+      console.log("Form Data: ", formData);
     } catch (error) {
       console.error("Error fetching event:", error);
       toast({
@@ -941,6 +947,9 @@ const AdminEditEvent = () => {
                   <div className="space-y-2">
                     <Label htmlFor="start_date">Start date *</Label>
                     <div className="relative">
+                      {/* {
+                        console.log("formData.start_date", formData.start_date)
+                      } */}
                       <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
                         id="start_date"
@@ -967,6 +976,9 @@ const AdminEditEvent = () => {
                     <Label htmlFor="start_time">Time Start *</Label>
                     <div className="relative">
                       <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                       {/* {
+                        console.log("formData.start_time", formData.start_time)
+                      } */}
                       <Input
                         id="start_time"
                         type="time"
@@ -992,6 +1004,9 @@ const AdminEditEvent = () => {
                     <Label htmlFor="end_date">End Date</Label>
                     <div className="relative">
                       <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                       {/* {
+                        console.log("formData.end_date", formData.end_date)
+                      } */}
                       <Input
                         id="end_date"
                         type="date"
@@ -1016,6 +1031,10 @@ const AdminEditEvent = () => {
                     <Label htmlFor="end_time">Time End</Label>
                     <div className="relative">
                       <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                             {
+                        console.log("formData.end_time", formData.end_time)
+                      }
+
                       <Input
                         id="end_time"
                         type="time"
