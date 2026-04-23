@@ -691,7 +691,10 @@ const AdminWalletRequests = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {withdrawRequests.map((req) => (
+                  {withdrawRequests.map((req) => {
+                    const actualAmount = req.total_amount / (1 - req.feePercentage / 100);
+const feeAmount = actualAmount - req.total_amount;
+                    return (
                     <tr
                       key={req.id}
                       className="border-t border-border hover:bg-muted/50 transition"
@@ -707,12 +710,10 @@ const AdminWalletRequests = () => {
                         ${req.total_amount}
                       </td>
                       <td className="p-3 text-green-600">
-                        {req.feePercentage}%
+                        ${feeAmount.toFixed(2)}
                       </td>
                       <td className="p-3 text-green-600">
-                        {(
-  req.total_amount / (1 - req.feePercentage / 100)
-).toFixed(2)}
+                        ${actualAmount.toFixed(2)}
                       </td>
                       <td className="p-3 capitalize">{req.status}</td>
                       <td className="p-3">
@@ -905,7 +906,7 @@ const AdminWalletRequests = () => {
                         </DropdownMenu>
                       </td>
                     </tr>
-                  ))}
+                  )})}
                 </tbody>
               </table>
             </div>
