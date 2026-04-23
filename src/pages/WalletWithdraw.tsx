@@ -174,6 +174,7 @@ const WalletWithdraw = () => {
             status: "pending",
             payment_method: paymentMethod.trim(),
             account_details: accountDetails.trim(),
+            feePercentage
           },
         ]);
       if (insertError) throw insertError;

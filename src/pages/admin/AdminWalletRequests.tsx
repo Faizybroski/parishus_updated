@@ -35,6 +35,9 @@ type WithdrawRequest = {
   creator_id: string;
   note: string;
   total_amount: number;
+  feePercentage: number;
+  account_details: string;
+  payment_method: string;
   status: string;
   created_at: string;
   profiles?: {
@@ -80,6 +83,7 @@ const AdminWalletRequests = () => {
           total_amount,
           payment_method,
           account_details,
+          feePercentage,
           status,
           created_at,
           profiles:creator_id (
@@ -678,7 +682,9 @@ const AdminWalletRequests = () => {
                     <th className="p-3 whitespace-nowrap">Note</th>
                     <th className="p-3 whitespace-nowrap">Payment Method</th>
                     <th className="p-3 whitespace-nowrap">Account Username</th>
-                    <th className="p-3 whitespace-nowrap">Amount</th>
+                    <th className="p-3 whitespace-nowrap">Req. Amount</th>
+                    <th className="p-3 whitespace-nowrap">Admin %</th>
+                    <th className="p-3 whitespace-nowrap">Actual Amount</th>
                     <th className="p-3 whitespace-nowrap">Status</th>
                     <th className="p-3 whitespace-nowrap">Date</th>
                     <th className="p-3 whitespace-nowrap">Action</th>
@@ -699,6 +705,14 @@ const AdminWalletRequests = () => {
                       <td className="p-3">{req.account_details}</td>
                       <td className="p-3 text-green-600">
                         ${req.total_amount}
+                      </td>
+                      <td className="p-3 text-green-600">
+                        {req.feePercentage}%
+                      </td>
+                      <td className="p-3 text-green-600">
+                        {(
+  req.total_amount / (1 - req.feePercentage / 100)
+).toFixed(2)}
                       </td>
                       <td className="p-3 capitalize">{req.status}</td>
                       <td className="p-3">
