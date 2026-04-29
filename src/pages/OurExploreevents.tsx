@@ -1220,7 +1220,11 @@ const OurExploreEvents = () => {
                         {event.name}
                       </h3>
                       <p className="text-white pb-7 text-sm">
-                        {event.location_name}
+                         {event?.location_name ? (
+                    `${event?.location_name}`
+                  ) : (
+                    <p className="font-medium">Location not specified</p>
+                  )}
                       </p>
                     </div>
                   </div>

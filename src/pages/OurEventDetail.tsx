@@ -1395,7 +1395,7 @@ const OurEventDetails = () => {
                             </p>
                           )}
                         {event.location_status === "tbd" && (
-                          <p className="font-medium">Location: To Be Decided</p>
+                          <p className="font-medium">Location not specified</p>
                         )}
                       </>
                     </div>
