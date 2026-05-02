@@ -300,7 +300,7 @@ const CreateEvent = () => {
         .insert({
           creator_id: profile.id,
           guest_user_ids: invitedGuestIds,
-          date_time: eventDateTime.toISOString(),
+          date_time: new Date(eventDateTime.getTime() - eventDateTime.getTimezoneOffset() * 60000).toISOString(),
           location_name: formData.location_name.trim(),
           location_address: formData.location_address.trim(),
           location_lng: formData.location_lng,
@@ -310,7 +310,9 @@ const CreateEvent = () => {
           status: "active",
           dining_style: formData.dining_style || null,
           dietary_theme: formData.dietary_theme || null,
-          rsvp_deadline: rsvpDeadline?.toISOString(),
+          rsvp_deadline: rsvpDeadline
+  ? new Date(rsvpDeadline.getTime() - rsvpDeadline.getTimezoneOffset() * 60000).toISOString()
+  : null,
           tags: formData.tags.length > 0 ? formData.tags : null,
           cover_photo_url: formData.cover_photo_url,
           is_mystery_dinner: formData.is_mystery_dinner,

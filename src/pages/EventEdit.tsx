@@ -154,7 +154,10 @@ const EventEdit = () => {
   const [showRecurringDialog, setShowRecurringDialog] = useState(false);
   const [mode, setMode] = useState<"sell" | "rsvp">("sell");
   const [isLoaded, setIsLoaded] = useState(false);
-
+  const toLocalDatetimeString = (date: Date): string => {
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  };
   useEffect(() => {
     const url = formData.flyer_url;
     if (!url) return;
@@ -241,7 +244,7 @@ const EventEdit = () => {
         description: data.description.trim() || "",
         // start_date: eventDate.toISOString().split("T")[0],
         // start_time: eventDate.toTimeString().slice(0, 5),
-        start_datetime: eventDate.toISOString().slice(0, 16),
+        start_datetime: toLocalDatetimeString(eventDate),
         location_name: data.location_name?.trim() || null,
         location_address: data.location_address?.trim() || null,
         location_lat: data.location_lat || null,
@@ -254,9 +257,7 @@ const EventEdit = () => {
         guest_invitation_type: data.guest_invitation_type,
         is_paid: data.is_paid,
         event_fee: data.event_fee,
-        rsvp_deadline: rsvpDeadline
-          ? rsvpDeadline.toISOString().slice(0, 16)
-          : "",
+        rsvp_deadline: rsvpDeadline ? toLocalDatetimeString(rsvpDeadline) : "",
         tags: data.tags || [],
         flyer_url: data.cover_photo_url || "",
         is_mystery_dinner: data.is_mystery_dinner || false,
@@ -267,7 +268,7 @@ const EventEdit = () => {
         recurring: data.recurrence || false,
         recurrenceDates: data.recurrence_dates || [],
         end_datetime: eventEndDateTime
-          ? eventEndDateTime.toISOString().slice(0, 16)
+          ? toLocalDatetimeString(eventEndDateTime)
           : "",
         tiktok: data.tiktok || false,
         tiktokLink: data.tiktok_Link || "",
@@ -289,11 +290,16 @@ const EventEdit = () => {
     }
   };
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (
+    field: string,
+    value: any,
+    isUserAction = false,
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
+    if (!isUserAction) return;
     if (field === "guest_invitation_type" && value === "manual") {
       setEmailInviteModelOpen(true);
     }
@@ -612,34 +618,34 @@ const EventEdit = () => {
     setLoading(true);
 
     try {
-      if (subscriptionStatus === "free") {
-        const now = new Date();
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      // if (subscriptionStatus === "free") {
+      //   const now = new Date();
+      //   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      //   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-        const { count, error: countError } = await supabase
-          .from("events")
-          .select("*", { count: "exact", head: true })
-          .eq("creator_id", profile.id)
-          .gte("created_at", startOfMonth.toISOString())
-          .lte("created_at", endOfMonth.toISOString());
+      //   const { count, error: countError } = await supabase
+      //     .from("events")
+      //     .select("*", { count: "exact", head: true })
+      //     .eq("creator_id", profile.id)
+      //     .gte("created_at", startOfMonth.toISOString())
+      //     .lte("created_at", endOfMonth.toISOString());
 
-        if (countError) throw countError;
+      //   if (countError) throw countError;
 
-        if (count >= 2) {
-          toast({
-            title: "Event Limit Reached",
-            description:
-              "Free-tier users can only create 2 events per month. Upgrade to Premium to unlock unlimited events.",
-            variant: "destructive",
-          });
-          setTimeout(() => {
-            navigate("/subscription");
-          }, 1500);
-          setLoading(false);
-          return;
-        }
-      }
+      //   if (count >= 2) {
+      //     toast({
+      //       title: "Event Limit Reached",
+      //       description:
+      //         "Free-tier users can only create 2 events per month. Upgrade to Premium to unlock unlimited events.",
+      //       variant: "destructive",
+      //     });
+      //     setTimeout(() => {
+      //       navigate("/subscription");
+      //     }, 1500);
+      //     setLoading(false);
+      //     return;
+      //   }
+      // }
 
       let passwordHashed = null;
 
@@ -647,20 +653,11 @@ const EventEdit = () => {
         const trimmedPassword = formData.event_password
           ? formData.event_password.trim()
           : null;
-        if (trimmedPassword === null || trimmedPassword.length === 0) {
-          toast({
-            title: "Validation Error",
-            description: "Password cannot be empty if protection is enabled.",
-            variant: "destructive",
-          });
-          setLoading(false);
-          return;
+        if (trimmedPassword && trimmedPassword.length > 0) {
+          const salt = await bcrypt.genSalt(10);
+          passwordHashed = await bcrypt.hash(trimmedPassword, salt);
         }
-
-        const salt = await bcrypt.genSalt(10);
-        passwordHashed = await bcrypt.hash(trimmedPassword, salt);
       }
-
       // const eventDateTime = new Date(
       //   `${formData.start_date}T${formData.start_time}`
       // );
@@ -769,13 +766,12 @@ const EventEdit = () => {
         });
         return;
       }
-
       const { data, error } = await supabase
         .from("events")
         .update({
           creator_id: profile.id,
           guest_user_ids: invitedGuestIds,
-          date_time: eventDateTime.toISOString(),
+          date_time: new Date(eventDateTime.getTime() - eventDateTime.getTimezoneOffset() * 60000).toISOString(),
           location_name: formData.location_name,
           location_address: formData.location_address,
           location_lng: formData.location_lng,
@@ -786,14 +782,16 @@ const EventEdit = () => {
           status: "active",
           dining_style: formData.dining_style || null,
           dietary_theme: formData.dietary_theme || null,
-          rsvp_deadline: rsvpDeadline?.toISOString() || null,
+          rsvp_deadline: rsvpDeadline
+  ? new Date(rsvpDeadline.getTime() - rsvpDeadline.getTimezoneOffset() * 60000).toISOString()
+  : null,
           tags: formData.tags.length > 0 ? formData.tags : null,
           cover_photo_url: formData.flyer_url,
           is_mystery_dinner: formData.is_mystery_dinner,
           description: formData.description,
           name: formData.name,
           is_password_protected: formData.is_password_protected,
-          password_hash: passwordHashed,
+          ...(passwordHashed !== null && { password_hash: passwordHashed }),
           explore: formData.explore,
           guest_invitation_type: formData.guest_invitation_type,
           auto_suggest_crossed_paths:
@@ -818,8 +816,8 @@ const EventEdit = () => {
             ? formData.recurrenceDates
             : null,
           eventEndDateTime: eventEndDateTime
-            ? eventEndDateTime.toISOString()
-            : null,
+  ? new Date(eventEndDateTime.getTime() - eventEndDateTime.getTimezoneOffset() * 60000).toISOString()
+  : null,
           location:
             formData.location_status === "confirmed"
               ? `${formData.location_name}, ${formData.location_address}`
@@ -1774,7 +1772,11 @@ const EventEdit = () => {
                       value="manual"
                       checked={formData.guest_invitation_type === "manual"}
                       onCheckedChange={() =>
-                        handleInputChange("guest_invitation_type", "manual")
+                        handleInputChange(
+                          "guest_invitation_type",
+                          "manual",
+                          true,
+                        )
                       }
                       className={`w-4 h-4 ${
                         formData.guest_invitation_type === "manual"
@@ -1800,6 +1802,7 @@ const EventEdit = () => {
                         handleInputChange(
                           "guest_invitation_type",
                           "crossed_paths",
+                          true,
                         )
                       }
                       className={`w-4 h-4 border  ${

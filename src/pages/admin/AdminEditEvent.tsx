@@ -181,7 +181,11 @@ const AdminEditEvent = () => {
       const eventEndDateTime = data.eventEndDateTime
         ? new Date(data.eventEndDateTime)
         : null;
-
+      const pad = (n: number) => String(n).padStart(2, "0");
+      const toLocalDate = (d: Date) =>
+        `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+      const toLocalTime = (d: Date) =>
+        `${pad(d.getHours())}:${pad(d.getMinutes())}`;
       console.log("eventDate", eventDate);
       console.log("rsvpDeadline", rsvpDeadline);
       console.log("eventEndDateTime", eventEndDateTime);
@@ -191,13 +195,12 @@ const AdminEditEvent = () => {
       setSelectedBgColor(data.accent_bg || "#F8F6F1");
       setApplyAccentBg(data.bg_color ? true : false);
       setMode(data.is_paid ? "sell" : "rsvp");
-
       setFormData({
         name: data.name.trim() || "",
         description: data.description.trim() || "",
-        start_date: eventDate.toISOString().split("T")[0],
-        start_time: eventDate.toTimeString().slice(0, 5),
-         location_name: data.location_name?.trim() || null,
+        start_date: toLocalDate(eventDate),
+        start_time: toLocalTime(eventDate),
+        location_name: data.location_name?.trim() || null,
         location_address: data.location_address?.trim() || null,
         location_lat: data.location_lat || null,
         location_lng: data.location_lng || null,
@@ -209,12 +212,8 @@ const AdminEditEvent = () => {
         guest_invitation_type: data.guest_invitation_type,
         is_paid: data.is_paid,
         event_fee: data.event_fee,
-        rsvp_deadline_date: rsvpDeadline
-          ? rsvpDeadline.toISOString().split("T")[0]
-          : "",
-        rsvp_deadline_time: rsvpDeadline
-          ? rsvpDeadline.toTimeString().slice(0, 5)
-          : "",
+        rsvp_deadline_date: rsvpDeadline ? toLocalDate(rsvpDeadline) : "",
+        rsvp_deadline_time: rsvpDeadline ? toLocalTime(rsvpDeadline) : "",
         tags: data.tags || [],
         flyer_url: data.cover_photo_url || "",
         is_mystery_dinner: data.is_mystery_dinner || false,
@@ -224,12 +223,8 @@ const AdminEditEvent = () => {
         imageGalleryLinks: data.imageGalleryLinks || [],
         recurring: data.recurrence || false,
         recurrenceDates: data.recurrence_dates || [],
-        end_date: eventEndDateTime
-          ? eventEndDateTime.toISOString().split("T")[0]
-          : "",
-        end_time: eventEndDateTime
-          ? eventEndDateTime.toTimeString().slice(0, 5)
-          : "",
+        end_date: eventEndDateTime ? toLocalDate(eventEndDateTime) : "",
+        end_time: eventEndDateTime ? toLocalTime(eventEndDateTime) : "",
         tiktok: data.tiktok || false,
         tiktokLink: data.tiktok_Link || "",
         guestList: data.guest_list || true,
@@ -543,25 +538,13 @@ const AdminEditEvent = () => {
     setLoading(true);
     try {
       let passwordHashed = null;
-
       if (formData.is_password_protected) {
-        const trimmedPassword = formData.event_password
-          ? formData.event_password.trim()
-          : null;
-        if (trimmedPassword === null || trimmedPassword.length === 0) {
-          toast({
-            title: "Validation Error",
-            description: "Password cannot be empty if protection is enabled.",
-            variant: "destructive",
-          });
-          setLoading(false);
-          return;
+        const trimmedPassword = formData.event_password?.trim();
+        if (trimmedPassword && trimmedPassword.length > 0) {
+          const salt = await bcrypt.genSalt(10);
+          passwordHashed = await bcrypt.hash(trimmedPassword, salt);
         }
-
-        const salt = await bcrypt.genSalt(10);
-        passwordHashed = await bcrypt.hash(trimmedPassword, salt);
       }
-
       const eventDateTime = new Date(
         `${formData.start_date}T${formData.start_time}`,
       );
@@ -636,7 +619,12 @@ const AdminEditEvent = () => {
           cover_photo_url: formData.flyer_url,
           is_mystery_dinner: formData.is_mystery_dinner,
           description: formData.description,
-          name: formData.name,
+          is_password_protected: formData.is_password_protected,
+          ...(passwordHashed !== null
+            ? { password_hash: passwordHashed }
+            : !formData.is_password_protected
+              ? { password_hash: null }
+              : {}),
           guest_invitation_type: formData.guest_invitation_type,
           auto_suggest_crossed_paths:
             formData.guest_invitation_type === "crossed_paths",
@@ -766,10 +754,10 @@ const AdminEditEvent = () => {
       style={
         selectedColor
           ? ({
-              "--accent-bg": lightenColor(selectedBgColor),
-              background: "var(--accent-bg)",
-              transition: "background 0.5s ease",
-            } as React.CSSProperties)
+            "--accent-bg": lightenColor(selectedBgColor),
+            background: "var(--accent-bg)",
+            transition: "background 0.5s ease",
+          } as React.CSSProperties)
           : ({ transition: "background 0.5s ease" } as React.CSSProperties)
       }
     >
@@ -785,9 +773,9 @@ const AdminEditEvent = () => {
         style_button={
           selectedColor
             ? {
-                backgroundColor: selectedColor,
-                borderColor: selectedColor,
-              }
+              backgroundColor: selectedColor,
+              borderColor: selectedColor,
+            }
             : {}
         }
         open={emailInviteModelOpen}
@@ -809,9 +797,9 @@ const AdminEditEvent = () => {
         style_button={
           selectedColor
             ? {
-                backgroundColor: selectedColor,
-                borderColor: selectedColor,
-              }
+              backgroundColor: selectedColor,
+              borderColor: selectedColor,
+            }
             : {}
         }
         open={crossedPathInviteModelOpen}
@@ -827,8 +815,8 @@ const AdminEditEvent = () => {
             style={
               selectedBgColor
                 ? {
-                    backgroundColor: selectedBgColor,
-                  }
+                  backgroundColor: selectedBgColor,
+                }
                 : {}
             }
           >
@@ -836,11 +824,10 @@ const AdminEditEvent = () => {
               type="button"
               size="sm"
               onClick={() => setMode("sell")}
-              className={`rounded-full px-4 text-sm font-medium transition-all duration-200 ${
-                mode === "sell"
+              className={`rounded-full px-4 text-sm font-medium transition-all duration-200 ${mode === "sell"
                   ? "bg-primary text-primary-foreground shadow-lg text-lg"
                   : "bg-transparent text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
               style={{
                 backgroundColor:
                   mode === "sell" ? "var(--accent-color)" : "transparent",
@@ -854,11 +841,10 @@ const AdminEditEvent = () => {
               type="button"
               size="sm"
               onClick={() => setMode("rsvp")}
-              className={`rounded-full px-4 text-sm font-medium transition-all duration-200 ${
-                mode === "rsvp"
+              className={`rounded-full px-4 text-sm font-medium transition-all duration-200 ${mode === "rsvp"
                   ? "bg-primary text-primary-foreground shadow-lg text-lg"
                   : "bg-transparent text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
               style={{
                 backgroundColor:
                   mode === "rsvp" ? "var(--accent-color)" : "transparent",
@@ -976,7 +962,7 @@ const AdminEditEvent = () => {
                     <Label htmlFor="start_time">Time Start *</Label>
                     <div className="relative">
                       <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                       {/* {
+                      {/* {
                         console.log("formData.start_time", formData.start_time)
                       } */}
                       <Input
@@ -1004,7 +990,7 @@ const AdminEditEvent = () => {
                     <Label htmlFor="end_date">End Date</Label>
                     <div className="relative">
                       <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                       {/* {
+                      {/* {
                         console.log("formData.end_date", formData.end_date)
                       } */}
                       <Input
@@ -1031,9 +1017,7 @@ const AdminEditEvent = () => {
                     <Label htmlFor="end_time">Time End</Label>
                     <div className="relative">
                       <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                             {
-                        console.log("formData.end_time", formData.end_time)
-                      }
+                      {console.log("formData.end_time", formData.end_time)}
 
                       <Input
                         id="end_time"
@@ -1166,9 +1150,9 @@ const AdminEditEvent = () => {
                               style={
                                 selectedColor
                                   ? {
-                                      backgroundColor: selectedColor,
-                                      borderColor: selectedColor,
-                                    }
+                                    backgroundColor: selectedColor,
+                                    borderColor: selectedColor,
+                                  }
                                   : {}
                               }
                             >
@@ -1219,9 +1203,9 @@ const AdminEditEvent = () => {
                                 style={
                                   selectedColor
                                     ? {
-                                        backgroundColor: selectedColor,
-                                        borderColor: selectedColor,
-                                      }
+                                      backgroundColor: selectedColor,
+                                      borderColor: selectedColor,
+                                    }
                                     : {}
                                 }
                               >
@@ -1661,9 +1645,9 @@ const AdminEditEvent = () => {
                             style={
                               selectedColor
                                 ? {
-                                    backgroundColor: selectedColor,
-                                    borderColor: selectedColor,
-                                  }
+                                  backgroundColor: selectedColor,
+                                  borderColor: selectedColor,
+                                }
                                 : {}
                             }
                           >
@@ -1726,10 +1710,10 @@ const AdminEditEvent = () => {
                                             );
                                             const end =
                                               feature.end_date &&
-                                              feature.end_time
+                                                feature.end_time
                                                 ? new Date(
-                                                    `${feature.end_date}T${feature.end_time}`,
-                                                  )
+                                                  `${feature.end_date}T${feature.end_time}`,
+                                                )
                                                 : null;
 
                                             // Format like 28/10 04:23pm
@@ -1819,9 +1803,9 @@ const AdminEditEvent = () => {
                               style={
                                 selectedColor
                                   ? {
-                                      backgroundColor: selectedColor,
-                                      borderColor: selectedColor,
-                                    }
+                                    backgroundColor: selectedColor,
+                                    borderColor: selectedColor,
+                                  }
                                   : {}
                               }
                             >
@@ -1926,9 +1910,9 @@ const AdminEditEvent = () => {
                       style_button={
                         selectedColor
                           ? {
-                              backgroundColor: selectedColor,
-                              borderColor: selectedColor,
-                            }
+                            backgroundColor: selectedColor,
+                            borderColor: selectedColor,
+                          }
                           : {}
                       }
                       onImagesUploaded={(urls) => {
@@ -2092,9 +2076,9 @@ const AdminEditEvent = () => {
                     style={
                       selectedColor
                         ? {
-                            backgroundColor: selectedColor,
-                            borderColor: selectedColor,
-                          }
+                          backgroundColor: selectedColor,
+                          borderColor: selectedColor,
+                        }
                         : {}
                     }
                   >
@@ -2112,12 +2096,12 @@ const AdminEditEvent = () => {
                         style={
                           selectedColor
                             ? {
-                                backgroundColor: selectedColor,
-                                borderColor: selectedColor,
-                              }
+                              backgroundColor: selectedColor,
+                              borderColor: selectedColor,
+                            }
                             : {}
                         }
-                        // onClick={() => removeTag(tag)}
+                      // onClick={() => removeTag(tag)}
                       >
                         {tag}
                         <span className="" onClick={() => removeTag(tag)}>
@@ -2317,11 +2301,10 @@ const AdminEditEvent = () => {
                             type="button"
                             size="icon"
                             key={i}
-                            className={`w-7 h-7 rounded-md border transition-all hover:scale-105 ${
-                              selectedColor === color
+                            className={`w-7 h-7 rounded-md border transition-all hover:scale-105 ${selectedColor === color
                                 ? "ring-2 ring-offset-2 ring-primary"
                                 : "ring-0"
-                            }`}
+                              }`}
                             style={{ backgroundColor: color }}
                             onClick={() => {
                               setSelectedColor(color);
@@ -2411,11 +2394,10 @@ const AdminEditEvent = () => {
                                 handleColorChange(selectedColor);
                                 handleToggleBg(checked as boolean);
                               }}
-                              className={`w-4 h-4 border  ${
-                                formData.bg_color
+                              className={`w-4 h-4 border  ${formData.bg_color
                                   ? "backdrop-blur-md bg-white/40 border-black"
                                   : "bg-transparent border-red"
-                              }`}
+                                }`}
                             />
                           </div>
                         </>
@@ -2434,9 +2416,9 @@ const AdminEditEvent = () => {
               style={
                 selectedColor
                   ? {
-                      backgroundColor: selectedColor,
-                      borderColor: selectedColor,
-                    }
+                    backgroundColor: selectedColor,
+                    borderColor: selectedColor,
+                  }
                   : {}
               }
             >
@@ -2463,8 +2445,8 @@ const AdminEditEvent = () => {
           start_time={
             formData.start_date && formData.start_time
               ? new Date(
-                  `${formData.start_date}T${formData.start_time}`,
-                ).toISOString()
+                `${formData.start_date}T${formData.start_time}`,
+              ).toISOString()
               : null
           }
           onSubmit={(data) => {

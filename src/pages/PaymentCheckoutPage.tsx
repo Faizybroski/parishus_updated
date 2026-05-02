@@ -282,96 +282,102 @@ function CheckoutForm({ userName, userEmail, clientSecret, eventId, date }) {
 
         const locationName = eventData?.location_name;
 
-        const { data: restaurantData } = await supabase
-          .from("restaurants")
-          .select("*")
-          .eq("name", locationName)
-          .single();
-
-        const {
-          id: restaurant_id,
-          name: restaurant_name,
-          longitude: restaurant_long,
-          latitude: restaurant_lat,
-        } = restaurantData;
-
-        const { data: visit } = await supabase
-          .from("restaurant_visits")
-          .insert({
-            user_id: profile.id,
-            restaurant_id,
-            restaurant_name,
-            latitude: restaurant_long,
-            longitude: restaurant_lat,
-            visited_at: new Date().toISOString(),
-          })
-          .select()
-          .single();
-
-        const { data: sameRestaurantVisits } = await supabase
-          .from("restaurant_visits")
-          .select("user_id")
-          .eq("restaurant_id", restaurant_id)
-          .neq("user_id", profile.id);
-
-        for (const match of sameRestaurantVisits || []) {
-          const otherUserId = match.user_id;
-          const userAId = profile.id < otherUserId ? profile.id : otherUserId;
-          const userBId = profile.id < otherUserId ? otherUserId : profile.id;
-
-          const { data: existingCrossedPath } = await supabase
-            .from("crossed_paths_log")
+        try {
+          const { data: restaurantData } = await supabase
+            .from("restaurants")
             .select("*")
-            .eq("user_a_id", userAId)
-            .eq("user_b_id", userBId)
-            .eq("restaurant_id", restaurant_id)
+            .eq("name", locationName)
             .single();
 
-          if (existingCrossedPath) {
-            await supabase
-              .from("crossed_paths_log")
-              .update({
-                cross_count: existingCrossedPath.cross_count + 1,
-                updated_at: new Date().toISOString(),
-              })
-              .eq("id", existingCrossedPath.id);
-          } else {
-            await supabase.from("crossed_paths_log").insert({
-              user_a_id: userAId,
-              user_b_id: userBId,
-              restaurant_id,
-              restaurant_name,
-              location_lat: restaurant_long,
-              location_lng: restaurant_lat,
-              cross_count: 1,
-            });
+          if (restaurantData) {
+            const {
+              id: restaurant_id,
+              name: restaurant_name,
+              longitude: restaurant_long,
+              latitude: restaurant_lat,
+            } = restaurantData;
 
-            const { data: existingPath } = await supabase
-              .from("crossed_paths")
-              .select("*")
-              .eq("user1_id", userAId)
-              .eq("user2_id", userBId)
+            const { data: visit } = await supabase
+              .from("restaurant_visits")
+              .insert({
+                user_id: profile.id,
+                restaurant_id,
+                restaurant_name,
+                latitude: restaurant_long,
+                longitude: restaurant_lat,
+                visited_at: new Date().toISOString(),
+              })
+              .select()
               .single();
 
-            if (!existingPath) {
-              await supabase.from("crossed_paths").insert({
-                user1_id: userAId,
-                user2_id: userBId,
-                location_name: restaurant_name,
-                location_lat: restaurant_long,
-                location_lng: restaurant_lat,
-                is_active: true,
-              });
+            const { data: sameRestaurantVisits } = await supabase
+              .from("restaurant_visits")
+              .select("user_id")
+              .eq("restaurant_id", restaurant_id)
+              .neq("user_id", profile.id);
+
+            for (const match of sameRestaurantVisits || []) {
+              const otherUserId = match.user_id;
+              const userAId =
+                profile.id < otherUserId ? profile.id : otherUserId;
+              const userBId =
+                profile.id < otherUserId ? otherUserId : profile.id;
+
+              const { data: existingCrossedPath } = await supabase
+                .from("crossed_paths_log")
+                .select("*")
+                .eq("user_a_id", userAId)
+                .eq("user_b_id", userBId)
+                .eq("restaurant_id", restaurant_id)
+                .single();
+
+              if (existingCrossedPath) {
+                await supabase
+                  .from("crossed_paths_log")
+                  .update({
+                    cross_count: existingCrossedPath.cross_count + 1,
+                    updated_at: new Date().toISOString(),
+                  })
+                  .eq("id", existingCrossedPath.id);
+              } else {
+                await supabase.from("crossed_paths_log").insert({
+                  user_a_id: userAId,
+                  user_b_id: userBId,
+                  restaurant_id,
+                  restaurant_name,
+                  location_lat: restaurant_long,
+                  location_lng: restaurant_lat,
+                  cross_count: 1,
+                });
+
+                const { data: existingPath } = await supabase
+                  .from("crossed_paths")
+                  .select("*")
+                  .eq("user1_id", userAId)
+                  .eq("user2_id", userBId)
+                  .single();
+
+                if (!existingPath) {
+                  await supabase.from("crossed_paths").insert({
+                    user1_id: userAId,
+                    user2_id: userBId,
+                    location_name: restaurant_name,
+                    location_lat: restaurant_long,
+                    location_lng: restaurant_lat,
+                    is_active: true,
+                  });
+                }
+              }
             }
           }
+        } catch (restaurantErr) {
+          console.warn("Restaurant not found, skipping:", restaurantErr);
         }
-
-        // Send RSVP email AFTER payment (paid event)
         try {
-          // Fetch event details for email
           const { data: eventForEmail } = await supabase
             .from("events")
-            .select(`
+            .select(
+              `
               name,
               date_time,
               location_name,
@@ -384,7 +390,8 @@ function CheckoutForm({ userName, userEmail, clientSecret, eventId, date }) {
                 last_name,
                 email
               )
-            `)
+            `,
+            )
             .eq("id", eventId)
             .single();
 
@@ -392,18 +399,27 @@ function CheckoutForm({ userName, userEmail, clientSecret, eventId, date }) {
             const ownerProfile = eventForEmail.profiles as any;
             await sendRSVPedEmail({
               rsvpedUserEmail: userEmail || profile?.email || "",
-              rsvpedUserName: userName || `${profile?.first_name || ""} ${profile?.last_name || ""}`.trim() || "Guest",
+              rsvpedUserName:
+                userName ||
+                `${profile?.first_name || ""} ${profile?.last_name || ""}`.trim() ||
+                "Guest",
               eventName: eventForEmail.name,
               eventDateTime: eventForEmail.date_time,
-              eventLocation: eventForEmail.location_name || eventForEmail.location || "",
-              eventLocationAddress: eventForEmail.location_address || "",
+              eventLocation:
+                eventForEmail.location_name ||
+                eventForEmail.location ||
+                "Location To Be Decided",
+              eventLocationAddress:
+                eventForEmail.location_address || "Address To Be Decided",
               trackCode: rsvpTrackCode,
               qrCodeUrl: rsvpQrCode,
               isPaid: true,
               paymentStatus: "paid",
               pricePaid: eventForEmail.event_fee || undefined,
               organizerEmail: ownerProfile?.email || "",
-              organizerName: `${ownerProfile?.first_name || ""} ${ownerProfile?.last_name || ""}`.trim() || "Event Owner",
+              organizerName:
+                `${ownerProfile?.first_name || ""} ${ownerProfile?.last_name || ""}`.trim() ||
+                "Event Owner",
             });
           }
         } catch (emailErr) {
