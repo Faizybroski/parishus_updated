@@ -3,5 +3,14 @@ project_id = "udlsywpejkcnrygeeqvd"
 [functions.create-rsvp-payment]
 verify_jwt = false
 
-[functions.verify-rsvp-payment] 
+[functions.verify-rsvp-payment]
+verify_jwt = false
+
+[functions.create-event-plan-payment]
+verify_jwt = false
+
+[functions.event-rsvped]
+verify_jwt = false
+
+[functions.create-event-payment-intent]
 verify_jwt = false

@@ -20,6 +20,10 @@ interface RSVPEmailParams {
   paymentStatus: string; // 'paid' | 'unpaid' | 'pending'
   pricePaid?: string;
 
+  // Selected RSVP plan (optional — only present for multi-plan events)
+  selectedPlanTitle?: string;
+  selectedPlanDescription?: string;
+
   // Event owner email fields
   organizerEmail: string;
   organizerName: string;
@@ -54,6 +58,8 @@ export const sendRSVPedEmail = async (params: RSVPEmailParams) => {
     isPaid,
     paymentStatus,
     pricePaid,
+    selectedPlanTitle,
+    selectedPlanDescription,
     organizerEmail,
     organizerName,
     replyTo,
@@ -98,6 +104,21 @@ export const sendRSVPedEmail = async (params: RSVPEmailParams) => {
             ${isPaid ? `<tr><td style="padding: 6px 0; color: #666;">Payment</td><td style="padding: 6px 0; color: #2d8a4e; font-weight: 600;">✅ ${paymentStatus} ${pricePaid ? `($${pricePaid})` : ""}</td></tr>` : ""}
           </table>
         </div>
+
+        ${selectedPlanTitle ? `
+        <!-- Selected Plan Card -->
+        <div style="background: #f0ebe6; border-radius: 12px; padding: 20px; margin-bottom: 24px; border-left: 4px solid #a89282;">
+          <h3 style="color: #333; margin: 0 0 10px; font-size: 16px;">🎟 Your RSVP Plan</h3>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 6px 0; color: #666; width: 100px;">Plan</td>
+              <td style="padding: 6px 0; color: #333; font-weight: 700;">${selectedPlanTitle}</td>
+            </tr>
+            ${pricePaid ? `<tr><td style="padding: 6px 0; color: #666;">Price Paid</td><td style="padding: 6px 0; color: #2d8a4e; font-weight: 600;">$${pricePaid}</td></tr>` : ""}
+            ${selectedPlanDescription ? `<tr><td style="padding: 6px 0; color: #666; vertical-align: top;">Includes</td><td style="padding: 6px 0; color: #555;">${selectedPlanDescription}</td></tr>` : ""}
+          </table>
+        </div>
+        ` : ""}
 
         <!-- Track Code -->
         <div style="background: #333; border-radius: 12px; padding: 20px; margin-bottom: 24px; text-align: center;">
@@ -151,6 +172,7 @@ export const sendRSVPedEmail = async (params: RSVPEmailParams) => {
             <tr><td style="padding: 6px 0; color: #666;">Email</td><td style="padding: 6px 0; color: #333;">${rsvpedUserEmail}</td></tr>
             <tr><td style="padding: 6px 0; color: #666;">RSVP Time</td><td style="padding: 6px 0; color: #333;">${new Date().toLocaleString()}</td></tr>
             <tr><td style="padding: 6px 0; color: #666;">Payment</td><td style="padding: 6px 0; color: ${isPaid ? "#2d8a4e" : "#666"}; font-weight: 600;">${isPaid ? `✅ Paid${pricePaid ? ` ($${pricePaid})` : ""}` : "Free Event"}</td></tr>
+            ${selectedPlanTitle ? `<tr><td style="padding: 6px 0; color: #666;">Plan</td><td style="padding: 6px 0; color: #333; font-weight: 600;">${selectedPlanTitle}</td></tr>` : ""}
           </table>
         </div>
 

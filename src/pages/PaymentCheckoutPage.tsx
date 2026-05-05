@@ -39,11 +39,25 @@ interface Event {
   location_name: string;
 }
 
+interface SelectedPlan {
+  id: string;
+  title: string;
+  price: number;
+  description: string | null;
+}
+
 export default function PaymentCheckoutPage() {
   const location = useLocation();
   const [event, setEvent] = useState<Event | null>(null);
-  const { clientSecret, publishableKey, eventId, userName, userEmail, date } =
-    location.state || {};
+  const {
+    clientSecret,
+    publishableKey,
+    eventId,
+    userName,
+    userEmail,
+    date,
+    selectedPlan,
+  } = location.state || {};
   const [stripePromise, setStripePromise] = useState(null);
 
   useEffect(() => {
@@ -151,6 +165,24 @@ export default function PaymentCheckoutPage() {
           </Card>
         )}
 
+        {/* Selected Plan Card */}
+        {selectedPlan && (
+          <Card className="border-none shadow-lg">
+            <CardHeader>
+              <CardTitle>🎟 Selected Plan</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-1 text-sm">
+              <div className="flex justify-between items-center">
+                <span className="font-semibold text-base">{selectedPlan.title}</span>
+                <span className="font-bold text-base">${selectedPlan.price}</span>
+              </div>
+              {selectedPlan.description && (
+                <p className="text-muted-foreground">{selectedPlan.description}</p>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
         {/* Payment Form */}
         <div className="p-6 rounded-2xl shadow-lg border border-neutral-800">
           <Elements stripe={stripePromise} options={{ clientSecret }}>
@@ -160,6 +192,7 @@ export default function PaymentCheckoutPage() {
               clientSecret={clientSecret}
               eventId={eventId}
               date={date}
+              selectedPlan={selectedPlan ?? null}
             />
           </Elements>
         </div>
@@ -168,7 +201,21 @@ export default function PaymentCheckoutPage() {
   );
 }
 
-function CheckoutForm({ userName, userEmail, clientSecret, eventId, date }) {
+function CheckoutForm({
+  userName,
+  userEmail,
+  clientSecret,
+  eventId,
+  date,
+  selectedPlan,
+}: {
+  userName: string;
+  userEmail: string;
+  clientSecret: string;
+  eventId: string;
+  date: string;
+  selectedPlan: SelectedPlan | null;
+}) {
   const stripe = useStripe();
   const elements = useElements();
   const { profile } = useProfile();
@@ -234,28 +281,14 @@ function CheckoutForm({ userName, userEmail, clientSecret, eventId, date }) {
     });
 
     if (result?.paymentIntent?.status === "succeeded") {
-      const userId = profile.user_id;
-
-      const { data: response, error } = await supabase.functions.invoke(
-        "payment-complete",
-        {
-          body: {
-            eventId,
-            userId,
-            userName,
-            userEmail,
-            paymentIntentId: result.paymentIntent.id,
-            paymentStatus: result.paymentIntent.status,
-            date,
-          },
-        },
-      );
-
-      if (!error && response?.success === true) {
+      try {
         const rsvpTrackCode = generateTrackCode();
         const rsvpQrCode = await generateQRCodeDataURL(rsvpTrackCode);
 
-        await supabase.from("rsvps").insert({
+        // plan_id and plan_snapshot are new columns added via migration;
+        // cast needed until supabase types are regenerated.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const rsvpPayload: any = {
           event_id: eventId,
           user_id: profile.id,
           status: "confirmed",
@@ -264,7 +297,17 @@ function CheckoutForm({ userName, userEmail, clientSecret, eventId, date }) {
           qr_code_data: rsvpQrCode,
           payment_status: "paid",
           stripe_payment_id: result.paymentIntent.id,
-        });
+        };
+        if (selectedPlan) {
+          rsvpPayload.plan_id = selectedPlan.id;
+          rsvpPayload.plan_snapshot = {
+            id: selectedPlan.id,
+            title: selectedPlan.title,
+            price: selectedPlan.price,
+            description: selectedPlan.description,
+          };
+        }
+        await supabase.from("rsvps").insert(rsvpPayload);
 
         await supabase.from("reservations").insert({
           event_id: eventId,
@@ -415,11 +458,17 @@ function CheckoutForm({ userName, userEmail, clientSecret, eventId, date }) {
               qrCodeUrl: rsvpQrCode,
               isPaid: true,
               paymentStatus: "paid",
-              pricePaid: eventForEmail.event_fee || undefined,
+              pricePaid: selectedPlan
+                ? String(selectedPlan.price)
+                : eventForEmail.event_fee
+                  ? String(eventForEmail.event_fee)
+                  : undefined,
               organizerEmail: ownerProfile?.email || "",
               organizerName:
                 `${ownerProfile?.first_name || ""} ${ownerProfile?.last_name || ""}`.trim() ||
                 "Event Owner",
+              selectedPlanTitle: selectedPlan?.title,
+              selectedPlanDescription: selectedPlan?.description ?? undefined,
             });
           }
         } catch (emailErr) {
@@ -432,12 +481,13 @@ function CheckoutForm({ userName, userEmail, clientSecret, eventId, date }) {
         });
 
         navigate("/rsvp-success");
-      } else {
-        console.error(
-          "Payment was successful but backend failed:",
-          error || response,
-        );
-        alert("Payment done, but something went wrong on our end.");
+      } catch (rsvpErr) {
+        console.error("Failed to complete RSVP after payment:", rsvpErr);
+        toast({
+          title: "Almost there",
+          description: "Payment succeeded but RSVP setup failed. Please contact support.",
+          variant: "destructive",
+        });
       }
     }
 

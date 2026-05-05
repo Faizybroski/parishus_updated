@@ -76,6 +76,7 @@ interface Event {
   is_password_protected: boolean;
   password_hash: string;
   guest_list: boolean;
+  show_rsvp_count: boolean;
   tiktok: boolean;
   tiktok_Link: string;
   imageGallery: boolean;
@@ -126,6 +127,15 @@ interface Event {
   }>;
 }
 
+interface EventPlan {
+  id: string;
+  title: string;
+  description: string | null;
+  price: number;
+  capacity: number | null;
+  sort_order: number;
+}
+
 const OurEventDetails = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
@@ -148,6 +158,11 @@ const OurEventDetails = () => {
   const subscriptionStatus = useSubscriptionStatus(profile?.id);
   const [isInterested, setIsInterested] = useState(false);
   const [password, setPassword] = useState("");
+
+  // RSVP plans
+  const [eventPlans, setEventPlans] = useState<EventPlan[]>([]);
+  const [selectedPlan, setSelectedPlan] = useState<EventPlan | null>(null);
+  const [planSpotsLeft, setPlanSpotsLeft] = useState<Record<string, number | null>>({});
   const [showRecurrenceDialog, setShowRecurrenceDialog] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -270,9 +285,41 @@ const OurEventDetails = () => {
       if (eventId) {
         fetchEvent();
         fetchEventReviews();
+        fetchEventPlans();
       }
     });
   }, [eventId, user]);
+
+  const fetchEventPlans = async () => {
+    if (!eventId) return;
+    const { data, error } = await supabase
+      .from("event_plans")
+      .select("*")
+      .eq("event_id", eventId)
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true });
+    if (error || !data) return;
+    setEventPlans(data);
+
+    // Count RSVPs per plan to compute spots left
+    const spotMap: Record<string, number | null> = {};
+    await Promise.all(
+      data.map(async (plan) => {
+        if (plan.capacity === null) {
+          spotMap[plan.id] = null; // unlimited
+        } else {
+          const { count } = await supabase
+            .from("rsvps")
+            .select("id", { count: "exact", head: true })
+            .eq("event_id", eventId)
+            .eq("plan_id", plan.id)
+            .eq("status", "confirmed");
+          spotMap[plan.id] = plan.capacity - (count ?? 0);
+        }
+      }),
+    );
+    setPlanSpotsLeft(spotMap);
+  };
 
   const fetchEvent = async () => {
     if (!eventId) return;
@@ -391,10 +438,20 @@ const OurEventDetails = () => {
         description:
           "You’ll need to sign in or sign up before you can RSVP and join this event.",
       });
-      // navigate("/login", { state: { startStep: 1 , redirectTo: `/event/${eventId}/details` } });
       navigate(`/login?redirectTo=/event/${eventId}/details`);
       return;
     }
+
+    // If this event has plan tiers, a plan must be selected first
+    if (eventPlans.length > 0 && !selectedPlan) {
+      toast({
+        title: "Select a Plan",
+        description: "Please choose an RSVP plan before continuing.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsPaying(true);
     try {
       if (event.is_password_protected) {
@@ -402,7 +459,6 @@ const OurEventDetails = () => {
           password.trim(),
           event.password_hash,
         );
-
         if (!correctPassword) {
           toast({
             title: "Incorrect Password",
@@ -413,64 +469,48 @@ const OurEventDetails = () => {
           setIsPaying(false);
           return;
         }
+      }
 
-        const { data: response, error } = await supabase.functions.invoke(
-          "create-event-payment-intent",
-          {
-            body: { event_id: eventId, user_id: user.id },
+      // Determine which edge function + body to use
+      const usePlanPayment = eventPlans.length > 0 && selectedPlan;
+      const functionName = usePlanPayment
+        ? "create-event-plan-payment"
+        : "create-event-payment-intent";
+      const body = usePlanPayment
+        ? { event_id: eventId, user_id: user.id, plan_id: selectedPlan.id }
+        : { event_id: eventId, user_id: user.id };
+
+      const { data: response, error } = await supabase.functions.invoke(
+        functionName,
+        { body },
+      );
+
+      const parsed =
+        typeof response === "string" ? JSON.parse(response) : response;
+
+      if (parsed?.client_secret && parsed?.publishableKey) {
+        setIsPaying(false);
+        navigate("/payment-checkout", {
+          state: {
+            clientSecret: parsed.client_secret,
+            publishableKey: parsed.publishableKey,
+            eventId,
+            userName:
+              user?.user_metadata?.full_name ||
+              `${profile?.first_name ?? ""} ${profile?.last_name ?? ""}`.trim() ||
+              "Guest User",
+            userEmail: user?.email || "unknown@example.com",
+            date: event.recurrence ? selectedDate : event.date_time,
+            selectedPlan: usePlanPayment ? selectedPlan : null,
           },
-        );
-
-        const parsed =
-          typeof response === "string" ? JSON.parse(response) : response;
-
-        if (parsed?.client_secret && parsed?.publishableKey) {
-          setIsPaying(false);
-          navigate("/payment-checkout", {
-            state: {
-              clientSecret: parsed.client_secret,
-              publishableKey: parsed.publishableKey,
-              eventId: eventId,
-              userName:
-                user?.user_metadata?.full_name ||
-                `${profile?.first_name ?? ""} ${
-                  profile?.last_name ?? ""
-                }`.trim() ||
-                "Guest User",
-              userEmail: user?.email || "unknown@example.com",
-              date: event.recurrence ? selectedDate : event.date_time,
-            },
-          });
-        }
+        });
       } else {
-        const { data: response, error } = await supabase.functions.invoke(
-          "create-event-payment-intent",
-          {
-            body: { event_id: eventId, user_id: user.id },
-          },
-        );
-
-        const parsed =
-          typeof response === "string" ? JSON.parse(response) : response;
-
-        if (parsed?.client_secret && parsed?.publishableKey) {
-          setIsPaying(false);
-          navigate("/payment-checkout", {
-            state: {
-              clientSecret: parsed.client_secret,
-              publishableKey: parsed.publishableKey,
-              eventId: eventId,
-              userName:
-                user?.user_metadata?.full_name ||
-                `${profile?.first_name ?? ""} ${
-                  profile?.last_name ?? ""
-                }`.trim() ||
-                "Guest User",
-              userEmail: user?.email || "unknown@example.com",
-              date: event.recurrence ? selectedDate : event.date_time,
-            },
-          });
-        }
+        toast({
+          title: "Error",
+          description: parsed?.error || "Could not initiate payment",
+          variant: "destructive",
+        });
+        setIsPaying(false);
       }
     } catch (err) {
       setIsPaying(false);
@@ -1403,10 +1443,12 @@ const OurEventDetails = () => {
                   <div className="flex items-center space-x-3">
                     <Users className="h-5 w-5 " />
                     <div>
-                      <p className="font-medium">
-                        {confirmedRSVPs.length} / {event.max_attendees}{" "}
-                        attending
-                      </p>
+                      {event.show_rsvp_count && (
+                        <p className="font-medium">
+                          {confirmedRSVPs.length} / {event.max_attendees}{" "}
+                          attending
+                        </p>
+                      )}
                       <p className="text-sm">
                         {spotsLeft > 0
                           ? `${spotsLeft} spots left`
@@ -1457,6 +1499,20 @@ const OurEventDetails = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {event.show_rsvp_count && confirmedRSVPs.length > 0 && (
+              <Card className="space-y-2 bg-transparent shadow-none border-none">
+                <div className="border-t border-gray-300 mx-6" />
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <span>
+                      {confirmedRSVPs.length}{" "}
+                      {confirmedRSVPs.length === 1 ? "person" : "people"} going
+                    </span>
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+            )}
 
             {event.guest_list && confirmedRSVPs.length > 0 && !isCreator && (
               <Card className="space-y-2 bg-transparent shadow-none border-none">
@@ -1951,12 +2007,14 @@ const OurEventDetails = () => {
                 <CardTitle>Join Event</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="text-center">
-                  <p className="text-2xl font-bold">{confirmedRSVPs.length}</p>
-                  <p className="text-sm text-muted-foreground">
-                    People attending
-                  </p>
-                </div>
+                {event.show_rsvp_count && (
+                  <div className="text-center">
+                    <p className="text-2xl font-bold">{confirmedRSVPs.length}</p>
+                    <p className="text-sm text-muted-foreground">
+                      People attending
+                    </p>
+                  </div>
+                )}
                 {isCreator && !hasRSVP && (
                   <div className="text-center mt-2">
                     <Badge variant="outline" className="px-3 py-1">
@@ -2011,6 +2069,56 @@ const OurEventDetails = () => {
                     <Badge variant="secondary" className="px-3 py-1">
                       Event Ended
                     </Badge>
+                  </div>
+                )}
+
+                {/* RSVP Plans — shown when event has plan tiers */}
+                {isUpcoming && !hasRSVP && !isCreator && eventPlans.length > 0 && (
+                  <div className="space-y-2 pt-2">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Select a Plan
+                    </p>
+                    {eventPlans.map((plan) => {
+                      const spots = planSpotsLeft[plan.id];
+                      const soldOut = spots !== null && spots <= 0;
+                      const isSelected = selectedPlan?.id === plan.id;
+                      return (
+                        <button
+                          key={plan.id}
+                          type="button"
+                          disabled={soldOut}
+                          onClick={() => !soldOut && setSelectedPlan(plan)}
+                          className={`w-full text-left rounded-xl px-4 py-3 border transition-all text-sm ${
+                            soldOut
+                              ? "opacity-50 cursor-not-allowed border-muted"
+                              : isSelected
+                              ? "border-2 border-black bg-white/60 shadow-sm"
+                              : "border border-white/40 bg-white/20 hover:bg-white/40"
+                          }`}
+                        >
+                          <div className="flex justify-between items-start gap-2">
+                            <span className="font-semibold leading-tight">
+                              {plan.title}
+                            </span>
+                            <span className="font-bold whitespace-nowrap">
+                              ${plan.price}
+                            </span>
+                          </div>
+                          {plan.description && (
+                            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                              {plan.description}
+                            </p>
+                          )}
+                          <p className="text-xs mt-1 text-muted-foreground">
+                            {soldOut
+                              ? "Sold out"
+                              : spots === null
+                              ? "Unlimited spots"
+                              : `${spots} spot${spots === 1 ? "" : "s"} left`}
+                          </p>
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </CardContent>
@@ -2088,16 +2196,21 @@ const OurEventDetails = () => {
                         handlePaidRSVP();
                       }
                     }}
-                    disabled={isPaying}
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center"
-                    style={{
-                      backgroundColor: event.accent_color,
-                    }}
+                    disabled={isPaying || (eventPlans.length > 0 && !selectedPlan)}
+                    className="w-full flex items-center justify-center"
+                    style={{ backgroundColor: event.accent_color }}
                   >
                     {isPaying ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                         Processing...
+                      </>
+                    ) : eventPlans.length > 0 ? (
+                      <>
+                        <CreditCard className="h-4 w-4 mr-2" />
+                        {selectedPlan
+                          ? `Pay $${selectedPlan.price} — ${selectedPlan.title}`
+                          : "Select a plan above"}
                       </>
                     ) : (
                       <>

@@ -32,6 +32,7 @@ import {
   Users,
   DollarSign,
   ArrowLeft,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -79,6 +80,7 @@ const AdminEditEvent = () => {
     is_private: false,
     is_paid: false,
     guestList: true,
+    showRsvpCount: true,
     features: false,
     is_password_protected: false,
     tiktok: false,
@@ -113,6 +115,20 @@ const AdminEditEvent = () => {
   const [applyAccentBg, setApplyAccentBg] = useState(true);
   const [showRecurringDialog, setShowRecurringDialog] = useState(false);
   const [mode, setMode] = useState<"sell" | "rsvp">("sell");
+
+  // RSVP Plans (ticket tiers)
+  interface RsvpPlan {
+    id?: string;
+    title: string;
+    description: string;
+    price: string;
+    capacity: string;
+  }
+  const [useMultiplePlans, setUseMultiplePlans] = useState(false);
+  const [rsvpPlans, setRsvpPlans] = useState<RsvpPlan[]>([]);
+  const [editingPlanIndex, setEditingPlanIndex] = useState<number | null>(null);
+  const [planForm, setPlanForm] = useState<RsvpPlan>({ title: "", description: "", price: "", capacity: "" });
+  const [showPlanForm, setShowPlanForm] = useState(false);
 
   const navigate = useNavigate();
 
@@ -228,11 +244,30 @@ const AdminEditEvent = () => {
         tiktok: data.tiktok || false,
         tiktokLink: data.tiktok_Link || "",
         guestList: data.guest_list || true,
+        showRsvpCount: data.show_rsvp_count ?? true,
         features: data.features || false,
         eventFeatures: data.event_features || [],
       });
-      console.log(data);
-      console.log("Form Data: ", formData);
+
+      // Load existing RSVP plans
+      const { data: plansData } = await supabase
+        .from("event_plans")
+        .select("*")
+        .eq("event_id", eventId)
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true });
+      if (plansData && plansData.length > 0) {
+        setUseMultiplePlans(true);
+        setRsvpPlans(
+          plansData.map((p) => ({
+            id: p.id,
+            title: p.title,
+            description: p.description ?? "",
+            price: String(p.price),
+            capacity: p.capacity !== null ? String(p.capacity) : "",
+          })),
+        );
+      }
     } catch (error) {
       console.error("Error fetching event:", error);
       toast({
@@ -490,16 +525,24 @@ const AdminEditEvent = () => {
       return;
     }
 
-    if (
-      mode === "sell" &&
-      (!formData.event_fee || Number(formData.event_fee) <= 0)
-    ) {
-      toast({
-        title: "Validation Error",
-        description: "Please enter a valid event fee for paid events.",
-        variant: "destructive",
-      });
-      return;
+    if (mode === "sell") {
+      if (useMultiplePlans) {
+        if (rsvpPlans.length === 0) {
+          toast({
+            title: "Validation Error",
+            description: "Please add at least one RSVP plan.",
+            variant: "destructive",
+          });
+          return;
+        }
+      } else if (!formData.event_fee || Number(formData.event_fee) <= 0) {
+        toast({
+          title: "Validation Error",
+          description: "Please enter a valid event fee for paid events.",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     if (formData.tiktok) {
@@ -629,8 +672,10 @@ const AdminEditEvent = () => {
           auto_suggest_crossed_paths:
             formData.guest_invitation_type === "crossed_paths",
           is_paid: mode === "sell" ? true : false,
-          event_fee: mode === "sell" ? formData.event_fee : null,
+          event_fee:
+            mode === "sell" && !useMultiplePlans ? formData.event_fee : null,
           guest_list: formData.guestList,
+          show_rsvp_count: formData.showRsvpCount,
           tiktok: formData.tiktok,
           tiktok_Link: formData.tiktok ? formData.tiktokLink : null,
           imageGallery: formData.imageGallery,
@@ -657,6 +702,40 @@ const AdminEditEvent = () => {
         .eq("id", eventId);
 
       if (error) throw error;
+
+      // Upsert RSVP plans
+      if (mode === "sell" && useMultiplePlans) {
+        const existingIds = rsvpPlans.filter((p) => p.id).map((p) => p.id!);
+        await supabase
+          .from("event_plans")
+          .update({ is_active: false })
+          .eq("event_id", eventId)
+          .not("id", "in", `(${existingIds.length ? existingIds.join(",") : "00000000-0000-0000-0000-000000000000"})`);
+
+        for (let i = 0; i < rsvpPlans.length; i++) {
+          const p = rsvpPlans[i];
+          const payload = {
+            event_id: eventId,
+            title: p.title,
+            description: p.description || null,
+            price: parseFloat(p.price),
+            capacity: p.capacity ? parseInt(p.capacity) : null,
+            sort_order: i,
+            is_active: true,
+          };
+          if (p.id) {
+            await supabase.from("event_plans").update(payload).eq("id", p.id);
+          } else {
+            await supabase.from("event_plans").insert(payload);
+          }
+        }
+      } else if (mode !== "sell") {
+        await supabase
+          .from("event_plans")
+          .update({ is_active: false })
+          .eq("event_id", eventId);
+      }
+
       const eventLink = `${window.location.origin}/event/${eventId}/details`;
       const emails = invitedEmails;
 
@@ -1401,36 +1480,121 @@ const AdminEditEvent = () => {
                   <CardTitle>Payment Settings</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="event_fee">Event Fee (USD) *</Label>
-                    <div className="relative">
-                      <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="event_fee"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        placeholder="0.00"
-                        value={formData.event_fee ?? ""}
-                        onChange={(e) =>
-                          handleInputChange(
-                            "event_fee",
-                            parseFloat(e.target.value),
-                          )
-                        }
-                        className="pl-10"
-                        required={mode === "sell"}
-                        style={
-                          {
-                            "--accent-bg": lightenColor(selectedColor),
-                            background:
-                              "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
-                            transition: "background 0.5s ease",
-                          } as React.CSSProperties
-                        }
-                      />
-                    </div>
+                  {/* Toggle: multiple plans vs single fee */}
+                  <div className="flex justify-between items-center py-3 px-4 rounded-md backdrop-blur-md bg-white/40">
+                    <Label className="flex gap-2 items-center">
+                      <Sparkles className="h-4 w-4" />
+                      Multiple RSVP Plans (ticket tiers)
+                    </Label>
+                    <Checkbox
+                      checked={useMultiplePlans}
+                      onCheckedChange={(v) => setUseMultiplePlans(!!v)}
+                      className={`w-4 h-4 border ${useMultiplePlans ? "backdrop-blur-md bg-white/40 border-black" : "bg-transparent"}`}
+                    />
                   </div>
+
+                  {!useMultiplePlans && (
+                    <div className="space-y-2">
+                      <Label htmlFor="event_fee">Event Fee (USD) *</Label>
+                      <div className="relative">
+                        <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="event_fee"
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          placeholder="0.00"
+                          value={formData.event_fee ?? ""}
+                          onChange={(e) =>
+                            handleInputChange(
+                              "event_fee",
+                              parseFloat(e.target.value),
+                            )
+                          }
+                          className="pl-10"
+                          required={mode === "sell" && !useMultiplePlans}
+                          style={
+                            {
+                              "--accent-bg": lightenColor(selectedColor),
+                              background:
+                                "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
+                              transition: "background 0.5s ease",
+                            } as React.CSSProperties
+                          }
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {useMultiplePlans && (
+                    <div className="space-y-4">
+                      {rsvpPlans.length === 0 ? (
+                        <p className="text-sm text-muted-foreground italic px-1">No plans yet. Add at least one plan.</p>
+                      ) : (
+                        <div className="space-y-3">
+                          {rsvpPlans.map((plan, i) => (
+                            <div key={i} className="flex items-start justify-between gap-3 rounded-xl px-4 py-3 backdrop-blur-md bg-white/30">
+                              <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-sm">{plan.title}</p>
+                                <p className="text-xs text-muted-foreground">${plan.price}{plan.capacity ? ` · ${plan.capacity} spots` : " · Unlimited"}</p>
+                                {plan.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{plan.description}</p>}
+                              </div>
+                              <div className="flex gap-1 flex-shrink-0">
+                                <Button type="button" variant="ghost" size="icon" className="h-7 w-7 bg-transparent hover:bg-white/40"
+                                  onClick={() => { setEditingPlanIndex(i); setPlanForm({ ...plan }); setShowPlanForm(true); }}>
+                                  <Edit2 className="h-3.5 w-3.5" />
+                                </Button>
+                                <Button type="button" variant="ghost" size="icon" className="h-7 w-7 bg-transparent hover:bg-white/40 text-destructive"
+                                  onClick={() => setRsvpPlans((prev) => prev.filter((_, idx) => idx !== i))}>
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {showPlanForm ? (
+                        <div className="rounded-xl px-4 py-4 space-y-3 backdrop-blur-md bg-white/20 border border-white/30">
+                          <p className="text-sm font-semibold">{editingPlanIndex !== null ? "Edit Plan" : "New Plan"}</p>
+                          <Input placeholder="Plan title *" value={planForm.title} onChange={(e) => setPlanForm((p) => ({ ...p, title: e.target.value }))}
+                            className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black/60 focus-visible:ring-0" />
+                          <Input placeholder="Price (USD) *" type="number" min="0" step="0.01" value={planForm.price}
+                            onChange={(e) => setPlanForm((p) => ({ ...p, price: e.target.value }))}
+                            className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black/60 focus-visible:ring-0" />
+                          <Input placeholder="Capacity (leave blank for unlimited)" type="number" min="1" value={planForm.capacity}
+                            onChange={(e) => setPlanForm((p) => ({ ...p, capacity: e.target.value }))}
+                            className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black/60 focus-visible:ring-0" />
+                          <textarea placeholder="Description / benefits (optional)" value={planForm.description} rows={2}
+                            onChange={(e) => setPlanForm((p) => ({ ...p, description: e.target.value }))}
+                            className="w-full rounded-md px-3 py-2 text-sm border-none bg-white/40 placeholder:text-black/60 focus:outline-none resize-none" />
+                          <div className="flex gap-2">
+                            <Button type="button" size="sm" className="flex-1 bg-transparent backdrop-blur-md bg-white/40 text-black hover:bg-white/60"
+                              onClick={() => {
+                                if (!planForm.title || !planForm.price) { toast({ title: "Title and price are required", variant: "destructive" }); return; }
+                                if (editingPlanIndex !== null) {
+                                  setRsvpPlans((prev) => prev.map((p, i) => (i === editingPlanIndex ? planForm : p)));
+                                } else {
+                                  setRsvpPlans((prev) => [...prev, planForm]);
+                                }
+                                setPlanForm({ title: "", description: "", price: "", capacity: "" });
+                                setEditingPlanIndex(null); setShowPlanForm(false);
+                              }}>
+                              {editingPlanIndex !== null ? "Save Changes" : "Add Plan"}
+                            </Button>
+                            <Button type="button" variant="ghost" size="sm" className="bg-transparent hover:bg-white/20"
+                              onClick={() => { setShowPlanForm(false); setEditingPlanIndex(null); setPlanForm({ title: "", description: "", price: "", capacity: "" }); }}>
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <Button type="button" variant="outline" size="sm" onClick={() => setShowPlanForm(true)}
+                          className="border-none rounded-full flex items-center gap-2 bg-transparent backdrop-blur-md bg-white/40 hover:bg-white/60">
+                          <Plus className="h-4 w-4" /> Add Plan
+                        </Button>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             )}
@@ -1603,6 +1767,30 @@ const AdminEditEvent = () => {
                         ))}
                       </div>
                     </>
+                  )}
+                </div>
+
+                <div className="border py-2 rounded-md">
+                  <div className="flex justify-between items-center px-4">
+                    <Label htmlFor="showRsvpCount">RSVP Count</Label>
+                    <Checkbox
+                      id="showRsvpCount"
+                      checked={formData.showRsvpCount}
+                      onCheckedChange={(checked) =>
+                        handleInputChange("showRsvpCount", checked)
+                      }
+                      style={
+                        {
+                          "--accent-bg": lightenColor(selectedColor),
+                          background:
+                            "linear-gradient(135deg, var(--accent-bg) 0%, #ffffff 100%)",
+                          transition: "background 0.5s ease",
+                        } as React.CSSProperties
+                      }
+                    />
+                  </div>
+                  {formData.showRsvpCount && (
+                    <p className="mt-2 px-4 text-sm text-muted-foreground">42 people going</p>
                   )}
                 </div>
 
