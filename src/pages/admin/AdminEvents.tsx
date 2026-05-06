@@ -57,9 +57,11 @@ const AdminEvents = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [eventToDelete, setEventToDelete] = useState<string | null>(null);
+  const [eventPlans, setEventPlans] = useState([]);
 
   useEffect(() => {
     fetchEvents();
+    fetchEventPlans();
   }, []);
 
   const fetchEvents = async () => {
@@ -97,6 +99,21 @@ const AdminEvents = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchEventPlans = async () => {
+    // if (!eventIds.length) return;
+    const { data, error } = await supabase
+      .from("event_plans")
+      .select("*")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true });
+    if (error || !data) return;
+    if (error) {
+      console.error(error);
+      return;
+    }
+    setEventPlans(data);
   };
 
   const handleDeleteEvent = async (eventId: string) => {
@@ -241,6 +258,9 @@ const AdminEvents = () => {
           ) : (
             filteredEvents.map((event) => {
               const isCreator = profile?.id === event.creator_id;
+              const hasPlans = eventPlans?.some(
+                (plan) => plan.event_id === event.id,
+              );
               return (
                 <Card
                   key={event.id}
@@ -309,10 +329,26 @@ const AdminEvents = () => {
                     )}
 
                     {typeof event.is_paid !== "undefined" && (
-                      <div className="text-sm font-medium py-2">
-                        {event.is_paid
-                          ? `💵 Paid Event – $${event.event_fee}`
-                          : "🆓 Free Event"}
+                      <div className="py-2">
+                        {event.is_paid ? (
+                          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1.5 text-sm font-semibold text-emerald-600 border border-emerald-500/20">
+                            <span>💳</span>
+
+                            {hasPlans ? (
+                              <span>Paid Event • Multiple Plans Available</span>
+                            ) : (
+                              <span>
+                                Paid Event • $
+                                {Number(event.event_fee || 0).toFixed(0)}
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="inline-flex items-center gap-2 rounded-full bg-sky-500/10 px-3 py-1.5 text-sm font-semibold text-sky-600 border border-sky-500/20">
+                            <span>🆓</span>
+                            <span>Free Event</span>
+                          </div>
+                        )}
                       </div>
                     )}
 

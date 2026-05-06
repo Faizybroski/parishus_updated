@@ -75,11 +75,22 @@ export default function PaymentCheckoutPage() {
     if (!error) setEvent(data);
   };
 
-  useEffect(() => {
-    if (publishableKey) {
-      setStripePromise(loadStripe(publishableKey));
-    }
-  }, [publishableKey]);
+  // useEffect(() => {
+  //   if (publishableKey) {
+  //     setStripePromise(loadStripe(publishableKey));
+  //   }
+  // }, [publishableKey]);
+
+useEffect(() => {
+  if (
+    publishableKey &&
+    typeof publishableKey === "string"
+  ) {
+    setStripePromise(loadStripe(publishableKey));
+  } else {
+    console.error("Invalid Stripe publishable key:", publishableKey);
+  }
+}, [publishableKey]);
 
   if (!clientSecret || !stripePromise)
     return (

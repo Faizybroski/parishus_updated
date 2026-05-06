@@ -162,7 +162,9 @@ const OurEventDetails = () => {
   // RSVP plans
   const [eventPlans, setEventPlans] = useState<EventPlan[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<EventPlan | null>(null);
-  const [planSpotsLeft, setPlanSpotsLeft] = useState<Record<string, number | null>>({});
+  const [planSpotsLeft, setPlanSpotsLeft] = useState<
+    Record<string, number | null>
+  >({});
   const [showRecurrenceDialog, setShowRecurrenceDialog] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -484,6 +486,7 @@ const OurEventDetails = () => {
         functionName,
         { body },
       );
+      console.log(response);
 
       const parsed =
         typeof response === "string" ? JSON.parse(response) : response;
@@ -1440,22 +1443,23 @@ const OurEventDetails = () => {
                       </>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <Users className="h-5 w-5 " />
-                    <div>
-                      {event.show_rsvp_count && (
+                  {event.show_rsvp_count && (
+                    <div className="flex items-center space-x-3">
+                      <Users className="h-5 w-5 " />
+                      <div>
                         <p className="font-medium">
                           {confirmedRSVPs.length} / {event.max_attendees}{" "}
                           attending
                         </p>
-                      )}
-                      <p className="text-sm">
+
+                        {/* <p className="text-sm">
                         {spotsLeft > 0
                           ? `${spotsLeft} spots left`
                           : "Event full"}
-                      </p>
+                      </p> */}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {event.rsvp_deadline && (
@@ -2009,7 +2013,9 @@ const OurEventDetails = () => {
               <CardContent className="space-y-4">
                 {event.show_rsvp_count && (
                   <div className="text-center">
-                    <p className="text-2xl font-bold">{confirmedRSVPs.length}</p>
+                    <p className="text-2xl font-bold">
+                      {confirmedRSVPs.length}
+                    </p>
                     <p className="text-sm text-muted-foreground">
                       People attending
                     </p>
@@ -2073,54 +2079,63 @@ const OurEventDetails = () => {
                 )}
 
                 {/* RSVP Plans — shown when event has plan tiers */}
-                {isUpcoming && !hasRSVP && !isCreator && eventPlans.length > 0 && (
-                  <div className="space-y-2 pt-2">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Select a Plan
-                    </p>
-                    {eventPlans.map((plan) => {
-                      const spots = planSpotsLeft[plan.id];
-                      const soldOut = spots !== null && spots <= 0;
-                      const isSelected = selectedPlan?.id === plan.id;
-                      return (
-                        <button
-                          key={plan.id}
-                          type="button"
-                          disabled={soldOut}
-                          onClick={() => !soldOut && setSelectedPlan(plan)}
-                          className={`w-full text-left rounded-xl px-4 py-3 border transition-all text-sm ${
-                            soldOut
-                              ? "opacity-50 cursor-not-allowed border-muted"
-                              : isSelected
-                              ? "border-2 border-black bg-white/60 shadow-sm"
-                              : "border border-white/40 bg-white/20 hover:bg-white/40"
-                          }`}
-                        >
-                          <div className="flex justify-between items-start gap-2">
-                            <span className="font-semibold leading-tight">
-                              {plan.title}
-                            </span>
-                            <span className="font-bold whitespace-nowrap">
-                              ${plan.price}
-                            </span>
-                          </div>
-                          {plan.description && (
-                            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                              {plan.description}
-                            </p>
-                          )}
-                          <p className="text-xs mt-1 text-muted-foreground">
-                            {soldOut
-                              ? "Sold out"
-                              : spots === null
-                              ? "Unlimited spots"
-                              : `${spots} spot${spots === 1 ? "" : "s"} left`}
-                          </p>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
+                {isUpcoming &&
+                  !hasRSVP &&
+                  !isCreator &&
+                  eventPlans.length > 0 && (
+                    <div className="space-y-2 pt-2">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        Select a Plan
+                      </p>
+                      {eventPlans.map((plan) => {
+                        const spots = planSpotsLeft[plan.id];
+                        const soldOut = spots !== null && spots <= 0;
+                        const isSelected = selectedPlan?.id === plan.id;
+                        return (
+                          <button
+                            key={plan.id}
+                            type="button"
+                            disabled={soldOut}
+                            onClick={() => !soldOut && setSelectedPlan(plan)}
+                            className={`w-full text-left rounded-xl px-4 py-3 border transition-all text-sm ${
+                              soldOut
+                                ? "opacity-50 cursor-not-allowed border-muted"
+                                : isSelected
+                                  ? "border-2 border-black bg-white/60 shadow-sm"
+                                  : "border border-white/40 bg-white/20 hover:bg-white/40"
+                            }`}
+                          >
+                            <div className="flex justify-between items-start gap-2">
+                              <span className="font-semibold leading-tight">
+                                {plan.title}
+                              </span>
+                              <span className="font-bold whitespace-nowrap">
+                                ${plan.price}
+                              </span>
+                            </div>
+                            {plan.description && (
+                              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                {plan.description}
+                              </p>
+                            )}
+                            {event.show_rsvp_count ? (
+                              <p className="text-xs mt-1 text-muted-foreground">
+                                {soldOut
+                                  ? "Sold out"
+                                  : spots === null
+                                    ? "Unlimited spots"
+                                    : `${spots} spot${spots === 1 ? "" : "s"} left`}
+                              </p>
+                            ) : (
+                              <p className="text-xs mt-1 text-muted-foreground">
+                                {soldOut && "Sold out"}
+                              </p>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
               </CardContent>
             </Card>
           </div>
@@ -2196,7 +2211,9 @@ const OurEventDetails = () => {
                         handlePaidRSVP();
                       }
                     }}
-                    disabled={isPaying || (eventPlans.length > 0 && !selectedPlan)}
+                    disabled={
+                      isPaying || (eventPlans.length > 0 && !selectedPlan)
+                    }
                     className="w-full flex items-center justify-center"
                     style={{ backgroundColor: event.accent_color }}
                   >
