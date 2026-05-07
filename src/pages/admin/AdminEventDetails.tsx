@@ -610,7 +610,6 @@ const AdminEventDetails = () => {
     try {
       await navigator.share({
         title: event?.name,
-        text: event?.description,
         url: window.location.origin + `/event/${event?.id}/details`,
       });
     } catch (error) {

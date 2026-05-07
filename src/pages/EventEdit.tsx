@@ -166,6 +166,7 @@ const EventEdit = () => {
   }
   const [useMultiplePlans, setUseMultiplePlans] = useState(false);
   const [rsvpPlans, setRsvpPlans] = useState<RsvpPlan[]>([]);
+  const [deletedPlanIds, setDeletedPlanIds] = useState<string[]>([]);
   const [editingPlanIndex, setEditingPlanIndex] = useState<number | null>(null);
   const [planForm, setPlanForm] = useState<RsvpPlan>({ title: "", description: "", price: "", capacity: "" });
   const [showPlanForm, setShowPlanForm] = useState(false);
@@ -873,15 +874,26 @@ const EventEdit = () => {
 
       if (error) throw error;
 
+      // Helper: hard-delete a plan when no RSVPs reference it; soft-delete otherwise
+      // so that paid users' payment records are never orphaned.
+      const deletePlan = async (planId: string) => {
+        const { count } = await supabase
+          .from("rsvps")
+          .select("id", { count: "exact", head: true })
+          .eq("plan_id", planId);
+        if (count && count > 0) {
+          await supabase.from("event_plans").update({ is_active: false }).eq("id", planId);
+        } else {
+          await supabase.from("event_plans").delete().eq("id", planId);
+        }
+      };
+
       // Upsert RSVP plans
       if (mode === "sell" && useMultiplePlans) {
-        const existingIds = rsvpPlans.filter((p) => p.id).map((p) => p.id!);
-        // Soft-delete plans removed by the editor
-        await supabase
-          .from("event_plans")
-          .update({ is_active: false })
-          .eq("event_id", eventId)
-          .not("id", "in", `(${existingIds.length ? existingIds.join(",") : "00000000-0000-0000-0000-000000000000"})`);
+        // Delete only the plans the editor explicitly removed — never touch plans being edited.
+        for (const id of deletedPlanIds) {
+          await deletePlan(id);
+        }
 
         for (let i = 0; i < rsvpPlans.length; i++) {
           const p = rsvpPlans[i];
@@ -895,17 +907,34 @@ const EventEdit = () => {
             is_active: true,
           };
           if (p.id) {
-            await supabase.from("event_plans").update(payload).eq("id", p.id);
+            const { error: updateErr } = await supabase.from("event_plans").update(payload).eq("id", p.id);
+            if (updateErr) throw updateErr;
           } else {
-            await supabase.from("event_plans").insert(payload);
+            const { error: insertErr } = await supabase.from("event_plans").insert(payload);
+            if (insertErr) throw insertErr;
           }
         }
-      } else if (mode !== "sell") {
-        // Event switched to free — soft-delete all plans
-        await supabase
+        setDeletedPlanIds([]);
+      } else if (mode === "sell" && !useMultiplePlans) {
+        // Switched from multiple plans to single fee — remove all plans for this event
+        const { data: allPlans } = await supabase
           .from("event_plans")
-          .update({ is_active: false })
+          .select("id")
           .eq("event_id", eventId);
+        for (const plan of allPlans ?? []) {
+          await deletePlan(plan.id);
+        }
+        setDeletedPlanIds([]);
+      } else if (mode !== "sell") {
+        // Switched to free RSVP — remove all plans
+        const { data: allPlans } = await supabase
+          .from("event_plans")
+          .select("id")
+          .eq("event_id", eventId);
+        for (const plan of allPlans ?? []) {
+          await deletePlan(plan.id);
+        }
+        setDeletedPlanIds([]);
       }
 
       const eventLink = `${window.location.origin}/event/${eventId}/details`;
@@ -1856,7 +1885,13 @@ const EventEdit = () => {
                                   <Edit2 className="h-3.5 w-3.5" />
                                 </Button>
                                 <Button type="button" variant="ghost" size="icon" className="h-7 w-7 bg-transparent hover:bg-white/40 text-destructive"
-                                  onClick={() => setRsvpPlans((prev) => prev.filter((_, idx) => idx !== i))}>
+                                  onClick={() => {
+                                    const planToDelete = rsvpPlans[i];
+                                    if (planToDelete.id) {
+                                      setDeletedPlanIds((prev) => [...prev, planToDelete.id!]);
+                                    }
+                                    setRsvpPlans((prev) => prev.filter((_, idx) => idx !== i));
+                                  }}>
                                   <Trash2 className="h-3.5 w-3.5" />
                                 </Button>
                               </div>

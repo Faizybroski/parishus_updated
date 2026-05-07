@@ -668,6 +668,7 @@ const OurEventsCreate = () => {
           price: parseFloat(p.price),
           capacity: p.capacity ? parseInt(p.capacity) : null,
           sort_order: i,
+          is_active: true,
         }));
         const { error: plansError } = await supabase
           .from("event_plans")

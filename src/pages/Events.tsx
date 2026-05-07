@@ -357,7 +357,6 @@ const Events = () => {
     try {
       await navigator.share({
         title: name,
-        text: description,
         url: window.location.origin + `/event/${eventId}/details`,
       });
     } catch (error) {

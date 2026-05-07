@@ -2157,24 +2157,21 @@ const OurEventDetails = () => {
           !event.is_password_protected && (
             <div className="fixed bottom-4 left-0 right-0 px-4 sm:px-6 md:px-14 lg:px-36 z-50">
               {isBeforeDeadline ? (
-                !event.event_fee || event.event_fee == 0 ? (
+                !event.is_paid && eventPlans.length === 0 ? (
                   <Button
                     onClick={() => {
                       if (hasRSVP) {
                         handleRSVP();
+                        return;
                       }
                       if (event.recurrence && !hasRSVP) {
                         setShowRecurrenceDialog(true);
                         return;
                       }
-                      if (!event.recurrence) {
-                        handleRSVP();
-                      }
+                      handleRSVP();
                     }}
-                    className={`w-full ${hasRSVP ? "" : ""}`}
-                    style={{
-                      backgroundColor: event.accent_color,
-                    }}
+                    className="w-full"
+                    style={{ backgroundColor: event.accent_color }}
                     disabled={loadingStatus}
                   >
                     {hasRSVP ? (
@@ -2192,10 +2189,8 @@ const OurEventDetails = () => {
                 ) : hasRSVP ? (
                   <Button
                     onClick={handleRSVP}
-                    className={`w-full ${hasRSVP ? "" : ""}`}
-                    style={{
-                      backgroundColor: event.accent_color,
-                    }}
+                    className="w-full"
+                    style={{ backgroundColor: event.accent_color }}
                   >
                     <UserCheck className="h-4 w-4 mr-2" />
                     Going - Cancel RSVP
@@ -2207,13 +2202,9 @@ const OurEventDetails = () => {
                         setShowRecurrenceDialog(true);
                         return;
                       }
-                      if (!event.recurrence) {
-                        handlePaidRSVP();
-                      }
+                      handlePaidRSVP();
                     }}
-                    disabled={
-                      isPaying || (eventPlans.length > 0 && !selectedPlan)
-                    }
+                    disabled={isPaying || (eventPlans.length > 0 && !selectedPlan)}
                     className="w-full flex items-center justify-center"
                     style={{ backgroundColor: event.accent_color }}
                   >
@@ -2258,7 +2249,7 @@ const OurEventDetails = () => {
           event.is_password_protected && (
             <div className="fixed bottom-4 left-0 right-0 px-4 sm:px-6 md:px-14 lg:px-36 z-50">
               {isBeforeDeadline ? (
-                !event.event_fee || event.event_fee == 0 ? (
+                !event.is_paid && eventPlans.length === 0 ? (
                   hasRSVP ? (
                     <Button
                       onClick={handleRSVP}
@@ -2270,59 +2261,32 @@ const OurEventDetails = () => {
                     </Button>
                   ) : (
                     <div className="flex flex-col lg:flex-row gap-3">
-                      {event.is_password_protected && (
-                        <>
-                          <Input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="This event is password protected. Please enter the password to RSVP"
-                            className="w-[90%] mb-2 bg-transparent backdrop-blur-md bg-white/10"
-                          />
-                        </>
-                      )}
+                      <Input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="This event is password protected. Please enter the password to RSVP"
+                        className="w-[90%] mb-2 bg-transparent backdrop-blur-md bg-white/10"
+                      />
                       <Button
                         onClick={async () => {
-                          if (event.is_password_protected && !password.trim()) {
-                            toast({
-                              title: "Password Required",
-                              description: "Please enter the event password.",
-                              variant: "destructive",
-                            });
+                          if (!password.trim()) {
+                            toast({ title: "Password Required", description: "Please enter the event password.", variant: "destructive" });
                             return;
                           }
-                          const correctPassword = await bcrypt.compare(
-                            password.trim(),
-                            event.password_hash,
-                          );
+                          const correctPassword = await bcrypt.compare(password.trim(), event.password_hash);
                           if (!correctPassword) {
-                            toast({
-                              title: "Incorrect Password",
-                              description:
-                                "The Password you entered for RSVP this event is incorrect",
-                              variant: "destructive",
-                            });
+                            toast({ title: "Incorrect Password", description: "The Password you entered for RSVP this event is incorrect", variant: "destructive" });
                             return;
                           }
-
                           if (event.recurrence && !hasRSVP) {
                             setShowRecurrenceDialog(true);
                             return;
                           }
-                          if (!event.recurrence) {
-                            handleRSVP();
-                          }
-                          if (event.recurrence) {
-                            setShowRecurrenceDialog(true);
-                            return;
-                          }
-
                           handleRSVP();
                         }}
                         className="flex-1 lg:w-auto text-sm sm:text-base items-center justify-center flex-nowrap"
-                        style={{
-                          backgroundColor: event.accent_color,
-                        }}
+                        style={{ backgroundColor: event.accent_color }}
                         disabled={loadingStatus || !password.trim()}
                       >
                         <Heart className="h-4 w-4 mr-2" />
@@ -2341,56 +2305,31 @@ const OurEventDetails = () => {
                   </Button>
                 ) : (
                   <div className="flex flex-col lg:flex-row gap-3">
-                    {event.is_password_protected && (
-                      <>
-                        <Input
-                          type="password"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          placeholder="This event is password protected. Please enter the password to RSVP"
-                          className="w-full mb-2 bg-transparent backdrop-blur-md bg-white/10 placeholder:text-red"
-                        />
-                      </>
-                    )}
-
+                    <Input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="This event is password protected. Please enter the password to RSVP"
+                      className="w-full mb-2 bg-transparent backdrop-blur-md bg-white/10 placeholder:text-red"
+                    />
                     <Button
                       onClick={async () => {
-                        if (event.is_password_protected && !password.trim()) {
-                          toast({
-                            title: "Password Required",
-                            description: "Please enter the event password.",
-                            variant: "destructive",
-                          });
+                        if (!password.trim()) {
+                          toast({ title: "Password Required", description: "Please enter the event password.", variant: "destructive" });
                           return;
                         }
-                        const correctPassword = await bcrypt.compare(
-                          password.trim(),
-                          event.password_hash,
-                        );
+                        const correctPassword = await bcrypt.compare(password.trim(), event.password_hash);
                         if (!correctPassword) {
-                          toast({
-                            title: "Incorrect Password",
-                            description:
-                              "The Password you entered for RSVP this event is incorrect",
-                            variant: "destructive",
-                          });
+                          toast({ title: "Incorrect Password", description: "The Password you entered for RSVP this event is incorrect", variant: "destructive" });
                           return;
                         }
-
                         if (event.recurrence && !hasRSVP) {
                           setShowRecurrenceDialog(true);
                           return;
                         }
-                        if (!event.recurrence) {
-                          handlePaidRSVP();
-                        }
-
-                        if (event.recurrence && !hasRSVP) {
-                          setShowRecurrenceDialog(true);
-                          return;
-                        }
+                        handlePaidRSVP();
                       }}
-                      disabled={isPaying || !password.trim()}
+                      disabled={isPaying || !password.trim() || (eventPlans.length > 0 && !selectedPlan)}
                       className="w-full lg:w-auto flex-1"
                       style={{ backgroundColor: event.accent_color }}
                     >
@@ -2399,10 +2338,15 @@ const OurEventDetails = () => {
                           <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                           Processing...
                         </>
+                      ) : eventPlans.length > 0 ? (
+                        <>
+                          <CreditCard className="h-4 w-4 mr-2" />
+                          {selectedPlan ? `Pay $${selectedPlan.price} — ${selectedPlan.title}` : "Select a plan above"}
+                        </>
                       ) : (
                         <>
                           <CreditCard className="h-4 w-4 mr-2" />
-                          <span className="">Pay ${event.event_fee}</span>
+                          Pay ${event.event_fee} to RSVP
                         </>
                       )}
                     </Button>
@@ -2470,9 +2414,9 @@ const OurEventDetails = () => {
           </div>
 
           <Button
-            disabled={!selectedDate}
+            disabled={!selectedDate || (event.is_paid && eventPlans.length > 0 && !selectedPlan)}
             onClick={() => {
-              if (!event.event_fee) {
+              if (!event.is_paid && eventPlans.length === 0) {
                 handleRSVP();
               } else {
                 handlePaidRSVP();

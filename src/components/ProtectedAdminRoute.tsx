@@ -17,7 +17,7 @@ const ProtectedAdminRoute: React.FC<ProtectedAdminRouteProps> = ({
   const { user, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
 
-  if (authLoading || profileLoading) {
+  if (authLoading || profileLoading || (user && !profile)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <LoaderText text="Parish" />

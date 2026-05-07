@@ -35,6 +35,7 @@ export const useProfile = () => {
     if (lastFetchedUserId.current === user.id) return;
 
     lastFetchedUserId.current = user.id;
+    setLoading(true);
     fetchProfile();
   }, [user]);
 
