@@ -276,23 +276,23 @@ const EventEdit = () => {
         rsvp_deadline: rsvpDeadline ? toLocalDatetimeString(rsvpDeadline) : "",
         tags: data.tags || [],
         flyer_url: data.cover_photo_url || "",
-        is_mystery_dinner: data.is_mystery_dinner || false,
-        is_password_protected: data.is_password_protected || false,
-        explore: data.explore || true,
-        imageGallery: data.imageGallery || false,
+        is_mystery_dinner: data.is_mystery_dinner ?? false,
+        is_password_protected: data.is_password_protected ?? false,
+        explore: data.explore ?? true,
+        imageGallery: data.imageGallery ?? false,
         imageGalleryLinks: data.imageGalleryLinks || [],
-        recurring: data.recurrence || false,
+        recurring: data.recurrence ?? false,
         recurrenceDates: data.recurrence_dates || [],
         end_datetime: eventEndDateTime
           ? toLocalDatetimeString(eventEndDateTime)
           : "",
-        tiktok: data.tiktok || false,
+        tiktok: data.tiktok ?? false,
         tiktokLink: data.tiktok_Link || "",
-        guestList: data.guest_list || true,
+        guestList: data.guest_list ?? true,
         showRsvpCount: data.show_rsvp_count ?? true,
-        features: data.features || false,
+        features: data.features ?? false,
         eventFeatures: data.event_features || [],
-        bg_color: data.bg_color,
+        bg_color: data.bg_color ?? false,
       });
 
       // Load existing RSVP plans
@@ -749,23 +749,11 @@ const EventEdit = () => {
 
       if (formData.end_datetime) {
         const endDateTime = new Date(formData.end_datetime);
-        const now = new Date();
 
-        // Validate datetime parsing
         if (isNaN(endDateTime.getTime())) {
           toast({
             title: "Invalid date or time format",
             description: "Please ensure the end date and time are valid.",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        // Validate that it’s not in the past
-        if (endDateTime <= now) {
-          toast({
-            title: "End time in the past",
-            description: "End date and time cannot be in the past.",
             variant: "destructive",
           });
           return;
@@ -816,7 +804,7 @@ const EventEdit = () => {
         .update({
           creator_id: profile.id,
           guest_user_ids: invitedGuestIds,
-          date_time: new Date(eventDateTime.getTime() - eventDateTime.getTimezoneOffset() * 60000).toISOString(),
+          date_time: eventDateTime.toISOString(),
           location_name: formData.location_name,
           location_address: formData.location_address,
           location_lng: formData.location_lng,
@@ -827,9 +815,7 @@ const EventEdit = () => {
           status: "active",
           dining_style: formData.dining_style || null,
           dietary_theme: formData.dietary_theme || null,
-          rsvp_deadline: rsvpDeadline
-  ? new Date(rsvpDeadline.getTime() - rsvpDeadline.getTimezoneOffset() * 60000).toISOString()
-  : null,
+          rsvp_deadline: rsvpDeadline ? rsvpDeadline.toISOString() : null,
           tags: formData.tags.length > 0 ? formData.tags : null,
           cover_photo_url: formData.flyer_url,
           is_mystery_dinner: formData.is_mystery_dinner,
@@ -862,9 +848,7 @@ const EventEdit = () => {
           recurrence_dates: formData.recurring
             ? formData.recurrenceDates
             : null,
-          eventEndDateTime: eventEndDateTime
-  ? new Date(eventEndDateTime.getTime() - eventEndDateTime.getTimezoneOffset() * 60000).toISOString()
-  : null,
+          eventEndDateTime: eventEndDateTime ? eventEndDateTime.toISOString() : null,
           location:
             formData.location_status === "confirmed"
               ? `${formData.location_name}, ${formData.location_address}`
