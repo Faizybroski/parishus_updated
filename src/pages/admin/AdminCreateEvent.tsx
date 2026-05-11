@@ -161,7 +161,12 @@ const AdminCreateEvent = () => {
   const [useMultiplePlans, setUseMultiplePlans] = useState(false);
   const [rsvpPlans, setRsvpPlans] = useState<RsvpPlan[]>([]);
   const [editingPlanIndex, setEditingPlanIndex] = useState<number | null>(null);
-  const [planForm, setPlanForm] = useState<RsvpPlan>({ title: "", description: "", price: "", capacity: "" });
+  const [planForm, setPlanForm] = useState<RsvpPlan>({
+    title: "",
+    description: "",
+    price: "",
+    capacity: "",
+  });
   const [showPlanForm, setShowPlanForm] = useState(false);
 
   useEffect(() => {
@@ -535,49 +540,58 @@ const AdminCreateEvent = () => {
     }
 
     try {
-      const eventDateTime = new Date(
-        `${formData.start_date}T${formData.start_time}`,
-      );
+    const eventDateTime = new Date(
+  `${formData.start_date}T${formData.start_time}`,
+);
 
-      let eventEndDateTime: Date | null = null;
+let eventEndDateTime: Date | null = null;
 
-      if (formData.end_date || formData.end_time) {
-        if (!formData.end_date || !formData.end_time) {
-          toast({
-            title: "Invalid end time",
-            description: "Please provide both end date and end time.",
-            variant: "destructive",
-          });
-          return;
-        }
+if (formData.end_date || formData.end_time) {
+  if (!formData.end_date || !formData.end_time) {
+    toast({
+      title: "Invalid end time",
+      description: "Please provide both end date and end time.",
+      variant: "destructive",
+    });
+    return;
+  }
 
-        const endDateTime = new Date(
-          `${formData.end_date}T${formData.end_time}`,
-        );
+  const endDateTime = new Date(
+    `${formData.end_date}T${formData.end_time}`,
+  );
 
-        if (isNaN(endDateTime.getTime())) {
-          toast({
-            title: "Invalid date or time format",
-            description: "Please ensure the end date and time are valid.",
-            variant: "destructive",
-          });
-          return;
-        }
+  if (isNaN(endDateTime.getTime())) {
+    toast({
+      title: "Invalid date or time format",
+      description: "Please ensure the end date and time are valid.",
+      variant: "destructive",
+    });
+    return;
+  }
 
-        const now = new Date();
-        if (endDateTime < now) {
-          toast({
-            title: "End time in the past",
-            description: "End date and time cannot be in the past.",
-            variant: "destructive",
-          });
-          return;
-        }
+  const now = new Date();
+  if (endDateTime < now) {
+    toast({
+      title: "End time in the past",
+      description: "End date and time cannot be in the past.",
+      variant: "destructive",
+    });
+    return;
+  }
 
-        eventEndDateTime = endDateTime;
-      }
+  if (endDateTime <= eventDateTime) {
+    toast({
+      title: "Validation Error",
+      description: "End date and time must be later than the start date and time.",
+      variant: "destructive",
+    });
+    return;
+  }
 
-      let rsvpDeadline = null;
+  eventEndDateTime = endDateTime;
+}
+
+let rsvpDeadline = null;
 
       if (formData.rsvp_deadline_date && formData.rsvp_deadline_time) {
         rsvpDeadline = new Date(
@@ -620,7 +634,8 @@ const AdminCreateEvent = () => {
             formData.guest_invitation_type === "crossed_paths",
           is_private: formData.is_private,
           is_paid: mode === "sell" ? true : false,
-          event_fee: mode === "sell" && !useMultiplePlans ? formData.event_fee : null,
+          event_fee:
+            mode === "sell" && !useMultiplePlans ? formData.event_fee : null,
           guest_list: formData.guestList,
           show_rsvp_count: formData.showRsvpCount,
           tiktok: formData.tiktok,
@@ -761,6 +776,15 @@ const AdminCreateEvent = () => {
       </div>
     );
   }
+  const getContrastColor = (hexColor: string): string => {
+    if (!hexColor) return "#ffffff";
+    const hex = hexColor.replace("#", "");
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance > 0.5 ? "#000000" : "#ffffff";
+  };
 
   return (
     <div
@@ -1271,7 +1295,10 @@ const AdminCreateEvent = () => {
                           placeholder="0.00"
                           value={formData.event_fee ?? ""}
                           onChange={(e) =>
-                            handleInputChange("event_fee", parseFloat(e.target.value))
+                            handleInputChange(
+                              "event_fee",
+                              parseFloat(e.target.value),
+                            )
                           }
                           className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
                           required={mode === "sell" && !useMultiplePlans}
@@ -1283,23 +1310,57 @@ const AdminCreateEvent = () => {
                   {useMultiplePlans && (
                     <div className="space-y-4">
                       {rsvpPlans.length === 0 ? (
-                        <p className="text-sm text-muted-foreground italic px-1">No plans yet. Add at least one plan.</p>
+                        <p className="text-sm text-muted-foreground italic px-1">
+                          No plans yet. Add at least one plan.
+                        </p>
                       ) : (
                         <div className="space-y-3">
                           {rsvpPlans.map((plan, i) => (
-                            <div key={i} className="flex items-start justify-between gap-3 rounded-xl px-4 py-3 backdrop-blur-md bg-white/30">
+                            <div
+                              key={i}
+                              className="flex items-start justify-between gap-3 rounded-xl px-4 py-3 backdrop-blur-md bg-white/30"
+                            >
                               <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-sm">{plan.title}</p>
-                                <p className="text-xs text-muted-foreground">${plan.price}{plan.capacity ? ` · ${plan.capacity} spots` : " · Unlimited"}</p>
-                                {plan.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{plan.description}</p>}
+                                <p className="font-semibold text-sm">
+                                  {plan.title}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  ${plan.price}
+                                  {plan.capacity
+                                    ? ` · ${plan.capacity} spots`
+                                    : " · Unlimited"}
+                                </p>
+                                {plan.description && (
+                                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                    {plan.description}
+                                  </p>
+                                )}
                               </div>
                               <div className="flex gap-1 flex-shrink-0">
-                                <Button type="button" variant="ghost" size="icon" className="h-7 w-7 bg-transparent hover:bg-white/40"
-                                  onClick={() => { setEditingPlanIndex(i); setPlanForm({ ...plan }); setShowPlanForm(true); }}>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 bg-transparent hover:bg-white/40"
+                                  onClick={() => {
+                                    setEditingPlanIndex(i);
+                                    setPlanForm({ ...plan });
+                                    setShowPlanForm(true);
+                                  }}
+                                >
                                   <Edit2 className="h-3.5 w-3.5" />
                                 </Button>
-                                <Button type="button" variant="ghost" size="icon" className="h-7 w-7 bg-transparent hover:bg-white/40 text-destructive"
-                                  onClick={() => setRsvpPlans((prev) => prev.filter((_, idx) => idx !== i))}>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 bg-transparent hover:bg-white/40 text-destructive"
+                                  onClick={() =>
+                                    setRsvpPlans((prev) =>
+                                      prev.filter((_, idx) => idx !== i),
+                                    )
+                                  }
+                                >
                                   <Trash2 className="h-3.5 w-3.5" />
                                 </Button>
                               </div>
@@ -1310,46 +1371,125 @@ const AdminCreateEvent = () => {
 
                       {showPlanForm ? (
                         <div className="rounded-xl px-4 py-4 space-y-3 backdrop-blur-md bg-white/20 border border-white/30">
-                          <p className="text-sm font-semibold">{editingPlanIndex !== null ? "Edit Plan" : "New Plan"}</p>
-                          <Input placeholder="Plan title *" value={planForm.title}
-                            onChange={(e) => setPlanForm((p) => ({ ...p, title: e.target.value }))}
-                            className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black/60 focus-visible:ring-0" />
-                          <Input placeholder="Price (USD) *" type="number" min="0" step="0.01" value={planForm.price}
-                            onChange={(e) => setPlanForm((p) => ({ ...p, price: e.target.value }))}
-                            className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black/60 focus-visible:ring-0" />
-                          <Input placeholder="Capacity (leave blank for unlimited)" type="number" min="1" value={planForm.capacity}
-                            onChange={(e) => setPlanForm((p) => ({ ...p, capacity: e.target.value }))}
-                            className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black/60 focus-visible:ring-0" />
-                          <textarea placeholder="Description / benefits (optional)" value={planForm.description} rows={2}
-                            onChange={(e) => setPlanForm((p) => ({ ...p, description: e.target.value }))}
-                            className="w-full rounded-md px-3 py-2 text-sm border-none bg-white/40 placeholder:text-black/60 focus:outline-none resize-none" />
+                          <p className="text-sm font-semibold">
+                            {editingPlanIndex !== null
+                              ? "Edit Plan"
+                              : "New Plan"}
+                          </p>
+                          <Input
+                            placeholder="Plan title *"
+                            value={planForm.title}
+                            onChange={(e) =>
+                              setPlanForm((p) => ({
+                                ...p,
+                                title: e.target.value,
+                              }))
+                            }
+                            className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black/60 focus-visible:ring-0"
+                          />
+                          <Input
+                            placeholder="Price (USD) *"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={planForm.price}
+                            onChange={(e) =>
+                              setPlanForm((p) => ({
+                                ...p,
+                                price: e.target.value,
+                              }))
+                            }
+                            className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black/60 focus-visible:ring-0"
+                          />
+                          <Input
+                            placeholder="Capacity (leave blank for unlimited)"
+                            type="number"
+                            min="1"
+                            value={planForm.capacity}
+                            onChange={(e) =>
+                              setPlanForm((p) => ({
+                                ...p,
+                                capacity: e.target.value,
+                              }))
+                            }
+                            className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black/60 focus-visible:ring-0"
+                          />
+                          <textarea
+                            placeholder="Description / benefits (optional)"
+                            value={planForm.description}
+                            rows={2}
+                            onChange={(e) =>
+                              setPlanForm((p) => ({
+                                ...p,
+                                description: e.target.value,
+                              }))
+                            }
+                            className="w-full rounded-md px-3 py-2 text-sm border-none bg-white/40 placeholder:text-black/60 focus:outline-none resize-none"
+                          />
                           <div className="flex gap-2">
-                            <Button type="button" size="sm" className="flex-1 bg-transparent backdrop-blur-md bg-white/40 text-black hover:bg-white/60"
+                            <Button
+                              type="button"
+                              size="sm"
+                              className="flex-1 bg-transparent backdrop-blur-md bg-white/40 text-black hover:bg-white/60"
                               onClick={() => {
                                 if (!planForm.title || !planForm.price) {
-                                  toast({ title: "Title and price are required", variant: "destructive" });
+                                  toast({
+                                    title: "Title and price are required",
+                                    variant: "destructive",
+                                  });
                                   return;
                                 }
                                 if (editingPlanIndex !== null) {
-                                  setRsvpPlans((prev) => prev.map((p, i) => (i === editingPlanIndex ? planForm : p)));
+                                  setRsvpPlans((prev) =>
+                                    prev.map((p, i) =>
+                                      i === editingPlanIndex ? planForm : p,
+                                    ),
+                                  );
                                 } else {
                                   setRsvpPlans((prev) => [...prev, planForm]);
                                 }
-                                setPlanForm({ title: "", description: "", price: "", capacity: "" });
+                                setPlanForm({
+                                  title: "",
+                                  description: "",
+                                  price: "",
+                                  capacity: "",
+                                });
                                 setEditingPlanIndex(null);
                                 setShowPlanForm(false);
-                              }}>
-                              {editingPlanIndex !== null ? "Save Changes" : "Add Plan"}
+                              }}
+                            >
+                              {editingPlanIndex !== null
+                                ? "Save Changes"
+                                : "Add Plan"}
                             </Button>
-                            <Button type="button" variant="ghost" size="sm" className="bg-transparent hover:bg-white/20"
-                              onClick={() => { setShowPlanForm(false); setEditingPlanIndex(null); setPlanForm({ title: "", description: "", price: "", capacity: "" }); }}>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="bg-transparent hover:bg-white/20"
+                              onClick={() => {
+                                setShowPlanForm(false);
+                                setEditingPlanIndex(null);
+                                setPlanForm({
+                                  title: "",
+                                  description: "",
+                                  price: "",
+                                  capacity: "",
+                                });
+                              }}
+                            >
                               Cancel
                             </Button>
                           </div>
                         </div>
                       ) : (
-                        <Button type="button" variant="outline" size="sm" onClick={() => setShowPlanForm(true)}
-                          className="border-none rounded-full flex items-center gap-2 bg-transparent backdrop-blur-md bg-white/40 hover:bg-white/60">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowPlanForm(true)}
+                          className="border-none rounded-full flex items-center gap-2 bg-transparent backdrop-blur-md bg-white/40 hover:bg-white/60"
+                        >
                           <Plus className="h-4 w-4" /> Add Plan
                         </Button>
                       )}
@@ -1524,7 +1664,9 @@ const AdminCreateEvent = () => {
                     />
                   </div>
                   {formData.showRsvpCount && (
-                    <p className="mt-2 px-4 text-sm text-muted-foreground">42 people going</p>
+                    <p className="mt-2 px-4 text-sm text-muted-foreground">
+                      42 people going
+                    </p>
                   )}
                 </div>
 
@@ -2163,6 +2305,7 @@ const AdminCreateEvent = () => {
                   ? {
                       backgroundColor: selectedColor,
                       borderColor: selectedColor,
+                      color: getContrastColor(selectedColor),
                     }
                   : {}
               }

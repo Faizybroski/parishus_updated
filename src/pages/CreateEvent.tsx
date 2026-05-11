@@ -872,7 +872,7 @@ const CreateEvent = () => {
               <Button
                 type="submit"
                 disabled={!isFormValid || loading}
-                className="bg-primary hover:bg-secondary"
+                className="bg-primary hover:bg-secondary text-white"
               >
                 {loading ? "Creating..." : "Create Event"}
               </Button>

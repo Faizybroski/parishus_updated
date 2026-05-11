@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Bell, Eye, Trash2, RefreshCw } from 'lucide-react';
 import { LoaderText } from '@/components/loader/Loader';
@@ -17,7 +18,7 @@ interface Notification {
   message: string;
   is_read: boolean;
   created_at: string;
-  data?: any;
+  data?: Record<string, unknown>;
   profile?: {
     first_name: string;
     last_name: string;
@@ -28,13 +29,10 @@ interface Notification {
 const AdminNotifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
-    fetchNotifications();
-  }, []);
-
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('notifications')
@@ -55,6 +53,31 @@ const AdminNotifications = () => {
       });
     } finally {
       setLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
+
+  const openNotification = async (notification: Notification) => {
+    setSelectedNotification(notification);
+    if (!notification.is_read) {
+      try {
+        const { error } = await supabase
+          .from('notifications')
+          .update({ is_read: true })
+          .eq('id', notification.id);
+
+        if (error) throw error;
+
+        setNotifications(prev =>
+          prev.map(n => n.id === notification.id ? { ...n, is_read: true } : n)
+        );
+        setSelectedNotification({ ...notification, is_read: true });
+      } catch (error) {
+        console.error('Error marking notification as read:', error);
+      }
     }
   };
 
@@ -111,6 +134,7 @@ const AdminNotifications = () => {
   }
 
   return (
+    <>
     <div className="space-y-6">
   {/* Header */}
   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -228,9 +252,7 @@ const AdminNotifications = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => {
-                          // Mark as read logic
-                        }}
+                        onClick={() => openNotification(notification)}
                       >
                         <Eye className="h-3 w-3" />
                       </Button>
@@ -324,6 +346,85 @@ const AdminNotifications = () => {
   </Tabs>
 </div>
 
+  {/* Notification Detail Modal */}
+
+  <Dialog open={!!selectedNotification} onOpenChange={(open) => !open && setSelectedNotification(null)}>
+    <DialogContent className="max-w-lg">
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-2">
+          <Bell className="h-5 w-5" />
+          Notification Details
+        </DialogTitle>
+      </DialogHeader>
+      {selectedNotification && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 flex-wrap">
+            <Badge variant={getTypeBadgeVariant(selectedNotification.type)}>
+              {selectedNotification.type.replace(/_/g, ' ')}
+            </Badge>
+            <Badge variant={selectedNotification.is_read ? 'outline' : 'default'}>
+              {selectedNotification.is_read ? 'Read' : 'Unread'}
+            </Badge>
+          </div>
+
+          <div>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Title</p>
+            <p className="font-semibold">{selectedNotification.title}</p>
+          </div>
+
+          <div>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Message</p>
+            <p className="text-sm leading-relaxed">{selectedNotification.message}</p>
+          </div>
+
+          <div>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">User</p>
+            {selectedNotification.profile ? (
+              <div>
+                <p className="font-medium">
+                  {selectedNotification.profile.first_name} {selectedNotification.profile.last_name}
+                </p>
+                <p className="text-sm text-muted-foreground">{selectedNotification.profile.email}</p>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">System</p>
+            )}
+          </div>
+
+          <div>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Date</p>
+            <p className="text-sm">
+              {new Date(selectedNotification.created_at).toLocaleString()}
+            </p>
+          </div>
+
+          {/* {selectedNotification.data && (
+            <div>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Additional Data</p>
+              <pre className="text-xs bg-muted rounded p-3 overflow-x-auto">
+                {JSON.stringify(selectedNotification.data, null, 2)}
+              </pre>
+            </div>
+          )} */}
+
+          <div className="flex justify-end pt-2">
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => {
+                deleteNotification(selectedNotification.id);
+                setSelectedNotification(null);
+              }}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete
+            </Button>
+          </div>
+        </div>
+      )}
+    </DialogContent>
+  </Dialog>
+    </>
   );
 };
 

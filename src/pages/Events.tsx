@@ -623,16 +623,15 @@ const Events = () => {
     });
   };
 
-  const filteredEvents = events.filter(
-    (event) =>
-      event.name.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-      event.description
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase().trim()) ||
-      event.location_name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase().trim()),
-  );
+  const filteredEvents = events.filter((event) => {
+    if (!searchTerm.trim()) return true;
+    const term = searchTerm.toLowerCase().trim();
+    return (
+      (event.name || "").toLowerCase().includes(term) ||
+      (event.description || "").toLowerCase().includes(term) ||
+      (event.location_name || "").toLowerCase().includes(term)
+    );
+  });
 
   const EventCards = ({
     events,
@@ -1121,7 +1120,7 @@ const Events = () => {
                                 width: `${Math.min(
                                   ((event.rsvp_count || 0) /
                                     event.max_attendees) *
-                                    100,
+                                  100,
                                   100,
                                 )}%`,
                               }}
@@ -1191,16 +1190,15 @@ const Events = () => {
             </div>
 
             <EventCards
-              events={myEvents.filter(
-                (event) =>
-                  event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                  event.description
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase()) ||
-                  event.location_name
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase()),
-              )}
+              events={myEvents.filter((event) => {
+                if (!searchTerm.trim()) return true;
+                const term = searchTerm.toLowerCase().trim();
+                return (
+                  (event.name || "").toLowerCase().includes(term) ||
+                  (event.description || "").toLowerCase().includes(term) ||
+                  (event.location_name || "").toLowerCase().includes(term)
+                );
+              })}
               showActions
             />
           </div>

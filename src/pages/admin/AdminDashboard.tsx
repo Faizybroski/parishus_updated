@@ -2,7 +2,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-// import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,7 +40,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { sendEventInvite } from "@/lib/sendInvite";
-import { createClient } from "@supabase/supabase-js";
 import {
   AlertTriangle,
   Ban,
@@ -82,11 +80,6 @@ const generateStubData = async () => {
     const d = subMonths(now, 11 - i);
     return format(d, "MMM yyyy");
   });
-
-  // const { data: userRows, error: userError } = await supabase
-  //   .from("profiles")
-  //   .select("created_at");
-  // if (userError) throw userError;
 
   const { data: profileRows, error: profileError } = await supabase
     .from("profiles")
@@ -253,6 +246,8 @@ const AdminDashboard = () => {
   });
 
   const [chartData, setChartData] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     generateStubData().then(setChartData).catch(console.error);
@@ -264,9 +259,23 @@ const AdminDashboard = () => {
     }
   }, [profile]);
 
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([
+        fetchDashboardData(),
+        generateStubData().then(setChartData),
+      ]);
+      toast({ title: "Dashboard refreshed successfully" });
+    } catch (error) {
+      toast({ title: "Error refreshing dashboard", variant: "destructive" });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   const fetchDashboardData = async () => {
     try {
-      // Fetch users with RSVP counts
       const { data: usersData } = await supabase
         .from("profiles")
         .select(
@@ -278,7 +287,6 @@ const AdminDashboard = () => {
         )
         .neq("id", "00000000-0000-0000-0000-000000000000");
 
-      // Fetch events with RSVP data
       const { data: eventsData } = await supabase.from("events").select(`
           *,
           profiles(
@@ -290,14 +298,12 @@ const AdminDashboard = () => {
           )
         `);
 
-      // Fetch pending users
       const { data: pendingUsersData } = await supabase
         .from("profiles")
         .select(`*`)
         .eq("approval_status", "pending")
         .neq("id", "00000000-0000-0000-0000-000000000000");
 
-      // Calculate RSVPs for the month
       const thisMonth = new Date();
       thisMonth.setDate(1);
 
@@ -315,8 +321,8 @@ const AdminDashboard = () => {
         activeUsers,
         totalEvents: eventsData?.length || 0,
         monthlyRSVPs: monthlyRSVPs?.length || 0,
-        monthlyRevenue: 8500, // Stub data
-        yearlyRevenue: 47200, // Stub data
+        monthlyRevenue: 8500,
+        yearlyRevenue: 47200,
       });
 
       setUsers(usersData || []);
@@ -344,17 +350,9 @@ const AdminDashboard = () => {
       const approvedUserName = updatedProfiles?.[0]?.first_name;
       if (!approvedUserEmail) throw new Error("User email not found");
 
-      // await supabase.from("audit_logs").insert({
-      //   admin_id: user?.id,
-      //   action: "approve_user",
-      //   target_type: "user",
-      //   target_id: userId,
-      //   notes: "User approved via admin panel",
-      // });
-
       await sendEventInvite({
         to: approvedUserEmail,
-        subject: "Welcome to Parish – You’re Officially Approved!",
+        subject: "Welcome to Parish – You're Officially Approved!",
         html: `<!DOCTYPE html>
                   <html>
                     <head>
@@ -367,15 +365,11 @@ const AdminDashboard = () => {
                         <tr>
                           <td align="center">
                             <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-                              
-                              <!-- Header -->
                               <tr>
                                 <td align="center" style="background-color:#16a34a; padding:40px 20px;">
                                   <h1 style="margin:0; font-size:26px; color:#ffffff;">Account Approved ✅</h1>
                                 </td>
                               </tr>
-
-                              <!-- Body -->
                               <tr>
                                 <td style="padding:30px; font-size:16px; line-height:1.6; color:#444;">
                                   <p>Hi <strong>${approvedUserName}</strong>,</p>
@@ -383,32 +377,26 @@ const AdminDashboard = () => {
                                     Congratulations! 🎉 Your account has been 
                                     <span style="color:#16a34a; font-weight:bold;">approved</span> by our team.
                                   </p>
-
                                   <p>
                                     You now have full access to all features and services available in your account.
                                   </p>
-
                                   <p style="margin-top:20px; text-align:center;">
                                     <a href="https://parishus.com/" 
                                       style="display:inline-block; background-color:#16a34a; color:#ffffff; text-decoration:none; padding:14px 24px; border-radius:8px; font-weight:bold; font-size:16px;">
                                       Go to Dashboard
                                     </a>
                                   </p>
-
                                   <p style="margin-top:30px; font-size:14px; color:#888;">
                                     – The Parish Team
                                   </p>
                                 </td>
                               </tr>
-
-                              <!-- Footer -->
                               <tr>
                                 <td align="center" style="background-color:#f3f4f6; padding:20px; font-size:12px; color:#666;">
                                   <p style="margin:0;">Parish • User Accounts</p>
                                   <p style="margin:5px 0 0;">If you did not create this account, please contact support immediately.</p>
                                 </td>
                               </tr>
-
                             </table>
                           </td>
                         </tr>
@@ -438,14 +426,6 @@ const AdminDashboard = () => {
       const approvedUserName = updatedProfiles?.[0]?.first_name;
       if (!approvedUserEmail) throw new Error("User email not found");
 
-      // await supabase.from("audit_logs").insert({
-      //   admin_id: user?.id,
-      //   action: "reject_user",
-      //   target_type: "user",
-      //   target_id: userId,
-      //   notes: "User rejected via admin panel",
-      // });
-
       await sendEventInvite({
         to: approvedUserEmail,
         subject: "Update on Your Parish Application",
@@ -461,15 +441,11 @@ const AdminDashboard = () => {
                         <tr>
                           <td align="center">
                             <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-                              
-                              <!-- Header -->
                               <tr>
                                 <td align="center" style="background-color:#dc2626; padding:40px 20px;">
                                   <h1 style="margin:0; font-size:26px; color:#ffffff;">Account Rejected ❌</h1>
                                 </td>
                               </tr>
-
-                              <!-- Body -->
                               <tr>
                                 <td style="padding:30px; font-size:16px; line-height:1.6; color:#444;">
                                   <p>Hi <strong>${approvedUserName}</strong>,</p>
@@ -477,29 +453,23 @@ const AdminDashboard = () => {
                                     Unfortunately, your account application has been 
                                     <span style="color:#dc2626; font-weight:bold;">rejected</span>.
                                   </p>
-
                                   <p>
                                     This may be due to incomplete information, failing verification, or not meeting our eligibility criteria.
                                   </p>
-
                                   <p>
                                     If you believe this is a mistake, please reach out to our support team for further clarification.
                                   </p>
-
                                   <p style="margin-top:30px; font-size:14px; color:#888;">
                                     – The Parish Team
                                   </p>
                                 </td>
                               </tr>
-
-                              <!-- Footer -->
                               <tr>
                                 <td align="center" style="background-color:#f3f4f6; padding:20px; font-size:12px; color:#666;">
                                   <p style="margin:0;">Parish • User Accounts</p>
                                   <p style="margin:5px 0 0;">If you did not apply for this account, you can ignore this email.</p>
                                 </td>
                               </tr>
-
                             </table>
                           </td>
                         </tr>
@@ -526,15 +496,6 @@ const AdminDashboard = () => {
 
       if (error) throw error;
 
-      // Log audit action
-      // await supabase.from("audit_logs").insert({
-      //   admin_id: user?.id,
-      //   action: "suspend_user",
-      //   target_type: "user",
-      //   target_id: userId,
-      //   notes: "User suspended via admin panel",
-      // });
-
       toast({ title: "User suspended successfully" });
       fetchDashboardData();
     } catch (error) {
@@ -550,15 +511,6 @@ const AdminDashboard = () => {
         .eq("user_id", userId);
 
       if (error) throw error;
-
-      // Log audit action
-      // await supabase.from("audit_logs").insert({
-      //   admin_id: user?.id,
-      //   action: "reactivate_user",
-      //   target_type: "user",
-      //   target_id: userId,
-      //   notes: "User reactivated via admin panel",
-      // });
 
       toast({ title: "User reactivated successfully" });
       fetchDashboardData();
@@ -601,15 +553,6 @@ const AdminDashboard = () => {
 
       if (error) throw error;
 
-      // Log audit action
-      // await supabase.from("audit_logs").insert({
-      //   admin_id: user?.id,
-      //   action: "delete_event",
-      //   target_type: "event",
-      //   target_id: eventId,
-      //   notes: "Event deleted via admin panel",
-      // });
-
       toast({ title: "Event deleted successfully" });
       fetchDashboardData();
     } catch (error) {
@@ -628,15 +571,6 @@ const AdminDashboard = () => {
 
       if (error) throw error;
 
-      // Log audit action
-      // await supabase.from("audit_logs").insert({
-      //   admin_id: user?.id,
-      //   action: "cancel_event",
-      //   target_type: "event",
-      //   target_id: eventId,
-      //   notes: "Event cancelled via admin panel",
-      // });
-
       toast({ title: "Event cancelled successfully" });
       fetchDashboardData();
     } catch (error) {
@@ -644,8 +578,116 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleExportReport = async () => {
+    setIsExporting(true);
+    try {
+      const reportDate = format(new Date(), "yyyy-MM-dd");
+
+      const csvSections: string[] = [];
+
+      csvSections.push("PARISH ADMIN DASHBOARD REPORT");
+      csvSections.push(`Generated: ${format(new Date(), "PPpp")}`);
+      csvSections.push("");
+
+      csvSections.push("SUMMARY STATS");
+      csvSections.push("Metric,Value");
+      csvSections.push(`Total Users,${stats.totalUsers}`);
+      csvSections.push(`Active Users,${stats.activeUsers}`);
+      csvSections.push(`Total Events,${stats.totalEvents}`);
+      csvSections.push(`RSVPs This Month,${stats.monthlyRSVPs}`);
+      csvSections.push(`Monthly Revenue,$${chartData?.currentMonthRevenue ?? 0}`);
+      csvSections.push(`Yearly Revenue,$${chartData?.currentYearRevenue ?? 0}`);
+      csvSections.push("");
+
+      if (chartData?.userGrowthData?.length) {
+        csvSections.push("USER GROWTH (Last 12 Months)");
+        csvSections.push("Month,New Users");
+        chartData.userGrowthData.forEach(({ month, users }) => {
+          csvSections.push(`${month},${users}`);
+        });
+        csvSections.push("");
+      }
+
+      if (chartData?.eventTrendsData?.length) {
+        csvSections.push("EVENT CREATION TRENDS (Last 12 Months)");
+        csvSections.push("Month,Events Created");
+        chartData.eventTrendsData.forEach(({ month, events }) => {
+          csvSections.push(`${month},${events}`);
+        });
+        csvSections.push("");
+      }
+
+      if (chartData?.revenueData?.length) {
+        csvSections.push("REVENUE TRENDS (Last 12 Months)");
+        csvSections.push("Month,Revenue ($)");
+        chartData.revenueData.forEach(({ month, revenue }) => {
+          csvSections.push(`${month},${revenue}`);
+        });
+        csvSections.push("");
+      }
+
+      if (users?.length) {
+        csvSections.push("USER LIST");
+        csvSections.push("Name,Email,Status,Role,Events Created,RSVPs,Joined");
+        users.forEach((u) => {
+          const name = `${u.first_name ?? ""} ${u.last_name ?? ""}`.trim();
+          const status = u.is_suspended ? "Suspended" : u.approval_status === "approved" ? "Active" : u.approval_status;
+          csvSections.push(
+            [
+              `"${name}"`,
+              `"${u.email ?? ""}"`,
+              status,
+              u.role ?? "",
+              u.created_events?.[0]?.count ?? 0,
+              u.rsvps?.[0]?.count ?? 0,
+              u.created_at ? format(new Date(u.created_at), "yyyy-MM-dd") : "",
+            ].join(",")
+          );
+        });
+        csvSections.push("");
+      }
+
+      if (events?.length) {
+        csvSections.push("EVENT LIST");
+        csvSections.push("Event Name,Creator,Date,Status,Max Attendees,Confirmed RSVPs");
+        events.forEach((ev) => {
+          const creatorName = `${ev.profiles?.first_name ?? ""} ${ev.profiles?.last_name ?? ""}`.trim();
+          const confirmedRSVPs = ev.rsvps?.filter((r) => r.status === "confirmed").length ?? 0;
+          csvSections.push(
+            [
+              `"${ev.name ?? ""}"`,
+              `"${creatorName}"`,
+              ev.date_time ? format(new Date(ev.date_time), "yyyy-MM-dd") : "",
+              ev.status ?? "",
+              ev.max_attendees ?? 0,
+              confirmedRSVPs,
+            ].join(",")
+          );
+        });
+        csvSections.push("");
+      }
+
+      const csvContent = csvSections.join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `parish-report-${reportDate}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast({ title: "Report exported successfully" });
+    } catch (error) {
+      console.error("Export error:", error);
+      toast({ title: "Error exporting report", variant: "destructive" });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const sendEmail = async () => {
-    // This would integrate with your email service
     try {
       await sendEventInvite({
         to: [emailData.to],
@@ -659,12 +701,10 @@ const AdminDashboard = () => {
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>${emailData.subject.trim()}</title>
     <style>
-      /* Basic reset */
       body,table,td,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}
       table,td{mso-table-lspace:0pt;mso-table-rspace:0pt}
       img{border:0;height:auto;line-height:100%;outline:none;text-decoration:none}
       a[x-apple-data-detectors]{color:inherit !important;text-decoration:none !important}
-      /* Container */
       .email-body{width:100%;background-color:#f6f8fb;padding:24px 0}
       .email-card{max-width:600px;margin:0 auto;background:#ffffff;border-radius:12px;box-shadow:0 6px 18px rgba(22,28,45,0.08);overflow:hidden;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
       .header{padding:28px 32px;background:linear-gradient(90deg,#0ea5a4,#6366f1);color:#fff}
@@ -685,7 +725,6 @@ const AdminDashboard = () => {
     </style>
   </head>
   <body>
-    <!-- preheader: short summary for inbox preview -->
     <div class="preheader">${(emailData.message.trim() || "")
       .slice(0, 120)
       .replace(/\\n/g, " ")}</div>
@@ -699,18 +738,14 @@ const AdminDashboard = () => {
                 <div class="brand">Parish — Admin Message</div>
               </td>
             </tr>
-
             <tr>
               <td class="content">
                 <h1 class="title">${emailData.subject.trim()}</h1>
-
                 <div class="message">
                   ${(emailData.message.trim() || "").replace(/\\n/g, "<br/>")}
                 </div>
-
               </td>
             </tr>
-
             <tr>
               <td class="footer">
                 © ${new Date().getFullYear()} Parish <br/>
@@ -801,7 +836,6 @@ const AdminDashboard = () => {
 
   return (
     <div className="space-y-8">
-      {/* Welcome Header */}
       <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-background rounded-2xl p-8 border border-primary/20">
         <div className="flex items-center justify-between">
           <div>
@@ -819,19 +853,27 @@ const AdminDashboard = () => {
                 <span>View all Events</span>
               </Button>
             </Link>
-            <Button variant="outline" className="flex items-center space-x-2">
-              <RefreshCw className="h-4 w-4" />
-              <span>Refresh Data</span>
+            <Button
+              variant="outline"
+              className="flex items-center space-x-2"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+            >
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+              <span>{isRefreshing ? "Refreshing..." : "Refresh Data"}</span>
             </Button>
-            <Button className="flex items-center space-x-2">
-              <Download className="h-4 w-4" />
-              <span>Export Report</span>
+            <Button
+              className="flex items-center space-x-2"
+              onClick={handleExportReport}
+              disabled={isExporting}
+            >
+              <Download className={`h-4 w-4 ${isExporting ? "animate-bounce" : ""}`} />
+              <span>{isExporting ? "Exporting..." : "Export Report"}</span>
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="relative overflow-hidden bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 hover:shadow-lg transition-all duration-300">
           <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-primary/20 to-transparent rounded-bl-full" />
@@ -911,9 +953,7 @@ const AdminDashboard = () => {
         </Card>
       </div>
 
-      {/* Charts Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-2 gap-6 xl:gap-8">
-        {/* User Growth */}
         <Card className="shadow-lg border-0 bg-card/80 backdrop-blur-sm">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center space-x-3 text-base md:text-lg">
@@ -931,18 +971,25 @@ const AdminDashboard = () => {
                   color: "hsl(var(--chart-1))",
                 },
               }}
-              className="w-full h-[260px] sm:h-[300px] overflow-hidden"
+              className="w-full h-[300px] sm:h-[340px] overflow-hidden"
             >
               <LineChart data={chartData.userGrowthData} width={undefined}>
-                <XAxis dataKey="month" />
+                <XAxis
+                  dataKey="month"
+                  interval={0}
+                  tick={{ fontSize: 10 }}
+                  angle={-35}
+                  textAnchor="end"
+                  height={55}
+                />
                 <YAxis />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Line
                   type="monotone"
                   dataKey="users"
-                  stroke="var(--color-events)"
-                  dot={{ fill: "var(--color-events)" }}
-                  activeDot={{ fill: "var(--color-events)", r: 4 }}
+                  stroke="var(--color-users)"
+                  dot={{ fill: "var(--color-users)" }}
+                  activeDot={{ fill: "var(--color-users)", r: 4 }}
                   strokeWidth={2}
                 />
               </LineChart>
@@ -950,7 +997,6 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Event Trends */}
         <Card className="shadow-lg border-0 bg-card/80 backdrop-blur-sm">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center space-x-3 text-base md:text-lg">
@@ -968,10 +1014,17 @@ const AdminDashboard = () => {
                   color: "hsl(var(--chart-2))",
                 },
               }}
-              className="w-full h-[260px] sm:h-[300px] overflow-hidden"
+              className="w-full h-[300px] sm:h-[340px] overflow-hidden"
             >
               <BarChart data={chartData.eventTrendsData} width={undefined}>
-                <XAxis dataKey="month" />
+                <XAxis
+                  dataKey="month"
+                  interval={0}
+                  tick={{ fontSize: 10 }}
+                  angle={-35}
+                  textAnchor="end"
+                  height={55}
+                />
                 <YAxis />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Bar
@@ -984,7 +1037,6 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Revenue Trends */}
         <Card className="shadow-lg border-0 bg-card/80 backdrop-blur-sm">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center space-x-3 text-base md:text-lg">
@@ -1002,10 +1054,17 @@ const AdminDashboard = () => {
                   color: "hsl(var(--chart-3))",
                 },
               }}
-              className="w-full h-[260px] sm:h-[300px] overflow-hidden"
+              className="w-full h-[300px] sm:h-[340px] overflow-hidden"
             >
               <LineChart data={chartData.revenueData} width={undefined}>
-                <XAxis dataKey="month" />
+                <XAxis
+                  dataKey="month"
+                  interval={0}
+                  tick={{ fontSize: 10 }}
+                  angle={-35}
+                  textAnchor="end"
+                  height={55}
+                />
                 <YAxis />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Line
@@ -1021,7 +1080,6 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Dining Styles */}
         <Card className="shadow-lg border-0 bg-card/80 backdrop-blur-sm">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center space-x-3 text-base md:text-lg">
@@ -1042,7 +1100,7 @@ const AdminDashboard = () => {
                   health: { label: "Health Conscious", color: "#32CD32" },
                   social: { label: "Social Butterfly", color: "#FF8C00" },
                 }}
-                className="w-full h-[260px] sm:h-[300px] overflow-hidden"
+                className="w-full h-[300px] sm:h-[340px] overflow-hidden"
               >
                 <PieChart>
                   <Pie
@@ -1066,7 +1124,6 @@ const AdminDashboard = () => {
         </Card>
       </div>
 
-      {/* Management Tabs */}
       <Tabs defaultValue="users" className="space-y-4">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="users" className="flex items-center space-x-2">
@@ -1086,7 +1143,6 @@ const AdminDashboard = () => {
           </TabsTrigger>
         </TabsList>
 
-        {/* User Management Tab */}
         <TabsContent value="users" className="space-y-4">
           <Card className="max-w-full overflow-x-auto">
             <CardHeader>
@@ -1375,7 +1431,6 @@ const AdminDashboard = () => {
           </Card>
         </TabsContent>
 
-        {/* Event Management Tab */}
         <TabsContent value="events" className="space-y-4">
           <Card>
             <CardHeader>
@@ -1510,7 +1565,6 @@ const AdminDashboard = () => {
         </TabsContent>
       </Tabs>
 
-      {/* User Details Modal */}
       <Dialog open={showUserDetails} onOpenChange={setShowUserDetails}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
@@ -1549,7 +1603,6 @@ const AdminDashboard = () => {
                           "Not provided"
                         )}
                       </p>
-
                       <p>
                         <strong>Instagram:</strong>{" "}
                         {selectedUser.instagram_username ? (
@@ -1711,7 +1764,6 @@ const AdminDashboard = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Event Details Modal */}
       <Dialog open={showEventDetails} onOpenChange={setShowEventDetails}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
@@ -1882,7 +1934,6 @@ const AdminDashboard = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Email Modal */}
       <Dialog open={showEmailModal} onOpenChange={setShowEmailModal}>
         <DialogContent className="max-w-md">
           <DialogHeader>

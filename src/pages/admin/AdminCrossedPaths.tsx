@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { MapPin, Calendar, Search, TrendingUp, Users, Building, MessageCircle } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { MapPin, Calendar, Search, TrendingUp, Users, Building, MessageCircle, Mail, Hash, Globe } from 'lucide-react';
 import {LoaderText} from "@/components/loader/Loader";
 import { toast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -34,6 +35,17 @@ interface CrossedPathAnalytics {
   };
 }
 
+interface RestaurantDetails {
+  id: string;
+  name: string;
+  country: string;
+  state_province: string;
+  city: string;
+  full_address: string;
+  longitude?: number;
+  latitude?: number;
+}
+
 interface AnalyticsStats {
   totalCrossedPaths: number;
   activePaths: number;
@@ -54,7 +66,44 @@ const AdminCrossedPaths = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('newest');
   const [minCrossCount, setMinCrossCount] = useState('1');
+  const [selectedPath, setSelectedPath] = useState<CrossedPathAnalytics | null>(null);
+  const [restaurantDetails, setRestaurantDetails] = useState<RestaurantDetails | null>(null);
+  const [restaurantLoading, setRestaurantLoading] = useState(false);
   const { user } = useAuth();
+
+  const filterAndSortPaths = useCallback(() => {
+    let filtered = [...crossedPaths];
+
+    if (searchTerm) {
+      filtered = filtered.filter(path =>
+        path.restaurant_name?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
+        path.user_a.first_name?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
+        path.user_a.last_name?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
+        path.user_b.first_name?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
+        path.user_b.last_name?.toLowerCase().includes(searchTerm.toLowerCase().trim())
+      );
+    }
+
+    const minCount = parseInt(minCrossCount);
+    filtered = filtered.filter(path => path.cross_count >= minCount);
+
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'newest':
+          return new Date(b.date_crossed).getTime() - new Date(a.date_crossed).getTime();
+        case 'oldest':
+          return new Date(a.date_crossed).getTime() - new Date(b.date_crossed).getTime();
+        case 'most_crosses':
+          return b.cross_count - a.cross_count;
+        case 'restaurant':
+          return (a.restaurant_name || '').localeCompare(b.restaurant_name || '');
+        default:
+          return 0;
+      }
+    });
+
+    setFilteredPaths(filtered);
+  }, [crossedPaths, searchTerm, sortBy, minCrossCount]);
 
   useEffect(() => {
     fetchAnalytics();
@@ -62,13 +111,13 @@ const AdminCrossedPaths = () => {
 
   useEffect(() => {
     filterAndSortPaths();
-  }, [crossedPaths, searchTerm, sortBy, minCrossCount]);
+  }, [filterAndSortPaths]);
 
   const fetchAnalytics = async () => {
     try {
       // Fetch crossed paths with user profiles using proper foreign key joins
       const { data: pathsData, error: pathsError } = await supabase
-        .from('crossed_paths_log')
+        .from('crossed_paths_filtered')
         .select(`
           *,
           user_a:profiles!crossed_paths_log_user_a_id_fkey(
@@ -82,7 +131,7 @@ const AdminCrossedPaths = () => {
 
       if (pathsError) throw pathsError;
 
-      setCrossedPaths((pathsData || []) as any);
+      setCrossedPaths((pathsData || []) as CrossedPathAnalytics[]);
 
       // Calculate stats
       const totalPaths = pathsData?.length || 0;
@@ -113,7 +162,7 @@ const AdminCrossedPaths = () => {
         recentActivity
       });
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching analytics:', error);
       toast({
         title: "Error",
@@ -125,41 +174,28 @@ const AdminCrossedPaths = () => {
     }
   };
 
-  const filterAndSortPaths = () => {
-    let filtered = [...crossedPaths];
+  
 
-    // Search filter
-    if (searchTerm) {
-      filtered = filtered.filter(path => 
-        path.restaurant_name?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-        path.user_a.first_name?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-        path.user_a.last_name?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-        path.user_b.first_name?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-        path.user_b.last_name?.toLowerCase().includes(searchTerm.toLowerCase().trim())
-      );
-    }
+  const openPathDetails = async (path: CrossedPathAnalytics) => {
+    setSelectedPath(path);
+    setRestaurantDetails(null);
+    if (path.restaurant_name) {
+      setRestaurantLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('restaurants')
+          .select('id, name, country, state_province, city, full_address, longitude, latitude')
+          .ilike('name', path.restaurant_name)
+          .limit(1)
+          .maybeSingle();
 
-    // Cross count filter
-    const minCount = parseInt(minCrossCount);
-    filtered = filtered.filter(path => path.cross_count >= minCount);
-
-    // Sort
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'newest':
-          return new Date(b.date_crossed).getTime() - new Date(a.date_crossed).getTime();
-        case 'oldest':
-          return new Date(a.date_crossed).getTime() - new Date(b.date_crossed).getTime();
-        case 'most_crosses':
-          return b.cross_count - a.cross_count;
-        case 'restaurant':
-          return (a.restaurant_name || '').localeCompare(b.restaurant_name || '');
-        default:
-          return 0;
+        if (!error && data) setRestaurantDetails(data);
+      } catch (err) {
+        console.error('Error fetching restaurant details:', err);
+      } finally {
+        setRestaurantLoading(false);
       }
-    });
-
-    setFilteredPaths(filtered);
+    }
   };
 
   const createPrivateDinnerSuggestion = async (userAId: string, userBId: string, restaurantName: string) => {
@@ -169,7 +205,7 @@ const AdminCrossedPaths = () => {
         title: "Suggestion Created",
         description: `Private dinner suggestion created for users at ${restaurantName}`,
       });
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Error",
         description: "Failed to create dinner suggestion",
@@ -187,6 +223,7 @@ const AdminCrossedPaths = () => {
   }
 
 return (
+  <>
   <div className="min-h-screen bg-background">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       <div className="space-y-6 sm:space-y-8">
@@ -310,7 +347,11 @@ return (
         ) : (
           <div className="grid gap-3 sm:gap-4">
             {filteredPaths.map((path) => (
-              <Card key={path.id} className="shadow-card border-border">
+              <Card
+                key={path.id}
+                className="shadow-card border-border cursor-pointer hover:bg-muted/30 transition-colors"
+                onClick={() => openPathDetails(path)}
+              >
                 <CardContent className="p-4 sm:p-6">
                   <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 md:gap-6 flex-wrap">
                     
@@ -376,21 +417,18 @@ return (
                           {new Date(path.date_crossed).toLocaleDateString()}
                         </div>
                       </div>
-                      <Button
+                      {/* <Button
                         size="sm"
                         variant="outline"
                         className="w-full sm:w-auto"
-                        onClick={() =>
-                          createPrivateDinnerSuggestion(
-                            path.user_a_id,
-                            path.user_b_id,
-                            path.restaurant_name
-                          )
-                        }
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          createPrivateDinnerSuggestion(path.user_a_id, path.user_b_id, path.restaurant_name);
+                        }}
                       >
                         <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                         Suggest Dinner
-                      </Button>
+                      </Button> */}
                     </div>
                   </div>
                 </CardContent>
@@ -401,6 +439,108 @@ return (
       </div>
     </div>
   </div>
+
+  {/* Crossed Path Detail Modal */}
+  <Dialog open={!!selectedPath} onOpenChange={(open) => !open && setSelectedPath(null)}>
+    <DialogContent className="max-w-xl">
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-2">
+          <Users className="h-5 w-5" />
+          Crossed Path Details
+        </DialogTitle>
+      </DialogHeader>
+
+      {selectedPath && (
+        <div className="space-y-5">
+          {/* Cross count & date */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <Badge variant="secondary" className="flex items-center gap-1">
+              <Hash className="h-3 w-3" />
+              {selectedPath.cross_count} {selectedPath.cross_count === 1 ? 'cross' : 'crosses'}
+            </Badge>
+            <span className="text-sm text-muted-foreground flex items-center gap-1">
+              <Calendar className="h-3 w-3" />
+              {new Date(selectedPath.date_crossed).toLocaleString()}
+            </span>
+          </div>
+
+          {/* Users */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[selectedPath.user_a, selectedPath.user_b].map((user, i) => (
+              <div key={i} className="rounded-lg border p-4 space-y-2">
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                  {i === 0 ? 'User A' : 'User B'}
+                </p>
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-10 w-10 flex-shrink-0">
+                    <AvatarImage src={user.profile_photo_url} />
+                    <AvatarFallback>{user.first_name?.[0]}{user.last_name?.[0]}</AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0">
+                    <p className="font-medium truncate">{user.first_name} {user.last_name}</p>
+                    <p className="text-sm text-muted-foreground flex items-center gap-1 truncate">
+                      <Mail className="h-3 w-3 flex-shrink-0" />
+                      {user.email}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Restaurant */}
+          <div className="rounded-lg border p-4 space-y-2">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide">Restaurant</p>
+            {restaurantLoading ? (
+              <p className="text-sm text-muted-foreground">Loading restaurant details…</p>
+            ) : restaurantDetails ? (
+              <div className="space-y-1">
+                <p className="font-medium">{restaurantDetails.name}</p>
+                <p className="text-sm text-muted-foreground flex items-center gap-1">
+                  <MapPin className="h-3 w-3 flex-shrink-0" />
+                  {restaurantDetails.full_address}
+                </p>
+                <p className="text-sm text-muted-foreground flex items-center gap-1">
+                  <Globe className="h-3 w-3 flex-shrink-0" />
+                  {restaurantDetails.city}, {restaurantDetails.state_province}, {restaurantDetails.country}
+                </p>
+                {restaurantDetails.latitude && restaurantDetails.longitude && (
+                  <p className="text-xs text-muted-foreground">
+                    {restaurantDetails.latitude.toFixed(5)}, {restaurantDetails.longitude.toFixed(5)}
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-1">
+                <p className="font-medium">{selectedPath.restaurant_name || 'Unknown location'}</p>
+                {(selectedPath.location_lat || selectedPath.location_lng) && (
+                  <p className="text-xs text-muted-foreground">
+                    {selectedPath.location_lat?.toFixed(5)}, {selectedPath.location_lng?.toFixed(5)}
+                  </p>
+                )}
+                <p className="text-xs text-muted-foreground italic">No additional details found</p>
+              </div>
+            )}
+          </div>
+
+          {/* <div className="flex justify-end">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                createPrivateDinnerSuggestion(selectedPath.user_a_id, selectedPath.user_b_id, selectedPath.restaurant_name);
+                setSelectedPath(null);
+              }}
+            >
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Suggest Dinner
+            </Button>
+          </div> */}
+        </div>
+      )}
+    </DialogContent>
+  </Dialog>
+  </>
 );
 
 };

@@ -102,7 +102,6 @@ const AdminEvents = () => {
   };
 
   const fetchEventPlans = async () => {
-    // if (!eventIds.length) return;
     const { data, error } = await supabase
       .from("event_plans")
       .select("*")
@@ -145,6 +144,7 @@ const AdminEvents = () => {
       setEventToDelete(null);
     }
   };
+
   const shareEvent = async (
     name: string,
     description: string,
@@ -165,53 +165,20 @@ const AdminEvents = () => {
       });
     }
   };
-  // const handleDeleteEvent = (eventId: string) => {
-  //   setEventToDelete(eventId);
-  //   toast({
-  //     title: 'Confirm Delete',
-  //     description: 'Are you sure you want to delete this event?',
-  //     action: (
-  //       <div className="flex space-x-2">
-  //         <Button variant="destructive" size="sm" onClick={confirmDeleteEvent}>
-  //           Yes
-  //         </Button>
-  //         <Button
-  //           variant="outline"
-  //           size="sm"
-  //           onClick={() => {
-  //             setEventToDelete(null);
-  //             toast.dismiss();
-  //           }}
-  //         >
-  //           Cancel
-  //         </Button>
-  //       </div>
-  //     )
-  //   });
-  // };
 
-  const filteredEvents = events.filter(
-    (event) =>
-      event.name.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-      event.description
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase().trim()) ||
-      event.location_name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase().trim()) ||
-      (event.restaurants?.name &&
-        event.restaurants.name
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase().trim())) ||
-      (event.profiles?.first_name &&
-        event.profiles.first_name
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase().trim())) ||
-      (event.profiles?.last_name &&
-        event.profiles.last_name
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase().trim())),
-  );
+  const term = searchTerm.toLowerCase().trim();
+
+  const filteredEvents = events.filter((event) => {
+    if (!term) return true;
+    return (
+      (event.name || "").toLowerCase().includes(term) ||
+      (event.description || "").toLowerCase().includes(term) ||
+      (event.location_name || "").toLowerCase().includes(term) ||
+      (event.restaurants?.name || "").toLowerCase().includes(term) ||
+      (event.profiles?.first_name || "").toLowerCase().includes(term) ||
+      (event.profiles?.last_name || "").toLowerCase().includes(term)
+    );
+  });
 
   if (loading) {
     return (
@@ -271,11 +238,10 @@ const AdminEvents = () => {
                       alt={event.name}
                       className="w-full h-full object-contain"
                     />
-                    {/* <div className="absolute inset-0 bg-black/70 z-10" /> */}
                   </div>
 
                   <CardContent className="flex flex-col flex-grow space-y-3 p-4 text-muted-foreground">
-                    <div className=" inset-0 flex flex-col justify-end">
+                    <div className="inset-0 flex flex-col justify-end">
                       <h3 className="text-black text-xl font-bold line-clamp-1">
                         {event.name}
                       </h3>
@@ -303,14 +269,10 @@ const AdminEvents = () => {
 
                     {event.max_attendees && (
                       <div className="text-sm font-medium py-4 px-2 border-t-2 border-b-2 border-primary">
-                        {/* Top content */}
                         <div className="flex items-center mb-2">
                           <Users className="h-5 w-5 mr-3" />
-                          {event.rsvps?.length || 0}/{event.max_attendees}{" "}
-                          RSVPed
+                          {event.rsvps?.length || 0}/{event.max_attendees} RSVPed
                         </div>
-
-                        {/* Progress bar */}
                         <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
                           <div
                             className="h-full bg-primary transition-all duration-300"
@@ -332,7 +294,6 @@ const AdminEvents = () => {
                         {event.is_paid ? (
                           <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1.5 text-sm font-semibold text-emerald-600 border border-emerald-500/20">
                             <span>💳</span>
-
                             {hasPlans ? (
                               <span>Paid Event • Multiple Plans Available</span>
                             ) : (
@@ -353,12 +314,8 @@ const AdminEvents = () => {
 
                     <div className="flex items-center">
                       <MapPin className="h-5 w-5 mr-3" />
-
-                      {/* Location */}
                       <div className="text-sm flex flex-col">
-                        <span className="">
-                          {event.location_name || "Location not specified"}
-                        </span>
+                        <span>{event.location_name || "Location not specified"}</span>
                         {event.restaurants && (
                           <span className="text-sm text-gray-400 line-clamp-1">
                             {event.restaurants.name} - {event.restaurants.city}
@@ -378,7 +335,7 @@ const AdminEvents = () => {
                         </Button>
                       </Link>
                       <Link to={`/admin/event/${event.id}/edit`}>
-                        <Button variant="outline" size="sm" className="\">
+                        <Button variant="outline" size="sm">
                           <Edit className="h-4 w-4" />
                         </Button>
                       </Link>

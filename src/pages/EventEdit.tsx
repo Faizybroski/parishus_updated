@@ -758,7 +758,14 @@ const EventEdit = () => {
           });
           return;
         }
-
+if (endDateTime <= eventDateTime) {
+  toast({
+    title: "Validation Error",
+    description: "End date and time must be later than the start date and time.",
+    variant: "destructive",
+  });
+  return;
+}
         eventEndDateTime = endDateTime;
       }
 
@@ -1020,7 +1027,15 @@ const EventEdit = () => {
       </div>
     );
   }
-
+const getContrastColor = (hexColor: string): string => {
+  if (!hexColor) return "#ffffff";
+  const hex = hexColor.replace("#", "");
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? "#000000" : "#ffffff";
+};
   return (
     <div
       className="min-h-screen font-serif relative z-0 pt-16"
@@ -2711,6 +2726,7 @@ const EventEdit = () => {
                   ? {
                       backgroundColor: selectedColor,
                       borderColor: selectedColor,
+                      color: getContrastColor(selectedColor),
                     }
                   : {}
               }
@@ -2724,7 +2740,7 @@ const EventEdit = () => {
             type="submit"
             disabled={loading}
             className="w-full bg-primary hover:bg-secondary"
-            style={selectedColor ? { backgroundColor: selectedColor } : {}}
+            style={selectedColor ? { backgroundColor: selectedColor,color: getContrastColor(selectedColor) } : {}}
           >
             {loading ? "Uodating..." : "Update Event"}
           </Button>

@@ -32,7 +32,6 @@ import {
 } from "@/components/ui/table";
 import { toast } from "@/hooks/use-toast";
 import { sendEventInvite } from "@/lib/sendInvite";
-import { createClient } from "@supabase/supabase-js";
 import { format } from "date-fns";
 import {
   AlertTriangle,
@@ -120,17 +119,9 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
       const approvedUserName = updatedProfiles?.[0]?.first_name;
       if (!approvedUserEmail) throw new Error("User email not found");
 
-      // await supabase.from("audit_logs").insert({
-      //   admin_id: currentUser?.id,
-      //   action: "approve_user",
-      //   target_type: "user",
-      //   target_id: user.user_id,
-      //   notes: "User approved via admin panel",
-      // });
-
       await sendEventInvite({
         to: approvedUserEmail,
-        subject: "🎉 Welcome to Parish – You’re Officially Approved!",
+        subject: "Welcome to Parish – You're Officially Approved!",
         html: `<!DOCTYPE html>
                   <html>
                     <head>
@@ -143,48 +134,30 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
                         <tr>
                           <td align="center">
                             <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-                              
-                              <!-- Header -->
                               <tr>
                                 <td align="center" style="background-color:#16a34a; padding:40px 20px;">
                                   <h1 style="margin:0; font-size:26px; color:#ffffff;">Account Approved ✅</h1>
                                 </td>
                               </tr>
-
-                              <!-- Body -->
                               <tr>
                                 <td style="padding:30px; font-size:16px; line-height:1.6; color:#444;">
                                   <p>Hi <strong>${approvedUserName}</strong>,</p>
-                                  <p>
-                                    Congratulations! 🎉 Your account has been 
-                                    <span style="color:#16a34a; font-weight:bold;">approved</span> by our team.
-                                  </p>
-
-                                  <p>
-                                    You now have full access to all features and services available in your account.
-                                  </p>
-
+                                  <p>Congratulations! 🎉 Your account has been <span style="color:#16a34a; font-weight:bold;">approved</span> by our team.</p>
+                                  <p>You now have full access to all features and services available in your account.</p>
                                   <p style="margin-top:20px; text-align:center;">
-                                    <a href="https://parishus.com/" 
-                                      style="display:inline-block; background-color:#16a34a; color:#ffffff; text-decoration:none; padding:14px 24px; border-radius:8px; font-weight:bold; font-size:16px;">
+                                    <a href="https://parishus.com/" style="display:inline-block; background-color:#16a34a; color:#ffffff; text-decoration:none; padding:14px 24px; border-radius:8px; font-weight:bold; font-size:16px;">
                                       Go to Dashboard
                                     </a>
                                   </p>
-
-                                  <p style="margin-top:30px; font-size:14px; color:#888;">
-                                    – The Parish Team
-                                  </p>
+                                  <p style="margin-top:30px; font-size:14px; color:#888;">– The Parish Team</p>
                                 </td>
                               </tr>
-
-                              <!-- Footer -->
                               <tr>
                                 <td align="center" style="background-color:#f3f4f6; padding:20px; font-size:12px; color:#666;">
                                   <p style="margin:0;">Parish • User Accounts</p>
                                   <p style="margin:5px 0 0;">If you did not create this account, please contact support immediately.</p>
                                 </td>
                               </tr>
-
                             </table>
                           </td>
                         </tr>
@@ -215,14 +188,6 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
       const approvedUserName = updatedProfiles?.[0]?.first_name;
       if (!approvedUserEmail) throw new Error("User email not found");
 
-      // await supabase.from("audit_logs").insert({
-      //   admin_id: currentUser?.id,
-      //   action: "reject_user",
-      //   target_type: "user",
-      //   target_id: user.user_id,
-      //   notes: "User rejected via admin panel",
-      // });
-
       await sendEventInvite({
         to: approvedUserEmail,
         subject: "Update on Your Parish Application",
@@ -238,45 +203,26 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
                         <tr>
                           <td align="center">
                             <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-                              
-                              <!-- Header -->
                               <tr>
                                 <td align="center" style="background-color:#dc2626; padding:40px 20px;">
                                   <h1 style="margin:0; font-size:26px; color:#ffffff;">Account Rejected ❌</h1>
                                 </td>
                               </tr>
-
-                              <!-- Body -->
                               <tr>
                                 <td style="padding:30px; font-size:16px; line-height:1.6; color:#444;">
                                   <p>Hi <strong>${approvedUserName}</strong>,</p>
-                                  <p>
-                                    Unfortunately, your account application has been 
-                                    <span style="color:#dc2626; font-weight:bold;">rejected</span>.
-                                  </p>
-
-                                  <p>
-                                    This may be due to incomplete information, failing verification, or not meeting our eligibility criteria.
-                                  </p>
-
-                                  <p>
-                                    If you believe this is a mistake, please reach out to our support team for further clarification.
-                                  </p>
-
-                                  <p style="margin-top:30px; font-size:14px; color:#888;">
-                                    – The Parish Team
-                                  </p>
+                                  <p>Unfortunately, your account application has been <span style="color:#dc2626; font-weight:bold;">rejected</span>.</p>
+                                  <p>This may be due to incomplete information, failing verification, or not meeting our eligibility criteria.</p>
+                                  <p>If you believe this is a mistake, please reach out to our support team for further clarification.</p>
+                                  <p style="margin-top:30px; font-size:14px; color:#888;">– The Parish Team</p>
                                 </td>
                               </tr>
-
-                              <!-- Footer -->
                               <tr>
                                 <td align="center" style="background-color:#f3f4f6; padding:20px; font-size:12px; color:#666;">
                                   <p style="margin:0;">Parish • User Accounts</p>
                                   <p style="margin:5px 0 0;">If you did not apply for this account, you can ignore this email.</p>
                                 </td>
                               </tr>
-
                             </table>
                           </td>
                         </tr>
@@ -304,15 +250,6 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
 
       if (error) throw error;
 
-      // Log audit action
-      // await supabase.from("audit_logs").insert({
-      //   admin_id: currentUser?.id,
-      //   action: "suspend_user",
-      //   target_type: "user",
-      //   target_id: user.user_id,
-      //   notes: "User suspended via admin panel",
-      // });
-
       toast({ title: "User suspended successfully" });
       onUserUpdate();
       onOpenChange(false);
@@ -329,15 +266,6 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
         .eq("user_id", user.user_id);
 
       if (error) throw error;
-
-      // Log audit action
-      // await supabase.from("audit_logs").insert({
-      //   admin_id: currentUser?.id,
-      //   action: "reactivate_user",
-      //   target_type: "user",
-      //   target_id: user.user_id,
-      //   notes: "User reactivated via admin panel",
-      // });
 
       toast({ title: "User reactivated successfully" });
       onUserUpdate();
@@ -362,15 +290,6 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
       if (error) {
         console.error("❌ Error deleting user:", error.message);
       } else {
-        // Log audit action
-        // await supabase.from("audit_logs").insert({
-        //   admin_id: currentUser?.id,
-        //   action: "delete_user",
-        //   target_type: "user",
-        //   target_id: user.user_id,
-        //   notes: "User deleted via admin panel",
-        // });
-
         toast({ title: "User deleted successfully" });
         onUserUpdate();
         onOpenChange(false);
@@ -381,7 +300,6 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
   };
 
   const handleSendEmail = async (email: string) => {
-    // This would integrate with your email service
     try {
       await sendEventInvite({
         to: [email],
@@ -395,12 +313,10 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>${emailData.subject}</title>
     <style>
-      /* Basic reset */
       body,table,td,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}
       table,td{mso-table-lspace:0pt;mso-table-rspace:0pt}
       img{border:0;height:auto;line-height:100%;outline:none;text-decoration:none}
       a[x-apple-data-detectors]{color:inherit !important;text-decoration:none !important}
-      /* Container */
       .email-body{width:100%;background-color:#f6f8fb;padding:24px 0}
       .email-card{max-width:600px;margin:0 auto;background:#ffffff;border-radius:12px;box-shadow:0 6px 18px rgba(22,28,45,0.08);overflow:hidden;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
       .header{padding:28px 32px;background:linear-gradient(90deg,#0ea5a4,#6366f1);color:#fff}
@@ -409,8 +325,6 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
       .content{padding:28px 32px;color:#0f172a;line-height:1.5}
       .title{font-size:20px;font-weight:600;margin:0 0 8px}
       .message{font-size:15px;color:#334155;margin:0 0 20px;white-space:pre-wrap}
-      .cta{display:inline-block;padding:12px 18px;border-radius:10px;background:#111827;color:#fff;text-decoration:none;font-weight:600}
-      .meta{font-size:13px;color:#64748b;margin-top:18px}
       .footer{padding:18px 32px;background:#f1f5f9;color:#64748b;font-size:13px;text-align:center}
       .small{font-size:12px;color:#9aa4b2}
       @media (max-width:420px){
@@ -421,9 +335,7 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
     </style>
   </head>
   <body>
-    <!-- preheader: short summary for inbox preview -->
     <div class="preheader">${(emailData.message.trim() || "").slice(0, 120).replace(/\\n/g, " ")}</div>
-
     <table role="presentation" class="email-body" cellpadding="0" cellspacing="0" width="100%">
       <tr>
         <td align="center">
@@ -433,18 +345,14 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
                 <div class="brand">Parish — Admin Message</div>
               </td>
             </tr>
-
             <tr>
               <td class="content">
                 <h1 class="title">${emailData.subject.trim()}</h1>
-
                 <div class="message">
                   ${(emailData.message.trim() || "").replace(/\\n/g, "<br/>")}
                 </div>
-
               </td>
             </tr>
-
             <tr>
               <td class="footer">
                 © ${new Date().getFullYear()} Parish <br/>
@@ -499,7 +407,6 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
           </DialogHeader>
 
           <div className="space-y-6">
-            {/* User Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
@@ -526,7 +433,6 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
                         "Not provided"
                       )}
                     </p>
-
                     <p>
                       <Label className="text-sm font-medium">Instagram: </Label>
                       {user.instagram_username ? (
@@ -623,7 +529,6 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
               </Card>
             </div>
 
-            {/* Subscription Info (Stub) */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center space-x-2">
@@ -649,7 +554,6 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
               </CardContent>
             </Card>
 
-            {/* RSVP History */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center space-x-2">
@@ -699,7 +603,6 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
               </CardContent>
             </Card>
 
-            {/* Events Created */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center space-x-2">
@@ -741,7 +644,6 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
               </CardContent>
             </Card>
 
-            {/* Actions */}
             <div className="flex justify-end space-x-2 pt-4 border-t">
               <Button variant="outline" onClick={() => onOpenChange(false)}>
                 Close
@@ -820,7 +722,6 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
         </DialogContent>
       </Dialog>
 
-      {/* Email Modal */}
       <Dialog open={showEmailModal} onOpenChange={setShowEmailModal}>
         <DialogContent>
           <DialogHeader>
@@ -884,7 +785,6 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
                   )}
                 </>
               )}
-
               {user.approval_status === "pending" && (
                 <>
                   <Button
@@ -954,14 +854,14 @@ const AdminUsers = () => {
   };
 
   const getUserStatusColor = (user: User) => {
-    if (user.is_suspended)
-      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
-    if (!user.onboarding_completed)
-      return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
     if (user.approval_status === "pending")
       return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
     if (user.approval_status === "rejected")
       return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+    if (user.is_suspended)
+      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+    if (!user.onboarding_completed)
+      return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
     return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
   };
 
@@ -981,15 +881,15 @@ const AdminUsers = () => {
     const matchesStatus =
       statusFilter === "all" ||
       (statusFilter === "active" &&
+        user.approval_status === "approved" &&
         !user.is_suspended &&
-        user.onboarding_completed &&
-        user.approval_status === "approved") ||
+        user.onboarding_completed) ||
       (statusFilter === "suspended" &&
-        user.is_suspended &&
-        user.approval_status === "approved") ||
+        user.approval_status === "approved" &&
+        user.is_suspended) ||
       (statusFilter === "incomplete" &&
-        !user.onboarding_completed &&
-        user.approval_status === "approved") ||
+        user.approval_status === "approved" &&
+        !user.onboarding_completed) ||
       (statusFilter === "pending" && user.approval_status === "pending") ||
       (statusFilter === "rejected" && user.approval_status === "rejected");
 
@@ -1006,7 +906,6 @@ const AdminUsers = () => {
 
   return (
     <div className="p-4 sm:p-6 space-y-6 max-w-full mx-auto">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground font-script">
@@ -1018,11 +917,9 @@ const AdminUsers = () => {
         </div>
       </div>
 
-      {/* Filters */}
       <Card>
         <CardContent className="p-4">
           <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
             <div className="flex-1 min-w-[200px]">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -1034,8 +931,6 @@ const AdminUsers = () => {
                 />
               </div>
             </div>
-
-            {/* Filter */}
             <div className="flex items-center space-x-2">
               <Filter className="h-4 w-4 text-muted-foreground" />
               <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -1056,7 +951,6 @@ const AdminUsers = () => {
         </CardContent>
       </Card>
 
-      {/* Users Table */}
       <Card>
         <CardHeader>
           <CardTitle>Users ({filteredUsers.length})</CardTitle>
@@ -1136,12 +1030,12 @@ const AdminUsers = () => {
         onOpenChange={setShowUserDetails}
         onUserUpdate={fetchUsers}
       />
+
       <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
           </DialogHeader>
-
           {editUserData && (
             <div className="space-y-4">
               <div>
@@ -1156,7 +1050,6 @@ const AdminUsers = () => {
                   }
                 />
               </div>
-
               <div>
                 <Label>Last Name</Label>
                 <Input
@@ -1169,7 +1062,6 @@ const AdminUsers = () => {
                   }
                 />
               </div>
-
               <div>
                 <Label>Role</Label>
                 <Select
@@ -1187,7 +1079,6 @@ const AdminUsers = () => {
                   </SelectContent>
                 </Select>
               </div>
-
               <div>
                 <Label>Job Title</Label>
                 <Input
@@ -1200,7 +1091,6 @@ const AdminUsers = () => {
                   }
                 />
               </div>
-
               <div>
                 <Label>City</Label>
                 <Input
@@ -1235,7 +1125,6 @@ const AdminUsers = () => {
                 }
                 placeholder="LinkedIn Username"
               />
-
               <div className="flex justify-end space-x-2">
                 <Button
                   variant="outline"

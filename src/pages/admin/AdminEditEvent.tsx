@@ -129,7 +129,12 @@ const AdminEditEvent = () => {
   const [rsvpPlans, setRsvpPlans] = useState<RsvpPlan[]>([]);
   const [deletedPlanIds, setDeletedPlanIds] = useState<string[]>([]);
   const [editingPlanIndex, setEditingPlanIndex] = useState<number | null>(null);
-  const [planForm, setPlanForm] = useState<RsvpPlan>({ title: "", description: "", price: "", capacity: "" });
+  const [planForm, setPlanForm] = useState<RsvpPlan>({
+    title: "",
+    description: "",
+    price: "",
+    capacity: "",
+  });
   const [showPlanForm, setShowPlanForm] = useState(false);
 
   const navigate = useNavigate();
@@ -609,7 +614,15 @@ const AdminEditEvent = () => {
           });
           return;
         }
-
+        if (endDateTime <= eventDateTime) {
+          toast({
+            title: "Validation Error",
+            description:
+              "End date and time must be later than the start date and time.",
+            variant: "destructive",
+          });
+          return;
+        }
         eventEndDateTime = endDateTime;
       }
 
@@ -698,7 +711,10 @@ const AdminEditEvent = () => {
           .select("id", { count: "exact", head: true })
           .eq("plan_id", planId);
         if (count && count > 0) {
-          await supabase.from("event_plans").update({ is_active: false }).eq("id", planId);
+          await supabase
+            .from("event_plans")
+            .update({ is_active: false })
+            .eq("id", planId);
         } else {
           await supabase.from("event_plans").delete().eq("id", planId);
         }
@@ -723,10 +739,15 @@ const AdminEditEvent = () => {
             is_active: true,
           };
           if (p.id) {
-            const { error: updateErr } = await supabase.from("event_plans").update(payload).eq("id", p.id);
+            const { error: updateErr } = await supabase
+              .from("event_plans")
+              .update(payload)
+              .eq("id", p.id);
             if (updateErr) throw updateErr;
           } else {
-            const { error: insertErr } = await supabase.from("event_plans").insert(payload);
+            const { error: insertErr } = await supabase
+              .from("event_plans")
+              .insert(payload);
             if (insertErr) throw insertErr;
           }
         }
@@ -843,17 +864,25 @@ const AdminEditEvent = () => {
       </div>
     );
   }
-
+  const getContrastColor = (hexColor: string): string => {
+    if (!hexColor) return "#ffffff";
+    const hex = hexColor.replace("#", "");
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance > 0.5 ? "#000000" : "#ffffff";
+  };
   return (
     <div
       className="min-h-screen bg-background"
       style={
         selectedColor
           ? ({
-            "--accent-bg": lightenColor(selectedBgColor),
-            background: "var(--accent-bg)",
-            transition: "background 0.5s ease",
-          } as React.CSSProperties)
+              "--accent-bg": lightenColor(selectedBgColor),
+              background: "var(--accent-bg)",
+              transition: "background 0.5s ease",
+            } as React.CSSProperties)
           : ({ transition: "background 0.5s ease" } as React.CSSProperties)
       }
     >
@@ -869,9 +898,9 @@ const AdminEditEvent = () => {
         style_button={
           selectedColor
             ? {
-              backgroundColor: selectedColor,
-              borderColor: selectedColor,
-            }
+                backgroundColor: selectedColor,
+                borderColor: selectedColor,
+              }
             : {}
         }
         open={emailInviteModelOpen}
@@ -893,9 +922,9 @@ const AdminEditEvent = () => {
         style_button={
           selectedColor
             ? {
-              backgroundColor: selectedColor,
-              borderColor: selectedColor,
-            }
+                backgroundColor: selectedColor,
+                borderColor: selectedColor,
+              }
             : {}
         }
         open={crossedPathInviteModelOpen}
@@ -911,8 +940,8 @@ const AdminEditEvent = () => {
             style={
               selectedBgColor
                 ? {
-                  backgroundColor: selectedBgColor,
-                }
+                    backgroundColor: selectedBgColor,
+                  }
                 : {}
             }
           >
@@ -920,10 +949,11 @@ const AdminEditEvent = () => {
               type="button"
               size="sm"
               onClick={() => setMode("sell")}
-              className={`rounded-full px-4 text-sm font-medium transition-all duration-200 ${mode === "sell"
+              className={`rounded-full px-4 text-sm font-medium transition-all duration-200 ${
+                mode === "sell"
                   ? "bg-primary text-primary-foreground shadow-lg text-lg"
                   : "bg-transparent text-muted-foreground hover:text-foreground"
-                }`}
+              }`}
               style={{
                 backgroundColor:
                   mode === "sell" ? "var(--accent-color)" : "transparent",
@@ -937,10 +967,11 @@ const AdminEditEvent = () => {
               type="button"
               size="sm"
               onClick={() => setMode("rsvp")}
-              className={`rounded-full px-4 text-sm font-medium transition-all duration-200 ${mode === "rsvp"
+              className={`rounded-full px-4 text-sm font-medium transition-all duration-200 ${
+                mode === "rsvp"
                   ? "bg-primary text-primary-foreground shadow-lg text-lg"
                   : "bg-transparent text-muted-foreground hover:text-foreground"
-                }`}
+              }`}
               style={{
                 backgroundColor:
                   mode === "rsvp" ? "var(--accent-color)" : "transparent",
@@ -1246,9 +1277,9 @@ const AdminEditEvent = () => {
                               style={
                                 selectedColor
                                   ? {
-                                    backgroundColor: selectedColor,
-                                    borderColor: selectedColor,
-                                  }
+                                      backgroundColor: selectedColor,
+                                      borderColor: selectedColor,
+                                    }
                                   : {}
                               }
                             >
@@ -1299,9 +1330,9 @@ const AdminEditEvent = () => {
                                 style={
                                   selectedColor
                                     ? {
-                                      backgroundColor: selectedColor,
-                                      borderColor: selectedColor,
-                                    }
+                                        backgroundColor: selectedColor,
+                                        borderColor: selectedColor,
+                                      }
                                     : {}
                                 }
                               >
@@ -1546,29 +1577,64 @@ const AdminEditEvent = () => {
                   {useMultiplePlans && (
                     <div className="space-y-4">
                       {rsvpPlans.length === 0 ? (
-                        <p className="text-sm text-muted-foreground italic px-1">No plans yet. Add at least one plan.</p>
+                        <p className="text-sm text-muted-foreground italic px-1">
+                          No plans yet. Add at least one plan.
+                        </p>
                       ) : (
                         <div className="space-y-3">
                           {rsvpPlans.map((plan, i) => (
-                            <div key={i} className="flex items-start justify-between gap-3 rounded-xl px-4 py-3 backdrop-blur-md bg-white/30">
+                            <div
+                              key={i}
+                              className="flex items-start justify-between gap-3 rounded-xl px-4 py-3 backdrop-blur-md bg-white/30"
+                            >
                               <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-sm">{plan.title}</p>
-                                <p className="text-xs text-muted-foreground">${plan.price}{plan.capacity ? ` · ${plan.capacity} spots` : " · Unlimited"}</p>
-                                {plan.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{plan.description}</p>}
+                                <p className="font-semibold text-sm">
+                                  {plan.title}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  ${plan.price}
+                                  {plan.capacity
+                                    ? ` · ${plan.capacity} spots`
+                                    : " · Unlimited"}
+                                </p>
+                                {plan.description && (
+                                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                    {plan.description}
+                                  </p>
+                                )}
                               </div>
                               <div className="flex gap-1 flex-shrink-0">
-                                <Button type="button" variant="ghost" size="icon" className="h-7 w-7 bg-transparent hover:bg-white/40"
-                                  onClick={() => { setEditingPlanIndex(i); setPlanForm({ ...plan }); setShowPlanForm(true); }}>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 bg-transparent hover:bg-white/40"
+                                  onClick={() => {
+                                    setEditingPlanIndex(i);
+                                    setPlanForm({ ...plan });
+                                    setShowPlanForm(true);
+                                  }}
+                                >
                                   <Edit2 className="h-3.5 w-3.5" />
                                 </Button>
-                                <Button type="button" variant="ghost" size="icon" className="h-7 w-7 bg-transparent hover:bg-white/40 text-destructive"
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 bg-transparent hover:bg-white/40 text-destructive"
                                   onClick={() => {
                                     const planToDelete = rsvpPlans[i];
                                     if (planToDelete.id) {
-                                      setDeletedPlanIds((prev) => [...prev, planToDelete.id!]);
+                                      setDeletedPlanIds((prev) => [
+                                        ...prev,
+                                        planToDelete.id!,
+                                      ]);
                                     }
-                                    setRsvpPlans((prev) => prev.filter((_, idx) => idx !== i));
-                                  }}>
+                                    setRsvpPlans((prev) =>
+                                      prev.filter((_, idx) => idx !== i),
+                                    );
+                                  }}
+                                >
                                   <Trash2 className="h-3.5 w-3.5" />
                                 </Button>
                               </div>
@@ -1578,41 +1644,125 @@ const AdminEditEvent = () => {
                       )}
                       {showPlanForm ? (
                         <div className="rounded-xl px-4 py-4 space-y-3 backdrop-blur-md bg-white/20 border border-white/30">
-                          <p className="text-sm font-semibold">{editingPlanIndex !== null ? "Edit Plan" : "New Plan"}</p>
-                          <Input placeholder="Plan title *" value={planForm.title} onChange={(e) => setPlanForm((p) => ({ ...p, title: e.target.value }))}
-                            className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black/60 focus-visible:ring-0" />
-                          <Input placeholder="Price (USD) *" type="number" min="0" step="0.01" value={planForm.price}
-                            onChange={(e) => setPlanForm((p) => ({ ...p, price: e.target.value }))}
-                            className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black/60 focus-visible:ring-0" />
-                          <Input placeholder="Capacity (leave blank for unlimited)" type="number" min="1" value={planForm.capacity}
-                            onChange={(e) => setPlanForm((p) => ({ ...p, capacity: e.target.value }))}
-                            className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black/60 focus-visible:ring-0" />
-                          <textarea placeholder="Description / benefits (optional)" value={planForm.description} rows={2}
-                            onChange={(e) => setPlanForm((p) => ({ ...p, description: e.target.value }))}
-                            className="w-full rounded-md px-3 py-2 text-sm border-none bg-white/40 placeholder:text-black/60 focus:outline-none resize-none" />
+                          <p className="text-sm font-semibold">
+                            {editingPlanIndex !== null
+                              ? "Edit Plan"
+                              : "New Plan"}
+                          </p>
+                          <Input
+                            placeholder="Plan title *"
+                            value={planForm.title}
+                            onChange={(e) =>
+                              setPlanForm((p) => ({
+                                ...p,
+                                title: e.target.value,
+                              }))
+                            }
+                            className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black/60 focus-visible:ring-0"
+                          />
+                          <Input
+                            placeholder="Price (USD) *"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={planForm.price}
+                            onChange={(e) =>
+                              setPlanForm((p) => ({
+                                ...p,
+                                price: e.target.value,
+                              }))
+                            }
+                            className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black/60 focus-visible:ring-0"
+                          />
+                          <Input
+                            placeholder="Capacity (leave blank for unlimited)"
+                            type="number"
+                            min="1"
+                            value={planForm.capacity}
+                            onChange={(e) =>
+                              setPlanForm((p) => ({
+                                ...p,
+                                capacity: e.target.value,
+                              }))
+                            }
+                            className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black/60 focus-visible:ring-0"
+                          />
+                          <textarea
+                            placeholder="Description / benefits (optional)"
+                            value={planForm.description}
+                            rows={2}
+                            onChange={(e) =>
+                              setPlanForm((p) => ({
+                                ...p,
+                                description: e.target.value,
+                              }))
+                            }
+                            className="w-full rounded-md px-3 py-2 text-sm border-none bg-white/40 placeholder:text-black/60 focus:outline-none resize-none"
+                          />
                           <div className="flex gap-2">
-                            <Button type="button" size="sm" className="flex-1 bg-transparent backdrop-blur-md bg-white/40 text-black hover:bg-white/60"
+                            <Button
+                              type="button"
+                              size="sm"
+                              className="flex-1 bg-transparent backdrop-blur-md bg-white/40 text-black hover:bg-white/60"
                               onClick={() => {
-                                if (!planForm.title || !planForm.price) { toast({ title: "Title and price are required", variant: "destructive" }); return; }
+                                if (!planForm.title || !planForm.price) {
+                                  toast({
+                                    title: "Title and price are required",
+                                    variant: "destructive",
+                                  });
+                                  return;
+                                }
                                 if (editingPlanIndex !== null) {
-                                  setRsvpPlans((prev) => prev.map((p, i) => (i === editingPlanIndex ? planForm : p)));
+                                  setRsvpPlans((prev) =>
+                                    prev.map((p, i) =>
+                                      i === editingPlanIndex ? planForm : p,
+                                    ),
+                                  );
                                 } else {
                                   setRsvpPlans((prev) => [...prev, planForm]);
                                 }
-                                setPlanForm({ title: "", description: "", price: "", capacity: "" });
-                                setEditingPlanIndex(null); setShowPlanForm(false);
-                              }}>
-                              {editingPlanIndex !== null ? "Save Changes" : "Add Plan"}
+                                setPlanForm({
+                                  title: "",
+                                  description: "",
+                                  price: "",
+                                  capacity: "",
+                                });
+                                setEditingPlanIndex(null);
+                                setShowPlanForm(false);
+                              }}
+                            >
+                              {editingPlanIndex !== null
+                                ? "Save Changes"
+                                : "Add Plan"}
                             </Button>
-                            <Button type="button" variant="ghost" size="sm" className="bg-transparent hover:bg-white/20"
-                              onClick={() => { setShowPlanForm(false); setEditingPlanIndex(null); setPlanForm({ title: "", description: "", price: "", capacity: "" }); }}>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="bg-transparent hover:bg-white/20"
+                              onClick={() => {
+                                setShowPlanForm(false);
+                                setEditingPlanIndex(null);
+                                setPlanForm({
+                                  title: "",
+                                  description: "",
+                                  price: "",
+                                  capacity: "",
+                                });
+                              }}
+                            >
                               Cancel
                             </Button>
                           </div>
                         </div>
                       ) : (
-                        <Button type="button" variant="outline" size="sm" onClick={() => setShowPlanForm(true)}
-                          className="border-none rounded-full flex items-center gap-2 bg-transparent backdrop-blur-md bg-white/40 hover:bg-white/60">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowPlanForm(true)}
+                          className="border-none rounded-full flex items-center gap-2 bg-transparent backdrop-blur-md bg-white/40 hover:bg-white/60"
+                        >
                           <Plus className="h-4 w-4" /> Add Plan
                         </Button>
                       )}
@@ -1813,7 +1963,9 @@ const AdminEditEvent = () => {
                     />
                   </div>
                   {formData.showRsvpCount && (
-                    <p className="mt-2 px-4 text-sm text-muted-foreground">42 people going</p>
+                    <p className="mt-2 px-4 text-sm text-muted-foreground">
+                      42 people going
+                    </p>
                   )}
                 </div>
 
@@ -1856,9 +2008,9 @@ const AdminEditEvent = () => {
                             style={
                               selectedColor
                                 ? {
-                                  backgroundColor: selectedColor,
-                                  borderColor: selectedColor,
-                                }
+                                    backgroundColor: selectedColor,
+                                    borderColor: selectedColor,
+                                  }
                                 : {}
                             }
                           >
@@ -1921,10 +2073,10 @@ const AdminEditEvent = () => {
                                             );
                                             const end =
                                               feature.end_date &&
-                                                feature.end_time
+                                              feature.end_time
                                                 ? new Date(
-                                                  `${feature.end_date}T${feature.end_time}`,
-                                                )
+                                                    `${feature.end_date}T${feature.end_time}`,
+                                                  )
                                                 : null;
 
                                             // Format like 28/10 04:23pm
@@ -2014,9 +2166,9 @@ const AdminEditEvent = () => {
                               style={
                                 selectedColor
                                   ? {
-                                    backgroundColor: selectedColor,
-                                    borderColor: selectedColor,
-                                  }
+                                      backgroundColor: selectedColor,
+                                      borderColor: selectedColor,
+                                    }
                                   : {}
                               }
                             >
@@ -2121,9 +2273,9 @@ const AdminEditEvent = () => {
                       style_button={
                         selectedColor
                           ? {
-                            backgroundColor: selectedColor,
-                            borderColor: selectedColor,
-                          }
+                              backgroundColor: selectedColor,
+                              borderColor: selectedColor,
+                            }
                           : {}
                       }
                       onImagesUploaded={(urls) => {
@@ -2287,9 +2439,9 @@ const AdminEditEvent = () => {
                     style={
                       selectedColor
                         ? {
-                          backgroundColor: selectedColor,
-                          borderColor: selectedColor,
-                        }
+                            backgroundColor: selectedColor,
+                            borderColor: selectedColor,
+                          }
                         : {}
                     }
                   >
@@ -2307,12 +2459,12 @@ const AdminEditEvent = () => {
                         style={
                           selectedColor
                             ? {
-                              backgroundColor: selectedColor,
-                              borderColor: selectedColor,
-                            }
+                                backgroundColor: selectedColor,
+                                borderColor: selectedColor,
+                              }
                             : {}
                         }
-                      // onClick={() => removeTag(tag)}
+                        // onClick={() => removeTag(tag)}
                       >
                         {tag}
                         <span className="" onClick={() => removeTag(tag)}>
@@ -2512,10 +2664,11 @@ const AdminEditEvent = () => {
                             type="button"
                             size="icon"
                             key={i}
-                            className={`w-7 h-7 rounded-md border transition-all hover:scale-105 ${selectedColor === color
+                            className={`w-7 h-7 rounded-md border transition-all hover:scale-105 ${
+                              selectedColor === color
                                 ? "ring-2 ring-offset-2 ring-primary"
                                 : "ring-0"
-                              }`}
+                            }`}
                             style={{ backgroundColor: color }}
                             onClick={() => {
                               setSelectedColor(color);
@@ -2605,10 +2758,11 @@ const AdminEditEvent = () => {
                                 handleColorChange(selectedColor);
                                 handleToggleBg(checked as boolean);
                               }}
-                              className={`w-4 h-4 border  ${formData.bg_color
+                              className={`w-4 h-4 border  ${
+                                formData.bg_color
                                   ? "backdrop-blur-md bg-white/40 border-black"
                                   : "bg-transparent border-red"
-                                }`}
+                              }`}
                             />
                           </div>
                         </>
@@ -2627,9 +2781,10 @@ const AdminEditEvent = () => {
               style={
                 selectedColor
                   ? {
-                    backgroundColor: selectedColor,
-                    borderColor: selectedColor,
-                  }
+                      backgroundColor: selectedColor,
+                      borderColor: selectedColor,
+                      color: getContrastColor(selectedColor),
+                    }
                   : {}
               }
             >
@@ -2656,8 +2811,8 @@ const AdminEditEvent = () => {
           start_time={
             formData.start_date && formData.start_time
               ? new Date(
-                `${formData.start_date}T${formData.start_time}`,
-              ).toISOString()
+                  `${formData.start_date}T${formData.start_time}`,
+                ).toISOString()
               : null
           }
           onSubmit={(data) => {

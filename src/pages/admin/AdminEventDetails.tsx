@@ -827,7 +827,7 @@ const AdminEventDetails = () => {
                       <Share2 className="h-4 w-4" />
                     </Button>
 
-                    <Link to={`/event/${event.id}/edit`}>
+                    <Link to={`/admin/event/${event.id}/edit`}>
                       <Button
                         variant="outline"
                         size="sm"

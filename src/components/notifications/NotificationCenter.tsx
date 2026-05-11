@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useProfile } from "@/hooks/useProfile";
 import { Badge } from "@/components/ui/badge";
-import { Bell, Check, X, Calendar, Users, Heart, Wallet } from "lucide-react";
+import { Bell, Check, Calendar, Users, Heart, Wallet } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import "@/index.css";
 import {
@@ -29,7 +29,8 @@ interface Notification {
     | "feedback_request"
     | "general"
     | "rsvp_received"
-    | "wallet_update";
+    | "wallet_update"
+    | "user_registered";
   is_read: boolean;
   created_at: string;
   data?: any;
@@ -39,6 +40,7 @@ const NotificationCenter = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
   const { user } = useAuth();
   const { profile } = useProfile();
 
@@ -48,21 +50,20 @@ const NotificationCenter = () => {
       subscribeToNotifications();
     }
   }, [user, profile]);
+
   const fetchNotifications = async () => {
     if (!user || !profile?.id) return;
-
     try {
       const { data, error } = await supabase
         .from("notifications")
         .select("*")
         .eq("user_id", profile.id)
+        .eq("is_read", false)
         .order("created_at", { ascending: false })
         .limit(20);
-
       if (error) throw error;
-
       setNotifications(data || []);
-      setUnreadCount(data?.filter((n) => !n.is_read).length || 0);
+      setUnreadCount(data?.length || 0);
     } catch (error) {
       console.error("Error fetching notifications:", error);
     }
@@ -70,7 +71,6 @@ const NotificationCenter = () => {
 
   const subscribeToNotifications = () => {
     if (!user) return;
-
     const channel = supabase
       .channel("notifications")
       .on(
@@ -85,8 +85,6 @@ const NotificationCenter = () => {
           const newNotification = payload.new as Notification;
           setNotifications((prev) => [newNotification, ...prev]);
           setUnreadCount((prev) => prev + 1);
-
-          // Show toast for new notification
           toast({
             title: newNotification.title,
             description: newNotification.message,
@@ -94,44 +92,22 @@ const NotificationCenter = () => {
         }
       )
       .subscribe();
-
     return () => {
       supabase.removeChannel(channel);
     };
   };
 
-  const markAsRead = async (notificationId: string) => {
+  const markAllAsRead = async () => {
+    if (!user) return;
+    setLoading(true);
     try {
       const { error } = await supabase
         .from("notifications")
         .update({ is_read: true })
-        .eq("id", notificationId);
-
-      if (error) throw error;
-
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === notificationId ? { ...n, is_read: true } : n))
-      );
-      setUnreadCount((prev) => Math.max(0, prev - 1));
-    } catch (error) {
-      console.error("Error marking notification as read:", error);
-    }
-  };
-
-  const markAllAsRead = async () => {
-    if (!user) return;
-    setLoading(true);
-
-    try {
-      const { error } = await supabase
-        .from("notifications")
-        .update({ "is_read": true })
         .eq("user_id", profile.id)
         .eq("is_read", false);
-
       if (error) throw error;
-
-      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+      setNotifications([]);
       setUnreadCount(0);
     } catch (error) {
       console.error("Error marking all as read:", error);
@@ -140,10 +116,69 @@ const NotificationCenter = () => {
     }
   };
 
+  const getNotificationUrl = (notification: Notification): string => {
+    let parsedData: any = {};
+    try {
+      parsedData =
+        typeof notification.data === "string"
+          ? JSON.parse(notification.data)
+          : notification.data || {};
+    } catch {
+      parsedData = {};
+    }
+
+    switch (notification.type) {
+      case "user_registered":
+        return "/admin/users";
+      case "rsvp_received":
+        return parsedData?.event_id
+          ? `/admin/event/${parsedData.event_id}/details`
+          : "/admin/rsvps";
+      case "rsvp_confirmation":
+        return parsedData?.event_id
+          ? `/rsvp/${parsedData.event_id}/details`
+          : "/rsvps";
+      case "wallet_update":
+        return "/wallet/withdraw";
+      case "crossed_paths_match":
+        return "/crossed-paths";
+      case "event_reminder":
+        return parsedData?.event_id
+          ? `/event/${parsedData.event_id}/details`
+          : "/events";
+      case "feedback_request":
+        return "/feedback";
+      default:
+        return "/dashboard";
+    }
+  };
+
+  const handleNotificationClick = (notification: Notification) => {
+    const url = getNotificationUrl(notification);
+
+    if (!notification.is_read) {
+      setNotifications((prev) =>
+        prev.filter((n) => n.id !== notification.id)
+      );
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+
+      supabase
+        .from("notifications")
+        .update({ is_read: true })
+        .eq("id", notification.id)
+        .then(({ error }) => {
+          if (error) console.error("Error marking as read:", error);
+        });
+    }
+
+    setOpen(false);
+    window.location.href = url;
+  };
+
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case "rsvp_confirmation":
-        return <Calendar className="h-4 w-4  " />;
+        return <Calendar className="h-4 w-4" />;
       case "event_reminder":
         return <Bell className="h-4 w-4 text-blue-500" />;
       case "crossed_paths_match":
@@ -158,7 +193,7 @@ const NotificationCenter = () => {
   };
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button
           variant="outline"
@@ -195,7 +230,6 @@ const NotificationCenter = () => {
         </SheetHeader>
 
         <div className="mt-6 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
-          {/* Invitation Notifications */}
           <InvitationNotifications onInvitationUpdate={fetchNotifications} />
 
           {notifications.length === 0 ? (
@@ -216,12 +250,8 @@ const NotificationCenter = () => {
               {notifications.map((notification) => (
                 <Card
                   key={notification.id}
-                  className={`shadow-card border-border cursor-pointer transition-colors ${
-                    !notification.is_read ? "" : ""
-                  }`}
-                  onClick={() =>
-                    !notification.is_read && markAsRead(notification.id)
-                  }
+                  className="shadow-card border-border cursor-pointer transition-all hover:bg-muted/50 border-l-4 border-l-primary"
+                  onClick={() => handleNotificationClick(notification)}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start space-x-3">
@@ -230,28 +260,21 @@ const NotificationCenter = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <h4 className="text-sm font-semibold text-foreground truncate">
+                          <h4 className="text-sm truncate font-bold text-foreground">
                             {notification.title}
                           </h4>
-                          {!notification.is_read && (
-                            <div className="h-2 w-2 rounded-full flex-shrink-0 ml-2" />
-                          )}
+                          <div className="h-2 w-2 rounded-full bg-primary flex-shrink-0 ml-2" />
                         </div>
                         <p className="text-sm text-muted-foreground mt-1">
                           {notification.message}
                         </p>
                         <p className="text-xs text-muted-foreground mt-2">
-                          {new Date(
-                            notification.created_at
-                          ).toLocaleDateString()}{" "}
+                          {new Date(notification.created_at).toLocaleDateString()}{" "}
                           at{" "}
-                          {new Date(notification.created_at).toLocaleTimeString(
-                            [],
-                            {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            }
-                          )}
+                          {new Date(notification.created_at).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
                         </p>
                       </div>
                     </div>

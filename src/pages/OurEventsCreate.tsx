@@ -1351,7 +1351,10 @@ const OurEventsCreate = () => {
                         placeholder="0.00"
                         value={formData.event_fee ?? ""}
                         onChange={(e) =>
-                          handleInputChange("event_fee", parseFloat(e.target.value))
+                          handleInputChange(
+                            "event_fee",
+                            parseFloat(e.target.value),
+                          )
                         }
                         className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black focus-visible:ring-0 focus:ring-0 focus-visible:ring-offset-0 focus:border-none focus:outline-none"
                         required={mode === "sell" && !useMultiplePlans}
@@ -1374,10 +1377,14 @@ const OurEventsCreate = () => {
                               className="flex items-start justify-between gap-3 rounded-xl px-4 py-3 bg-transparent backdrop-blur-md bg-white/30"
                             >
                               <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-sm">{plan.title}</p>
+                                <p className="font-semibold text-sm">
+                                  {plan.title}
+                                </p>
                                 <p className="text-xs text-muted-foreground">
                                   ${plan.price}
-                                  {plan.capacity ? ` · ${plan.capacity} spots` : " · Unlimited"}
+                                  {plan.capacity
+                                    ? ` · ${plan.capacity} spots`
+                                    : " · Unlimited"}
                                 </p>
                                 {plan.description && (
                                   <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
@@ -1405,7 +1412,9 @@ const OurEventsCreate = () => {
                                   size="icon"
                                   className="h-7 w-7 bg-transparent hover:bg-white/40 text-destructive"
                                   onClick={() =>
-                                    setRsvpPlans((prev) => prev.filter((_, idx) => idx !== i))
+                                    setRsvpPlans((prev) =>
+                                      prev.filter((_, idx) => idx !== i),
+                                    )
                                   }
                                 >
                                   <Trash2 className="h-3.5 w-3.5" />
@@ -1420,12 +1429,19 @@ const OurEventsCreate = () => {
                       {showPlanForm ? (
                         <div className="rounded-xl px-4 py-4 space-y-3 bg-transparent backdrop-blur-md bg-white/20 border border-white/30">
                           <p className="text-sm font-semibold">
-                            {editingPlanIndex !== null ? "Edit Plan" : "New Plan"}
+                            {editingPlanIndex !== null
+                              ? "Edit Plan"
+                              : "New Plan"}
                           </p>
                           <Input
                             placeholder="Plan title (e.g. General Admission) *"
                             value={planForm.title}
-                            onChange={(e) => setPlanForm((p) => ({ ...p, title: e.target.value }))}
+                            onChange={(e) =>
+                              setPlanForm((p) => ({
+                                ...p,
+                                title: e.target.value,
+                              }))
+                            }
                             className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black/60 focus-visible:ring-0"
                           />
                           <Input
@@ -1434,7 +1450,12 @@ const OurEventsCreate = () => {
                             min="0"
                             step="0.01"
                             value={planForm.price}
-                            onChange={(e) => setPlanForm((p) => ({ ...p, price: e.target.value }))}
+                            onChange={(e) =>
+                              setPlanForm((p) => ({
+                                ...p,
+                                price: e.target.value,
+                              }))
+                            }
                             className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black/60 focus-visible:ring-0"
                           />
                           <Input
@@ -1442,14 +1463,24 @@ const OurEventsCreate = () => {
                             type="number"
                             min="1"
                             value={planForm.capacity}
-                            onChange={(e) => setPlanForm((p) => ({ ...p, capacity: e.target.value }))}
+                            onChange={(e) =>
+                              setPlanForm((p) => ({
+                                ...p,
+                                capacity: e.target.value,
+                              }))
+                            }
                             className="border-none bg-transparent backdrop-blur-md bg-white/40 placeholder:text-black/60 focus-visible:ring-0"
                           />
                           <textarea
                             placeholder="Description / benefits (optional)"
                             value={planForm.description}
                             rows={2}
-                            onChange={(e) => setPlanForm((p) => ({ ...p, description: e.target.value }))}
+                            onChange={(e) =>
+                              setPlanForm((p) => ({
+                                ...p,
+                                description: e.target.value,
+                              }))
+                            }
                             className="w-full rounded-md px-3 py-2 text-sm border-none bg-white/40 placeholder:text-black/60 focus:outline-none resize-none"
                           />
                           <div className="flex gap-2">
@@ -1459,22 +1490,34 @@ const OurEventsCreate = () => {
                               className="flex-1 bg-transparent backdrop-blur-md bg-white/40 text-black hover:bg-white/60"
                               onClick={() => {
                                 if (!planForm.title || !planForm.price) {
-                                  toast({ title: "Title and price are required", variant: "destructive" });
+                                  toast({
+                                    title: "Title and price are required",
+                                    variant: "destructive",
+                                  });
                                   return;
                                 }
                                 if (editingPlanIndex !== null) {
                                   setRsvpPlans((prev) =>
-                                    prev.map((p, i) => (i === editingPlanIndex ? planForm : p))
+                                    prev.map((p, i) =>
+                                      i === editingPlanIndex ? planForm : p,
+                                    ),
                                   );
                                 } else {
                                   setRsvpPlans((prev) => [...prev, planForm]);
                                 }
-                                setPlanForm({ title: "", description: "", price: "", capacity: "" });
+                                setPlanForm({
+                                  title: "",
+                                  description: "",
+                                  price: "",
+                                  capacity: "",
+                                });
                                 setEditingPlanIndex(null);
                                 setShowPlanForm(false);
                               }}
                             >
-                              {editingPlanIndex !== null ? "Save Changes" : "Add Plan"}
+                              {editingPlanIndex !== null
+                                ? "Save Changes"
+                                : "Add Plan"}
                             </Button>
                             <Button
                               type="button"
@@ -1484,7 +1527,12 @@ const OurEventsCreate = () => {
                               onClick={() => {
                                 setShowPlanForm(false);
                                 setEditingPlanIndex(null);
-                                setPlanForm({ title: "", description: "", price: "", capacity: "" });
+                                setPlanForm({
+                                  title: "",
+                                  description: "",
+                                  price: "",
+                                  capacity: "",
+                                });
                               }}
                             >
                               Cancel
@@ -1644,7 +1692,9 @@ const OurEventsCreate = () => {
                     />
                   </div>
                   {formData.showRsvpCount && (
-                    <p className="mt-2 px-4 text-sm text-muted-foreground">42 people going</p>
+                    <p className="mt-2 px-4 text-sm text-muted-foreground">
+                      42 people going
+                    </p>
                   )}
                 </div>
 
@@ -2207,6 +2257,7 @@ const OurEventsCreate = () => {
                   ? {
                       backgroundColor: selectedColor,
                       borderColor: selectedColor,
+                      color: getContrastColor(selectedColor),
                     }
                   : {}
               }
@@ -2220,7 +2271,14 @@ const OurEventsCreate = () => {
             type="submit"
             disabled={loading}
             className="w-full bg-primary hover:bg-secondary"
-            style={selectedColor ? { backgroundColor: selectedColor } : {}}
+            style={
+              selectedColor
+                ? {
+                    backgroundColor: selectedColor,
+                    color: getContrastColor(selectedColor),
+                  }
+                : {}
+            }
           >
             {loading ? "Creating..." : "Create Event"}
           </Button>
