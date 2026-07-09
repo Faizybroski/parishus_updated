@@ -23,9 +23,9 @@ const onboardingCards = [
   },
   {
     id: 2,
-    title: "Join Our Weekly Mystery Dinners",
+    title: "Join Out Weekly Mystery Activities",
     description:
-      "Every Thursday RSVP for a dining event. We'll reveal the restaurant and guests the day before.",
+      "Every week RSVP for a Parish event. We’ll reveal the location and guest the day before.",
     image: "/images/Carousel 1.png",
   },
   {

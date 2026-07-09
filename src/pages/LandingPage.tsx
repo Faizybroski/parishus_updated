@@ -221,7 +221,7 @@ export const ParishUsLanding: React.FC = () => {
                 </li>
                 <li className="flex items-center">
                   <Check className="h-5 w-5 mr-2 text-primary" />
-                  Dinners, coffee, or tea - every week
+                  Dinners, Wellness and Weekly experiences
                 </li>
               </ul>
               <p className="mt-2 text-sm text-foreground/80 leading-relaxed">
